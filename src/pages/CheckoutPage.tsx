@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
@@ -23,11 +23,15 @@ const CheckoutPage = () => {
 
   // Check for cart items on mount and save to session storage to prevent loss
   useEffect(() => {
+    // Se não começamos o checkout e há itens no carrinho, salvar no sessionStorage
     if (!hasStartedCheckout && cartItems.length > 0) {
       sessionStorage.setItem('checkoutCartItems', JSON.stringify(cartItems));
       setHasStartedCheckout(true);
+      return; // Early return para evitar executar o resto
     } 
-    else if (cartItems.length === 0) {
+    
+    // Se o carrinho está vazio E já começamos o checkout, verificar sessionStorage
+    if (cartItems.length === 0 && hasStartedCheckout) {
       const savedCartItems = sessionStorage.getItem('checkoutCartItems');
       
       if (!savedCartItems || JSON.parse(savedCartItems).length === 0) {
@@ -35,25 +39,25 @@ const CheckoutPage = () => {
         toast.error("Seu carrinho está vazio");
       }
     }
-  }, [cartItems, navigate, hasStartedCheckout]);
+  }, [cartItems.length, hasStartedCheckout, navigate]); // Adicionar navigate
 
   // Handle successful authentication
-  const handleAuthSuccess = () => {
+  const handleAuthSuccess = useCallback(() => {
     setCurrentStep(1); // Ir direto para pagamento
-  };
+  }, []);
 
   // Handle going back to previous step
-  const handlePreviousStep = () => {
+  const handlePreviousStep = useCallback(() => {
     setCurrentStep(0); // Voltar para autenticação
-  };
+  }, []);
 
   // Handle successful order completion
-  const handleOrderSuccess = (orderId: string) => {
+  const handleOrderSuccess = useCallback((orderId: string) => {
     sessionStorage.removeItem('checkoutCartItems');
     sessionStorage.removeItem('pendingCheckout');
     clearCart();
     navigate(`/order-success/${orderId}`);
-  };
+  }, [clearCart, navigate]);
 
   // Animation variants
   const pageVariants = {
