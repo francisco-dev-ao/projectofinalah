@@ -202,14 +202,23 @@ export function useCheckoutOrder() {
             console.log("Inserting domain with data:", domainData);
             
             const { data: insertedDomain, error } = await supabase
-              .from('domains')
-              .insert(domainData)
+              .from('domain_orders')
+              .insert({
+                domain_name: domainName,
+                tld_type: tld,
+                price: domainItem.price || 0,
+                duration: domainItem.duration || 12,
+                user_id: user.id,
+                order_id: result.orderId,
+                status: 'pending',
+                created_at: new Date().toISOString()
+              })
               .select()
               .single();
               
             if (error) {
               console.error(`Error registering domain ${domainName}:`, error);
-              toast.error(`Erro ao registrar domínio ${domainName}`);
+              toast.error(`Erro ao registrar domínio ${domainName}: ${error.message}`);
             } else {
               console.log(`Domain registered successfully:`, insertedDomain);
               toast.success(`Domínio ${domainName} registrado com sucesso!`);
@@ -236,14 +245,26 @@ export function useCheckoutOrder() {
               };
               
               const { data: insertedDomain, error } = await supabase
-                .from('domains')
-                .insert(domainData)
+                .from('domain_orders')
+                .insert({
+                  domain_name: domainName,
+                  tld_type: 'custom',
+                  price: 0,
+                  duration: 12,
+                  user_id: user.id,
+                  order_id: result.orderId,
+                  status: 'pending',
+                  created_at: new Date().toISOString()
+                })
                 .select()
                 .single();
                 
               if (!error) {
                 console.log(`Custom domain registered:`, insertedDomain);
                 toast.success(`Domínio personalizado ${domainName} registrado!`);
+              } else {
+                console.error(`Error registering custom domain:`, error);
+                toast.error(`Erro ao registrar domínio personalizado: ${error.message}`);
               }
             } catch (err) {
               console.error(`Error registering custom domain:`, err);

@@ -31,9 +31,38 @@ export function useAllCustomerDomains(userId?: string): UseAllCustomerDomains {
   // Buscar domínios já registrados
   const fetchRegisteredDomains = async () => {
     if (!userId) return [];
+    
+    // Buscar da tabela domains (domínios já processados)
     const { domains: registeredDomains } = await getUserDomains(userId);
-    console.log("Domínios registrados carregados:", registeredDomains);
-    return registeredDomains as Domain[];
+    console.log("Domínios registrados (domains table):", registeredDomains);
+    
+    // Buscar da tabela domain_orders (domínios dos pedidos)
+    const { data: domainOrders, error } = await supabase
+      .from('domain_orders')
+      .select('*')
+      .eq('user_id', userId);
+      
+    if (error) {
+      console.error("Erro ao buscar domain_orders:", error);
+    } else {
+      console.log("Domínios de pedidos (domain_orders table):", domainOrders);
+    }
+    
+    // Combinar ambas as fontes
+    const allDomains = [
+      ...registeredDomains,
+      ...(domainOrders || []).map(order => ({
+        id: order.id,
+        domain_name: order.domain_name,
+        tld: order.tld_type || 'ao',
+        status: order.status || 'pending',
+        registration_date: order.created_at,
+        expiration_date: null,
+        user_id: order.user_id
+      }))
+    ];
+    
+    return allDomains as Domain[];
   };
 
   // Buscar domínios presentes nos pedidos do usuário

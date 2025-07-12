@@ -39,8 +39,16 @@ const DomainsManagement = () => {
         .select(`
           *,
           orders (
-            *,
-            profiles:user_id (*)
+            id,
+            status,
+            total_amount,
+            created_at,
+            profiles:user_id (
+              id,
+              name,
+              email,
+              company_name
+            )
           )
         `)
         .order('created_at', { ascending: false });
