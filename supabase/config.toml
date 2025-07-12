@@ -1,0 +1,20 @@
+
+project_id = "qitelgupnfdszpioxmnm"
+[functions.multicaixa-callback]
+verify_jwt = false
+
+[functions.create-invoice-bucket]
+verify_jwt = false
+
+[functions.generate-invoice-pdf]
+verify_jwt = false
+
+[functions.test-smtp]
+verify_jwt = false
+
+[functions.send-invoice-email]
+verify_jwt = false
+
+[functions.wallet-payment-webhook]
+verify_jwt = false
+

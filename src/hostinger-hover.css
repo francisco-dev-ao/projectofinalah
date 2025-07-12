@@ -1,0 +1,49 @@
+/* Efeitos de hover inspirados na Hostinger */
+
+/* Botão */
+.btn-hostinger {
+  transition: all 0.2s cubic-bezier(.4,0,.2,1);
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.04);
+  background: linear-gradient(90deg, #673de6 0%, #4f2cc9 100%);
+  color: #fff;
+  border-radius: 8px;
+  font-weight: 600;
+}
+.btn-hostinger:hover, .btn-hostinger:focus {
+  background: linear-gradient(90deg, #7c4dff 0%, #512da8 100%);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 24px 0 rgba(103,61,230,0.18);
+  color: #fff;
+}
+
+/* Card */
+.card-hostinger {
+  transition: box-shadow 0.2s cubic-bezier(.4,0,.2,1), transform 0.2s cubic-bezier(.4,0,.2,1);
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.04);
+  border-radius: 12px;
+  background: #fff;
+}
+.card-hostinger:hover {
+  box-shadow: 0 8px 32px 0 rgba(103,61,230,0.12);
+  transform: translateY(-4px) scale(1.01);
+  border-color: #673de6;
+}
+
+/* Tabela (linha) */
+.table-row-hostinger {
+  transition: background 0.2s cubic-bezier(.4,0,.2,1);
+}
+.table-row-hostinger:hover {
+  background: #f3f0fd;
+}
+
+/* Link */
+.link-hostinger {
+  color: #673de6;
+  transition: color 0.2s cubic-bezier(.4,0,.2,1);
+  text-decoration: underline dotted 1.5px;
+}
+.link-hostinger:hover {
+  color: #512da8;
+  text-decoration: underline solid 2px;
+}

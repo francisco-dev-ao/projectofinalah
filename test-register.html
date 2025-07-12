@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Registro</title>
+</head>
+<body>
+    <h1>Teste de Registro</h1>
+    <p>Testando URL com parâmetros:</p>
+    <a href="http://localhost:8080/register?nif=5000088927&company_name=ANGOHOST+-+PRESTA%C3%87AO+DE+SERVI%C3%87OS%2C+LDA&address=Luanda" target="_blank">
+        Testar Registro com Parâmetros
+    </a>
+    
+    <h2>Parâmetros da URL:</h2>
+    <ul>
+        <li>NIF: 5000088927</li>
+        <li>Nome da Empresa: ANGOHOST - PRESTAÇÃO DE SERVIÇOS, LDA</li>
+        <li>Endereço: Luanda</li>
+    </ul>
+    
+    <h2>URL Decodificada:</h2>
+    <p>http://localhost:8080/register?nif=5000088927&company_name=ANGOHOST - PRESTAÇÃO DE SERVIÇOS, LDA&address=Luanda</p>
+    
+    <script>
+        // Testar decodificação de URL
+        const url = new URL(window.location.href);
+        const params = new URLSearchParams(url.search);
+        
+        console.log('Parâmetros da URL atual:', {
+            nif: params.get('nif'),
+            company_name: params.get('company_name'),
+            address: params.get('address')
+        });
+        
+        // Testar decodificação
+        const decodedCompanyName = params.get('company_name') ? decodeURIComponent(params.get('company_name')) : '';
+        console.log('Nome da empresa decodificado:', decodedCompanyName);
+    </script>
+</body>
+</html> 
