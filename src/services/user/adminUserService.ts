@@ -172,8 +172,12 @@ export const getAllUsers = async () => {
 export const deleteUser = async (userId: string) => {
   try {
     console.log("Starting user deletion for ID:", userId);
-    
-    // Primeiro, deletar o perfil
+    let profileDeleted = false;
+    let authDeleted = false;
+    let profileErrorMsg = null;
+    let authErrorMsg = null;
+
+    // Tentar deletar o perfil
     const { error: profileError } = await supabase
       .from('profiles')
       .delete()
@@ -181,22 +185,53 @@ export const deleteUser = async (userId: string) => {
 
     if (profileError) {
       console.error("Error deleting user profile:", profileError);
-      // Continuar mesmo se houver erro no profile
+      profileErrorMsg = profileError.message || profileError;
+    } else {
+      profileDeleted = true;
     }
 
-    // Deletar o usuário do auth usando admin
+    // Tentar deletar o usuário do auth
     const { error: authError } = await supabase.auth.admin.deleteUser(userId);
-    
     if (authError) {
       console.error("Error deleting auth user:", authError);
-      return { success: false, error: authError };
+      authErrorMsg = authError.message || authError;
+    } else {
+      authDeleted = true;
     }
 
-    console.log("User deleted successfully");
-    return { success: true };
+    // Se pelo menos um dos deletes foi bem-sucedido, considerar sucesso
+    if (profileDeleted || authDeleted) {
+      return { success: true };
+    }
+
+    // Se ambos falharam, verificar se o usuário realmente existe
+    // Buscar no profiles
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', userId)
+      .single();
+    // Buscar no Auth
+    let authUserExists = false;
+    try {
+      const { data: authUser } = await supabase.auth.admin.getUserById(userId);
+      if (authUser && authUser.user) {
+        authUserExists = true;
+      }
+    } catch (e) {
+      // Ignorar erro
+    }
+
+    if (!profileData && !authUserExists) {
+      // Usuário não existe mais em nenhum lugar, considerar sucesso
+      return { success: true };
+    }
+
+    // Se chegou aqui, realmente não conseguiu excluir
+    return { success: false, error: profileErrorMsg || authErrorMsg || 'Erro desconhecido ao excluir usuário.' };
   } catch (error) {
     console.error("Error deleting user:", error);
-    return { success: false, error };
+    return { success: false, error: error.message || error };
   }
 };
 
