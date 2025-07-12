@@ -123,7 +123,7 @@ const printInvoice = async (invoice: any, requireReference = true): Promise<void
 
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-const generateInvoicePDF = async (invoice: any, requireReference = true): Promise<Buffer> => {
+const generateInvoicePDF = async (invoice: any, requireReference = true): Promise<Uint8Array> => {
   try {
     // Atualizar a referência de pagamento, se necessário
     const updatedInvoice = await updateInvoiceReference(invoice, requireReference);
@@ -261,7 +261,7 @@ const generateInvoicePDF = async (invoice: any, requireReference = true): Promis
       const imgData = canvas.toDataURL('image/png');
       pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
       const arrayBuffer = pdf.output('arraybuffer');
-      return Buffer.from(arrayBuffer);
+      return new Uint8Array(arrayBuffer);
     } finally {
       document.body.removeChild(container);
     }
@@ -315,7 +315,7 @@ const printOrder = async (order: any): Promise<void> => {
 /**
  * Gera um PDF do pedido
  */
-const generateOrderPDF = async (order: any): Promise<Buffer> => {
+const generateOrderPDF = async (order: any): Promise<Uint8Array> => {
   try {
     // Similar à implementação de generateInvoicePDF, mas para pedidos
     const container = document.createElement('div');
@@ -348,9 +348,9 @@ const generateOrderPDF = async (order: any): Promise<Buffer> => {
       const imgData = canvas.toDataURL('image/png');
       pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
       
-      // Converter para ArrayBuffer e depois para Buffer
+      // Converter para ArrayBuffer e depois para Uint8Array
       const arrayBuffer = pdf.output('arraybuffer');
-      return Buffer.from(arrayBuffer);
+      return new Uint8Array(arrayBuffer);
     } finally {
       document.body.removeChild(container);
     }
@@ -404,7 +404,7 @@ const printService = async (service: any): Promise<void> => {
 /**
  * Gera um PDF do serviço
  */
-const generateServicePDF = async (service: any): Promise<Buffer> => {
+const generateServicePDF = async (service: any): Promise<Uint8Array> => {
   // Implementação similar a generateInvoicePDF e generateOrderPDF
   try {
     const container = document.createElement('div');
@@ -434,7 +434,7 @@ const generateServicePDF = async (service: any): Promise<Buffer> => {
       pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
       
       const arrayBuffer = pdf.output('arraybuffer');
-      return Buffer.from(arrayBuffer);
+      return new Uint8Array(arrayBuffer);
     } finally {
       document.body.removeChild(container);
     }
@@ -460,9 +460,9 @@ const sendInvoiceByEmail = async (
 
     // Obter PDF - se requireReference for false, pode usar 'Pendente' como referência
     const pdfBuffer = await generateInvoicePDF(invoice, requireReference);
-
-    // Converter o buffer para Base64 para enviar na requisição
-    const base64Pdf = btoa(String.fromCharCode(...new Uint8Array(pdfBuffer)));
+    
+    // Converter o Uint8Array para Base64 para enviar na requisição
+    const base64Pdf = btoa(String.fromCharCode(...pdfBuffer));
     
     // Preparar os dados para a API
     const apiData = {
@@ -508,9 +508,9 @@ const sendOrderByEmail = async (
 
     // Gerar o PDF
     const pdfBuffer = await generateOrderPDF(order);
-
-    // Converter o buffer para Base64 para enviar na requisição
-    const base64Pdf = btoa(String.fromCharCode(...new Uint8Array(pdfBuffer)));
+    
+    // Converter o Uint8Array para Base64 para enviar na requisição
+    const base64Pdf = btoa(String.fromCharCode(...pdfBuffer));
     
     // Preparar os dados para a API
     const apiData = {
