@@ -16,7 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Domain } from "@/services/domain/domainService";
 import { toast } from "sonner";
 import DomainsBulkManager from "@/components/admin/bulk-actions/DomainsBulkManager";
-import { useAdminAuth } from "@/hooks/use-admin-auth";
+import { useAuth } from "@/contexts/AuthContext";
 import AdminDomainOrdersList from "@/components/admin/AdminDomainOrdersList";
 
 const DomainsManagement = () => {
@@ -26,7 +26,8 @@ const DomainsManagement = () => {
   const navigate = useNavigate();
   
   // Check admin authentication
-  const { user, loading: authLoading } = useAdminAuth();
+  const { user, profile, isLoading } = useAuth();
+  const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
 
   useEffect(() => {
     loadDomains();
@@ -131,15 +132,16 @@ const DomainsManagement = () => {
     }
   };
 
-  if (authLoading) {
+
+  if (isLoading || loading) {
     return (
-      <div className="flex items-center justify-center h-48">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="flex h-screen items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
 
-  if (!user) {
+  if (!isAdmin) {
     return (
       <div className="text-center py-10">
         <h3 className="text-lg font-medium">Acesso Negado</h3>

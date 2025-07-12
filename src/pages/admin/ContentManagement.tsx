@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useAdminAuth } from "@/hooks/use-admin-auth";
+import { useAuth } from "@/contexts/AuthContext";
 import { Globe, FileText, AlertTriangle, Plus, Edit, Trash2, Save } from "lucide-react";
 
 interface SiteContent {
@@ -45,7 +45,8 @@ interface BannerConfig {
 }
 
 const ContentManagement = () => {
-  const { user, isAdmin } = useAdminAuth();
+  const { user, profile, isLoading } = useAuth();
+  const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   
@@ -331,6 +332,16 @@ const ContentManagement = () => {
         return 'bg-blue-100 text-blue-700';
     }
   };
+
+  if (isLoading || loading) {
+    return (
+      <AdminLayout>
+        <div className="flex h-screen items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   if (!isAdmin) {
     return (
