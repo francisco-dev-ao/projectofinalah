@@ -206,22 +206,24 @@ export const adminRoutes = [
       </SuperAdminRoute>
     } 
   />,
+  
+  // Admin routes (access: admin, super-admin)
   <Route 
     key="/admin/cleanup" 
     path="/admin/cleanup" 
     element={
-      <SuperAdminRoute>
+      <AdminRoute>
         <UserCleanup />
-      </SuperAdminRoute>
+      </AdminRoute>
     } 
   />,
   <Route 
     key="/admin/data-cleanup" 
     path="/admin/data-cleanup" 
     element={
-      <SuperAdminRoute>
+      <AdminRoute>
         <DataCleanup />
-      </SuperAdminRoute>
+      </AdminRoute>
     } 
   />
 ];
