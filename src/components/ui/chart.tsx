@@ -146,15 +146,26 @@ export const Chart = React.forwardRef<any, ChartProps>(({ options = {}, series, 
   // Cleanup on unmount
   React.useEffect(() => {
     return () => {
-      if (chartRef.current) {
-        try {
-          if (chartRef.current.chart && typeof chartRef.current.chart.destroy === 'function') {
-            chartRef.current.chart.destroy();
+      // Add a timeout to ensure cleanup happens after React's cleanup
+      setTimeout(() => {
+        if (chartRef.current) {
+          try {
+            // More defensive check for chart instance
+            if (chartRef.current.chart && 
+                typeof chartRef.current.chart.destroy === 'function' && 
+                chartRef.current.chart.el && 
+                chartRef.current.chart.el.parentNode) {
+              chartRef.current.chart.destroy();
+            }
+          } catch (error) {
+            // Silently ignore cleanup errors during unmount
+            console.warn('Chart cleanup warning:', error);
+          } finally {
+            // Clear the ref to prevent further access
+            chartRef.current = null;
           }
-        } catch (error) {
-          // Silently ignore cleanup errors
         }
-      }
+      }, 0);
     };
   }, []);
 
@@ -175,7 +186,10 @@ export const Chart = React.forwardRef<any, ChartProps>(({ options = {}, series, 
 
   return (
     <div ref={containerRef} className="w-full">
+      {/* Add key to force remount if needed */}
       <ReactApexChart
+        ref={chartRef}
+        key={`chart-${type}-${JSON.stringify(validSeries?.slice(0, 1))}`}
         options={mergedOptions}
         series={validSeries}
         type={type}
