@@ -202,16 +202,17 @@ export function useCheckoutOrder() {
             console.log("Inserting domain with data:", domainData);
             
             const { data: insertedDomain, error } = await supabase
-              .from('domain_orders')
+              .from('domains')
               .insert({
                 domain_name: domainName,
-                tld_type: tld,
-                price: domainItem.price || 0,
-                duration: domainItem.duration || 12,
+                tld: tld,
                 user_id: user.id,
                 order_id: result.orderId,
                 status: 'pending',
-                created_at: new Date().toISOString()
+                auto_renew: true,
+                is_locked: false,
+                registration_date: new Date().toISOString(),
+                expiration_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
               })
               .select()
               .single();
@@ -245,17 +246,8 @@ export function useCheckoutOrder() {
               };
               
               const { data: insertedDomain, error } = await supabase
-                .from('domain_orders')
-                .insert({
-                  domain_name: domainName,
-                  tld_type: 'custom',
-                  price: 0,
-                  duration: 12,
-                  user_id: user.id,
-                  order_id: result.orderId,
-                  status: 'pending',
-                  created_at: new Date().toISOString()
-                })
+                .from('domains')
+                .insert(domainData)
                 .select()
                 .single();
                 
