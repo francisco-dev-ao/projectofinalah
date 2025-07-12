@@ -218,14 +218,14 @@ export function useCheckoutOrder() {
               
             if (error) {
               console.error(`Error registering domain ${domainName}:`, error);
-              toast.error(`Erro ao registrar domínio ${domainName}: ${error.message}`);
+              toast.error(`Erro ao registrar domínio ${domainName}: ${error.message || 'Erro desconhecido'}`);
             } else {
               console.log(`Domain registered successfully:`, insertedDomain);
               toast.success(`Domínio ${domainName} registrado com sucesso!`);
             }
-          } catch (err) {
+          } catch (err: any) {
             console.error(`Error registering domain ${domainName}:`, err);
-            toast.error(`Erro ao registrar domínio ${domainName}`);
+            toast.error(`Erro ao registrar domínio ${domainName}: ${err.message || 'Erro inesperado'}`);
           }
         } else {
           console.warn('Invalid domain name format:', domainName);
@@ -264,7 +264,7 @@ export function useCheckoutOrder() {
                 toast.success(`Domínio personalizado ${domainName} registrado!`);
               } else {
                 console.error(`Error registering custom domain:`, error);
-                toast.error(`Erro ao registrar domínio personalizado: ${error.message}`);
+                toast.error(`Erro ao registrar domínio personalizado: ${error.message || 'Erro desconhecido'}`);
               }
             } catch (err) {
               console.error(`Error registering custom domain:`, err);

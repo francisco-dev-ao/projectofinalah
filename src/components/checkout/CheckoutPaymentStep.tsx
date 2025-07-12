@@ -87,44 +87,6 @@ const CheckoutPaymentStep = ({ onPrevStep, onOrderSuccess }: CheckoutPaymentStep
               setPaymentReference(paymentRef);
               setShowReferenceModal(true);
               
-              // Imprimir fatura automaticamente
-              try {
-                console.log("🖨️ Iniciando impressão automática da fatura...");
-                const { downloadHelpers } = await import("@/utils/downloadHelpers");
-                
-                // Aguardar um momento para garantir que a referência foi salva
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                
-                // Buscar dados completos da fatura com referências de pagamento
-                const { supabase } = await import("@/lib/supabase");
-                const { data: invoice, error: invoiceError } = await supabase
-                  .from('invoices')
-                  .select(`
-                    *,
-                    orders (
-                      *,
-                      profiles:user_id (*),
-                      payment_references (*),
-                      order_items (*)
-                    )
-                  `)
-                  .eq('order_id', result.orderId)
-                  .single();
-                  
-                if (invoice && !invoiceError) {
-                  console.log("📋 Dados da fatura:", invoice);
-                  console.log("💳 Referências de pagamento:", invoice.orders?.payment_references);
-                  // Usar o parâmetro requireReference=false para permitir impressão mesmo sem referência
-                  await downloadHelpers.printInvoiceDirectly(invoice, false);
-                  console.log("✅ Fatura impressa automaticamente");
-                } else {
-                  console.warn("⚠️ Fatura não encontrada para impressão automática");
-                }
-              } catch (printError) {
-                console.error("❌ Erro na impressão automática:", printError);
-                // Não mostrar erro ao usuário, apenas logar
-              }
-              
               toast.success("Referência de pagamento gerada!");
             } else {
               console.error("❌ Falha ao gerar cobrança:", cobrancaResult.error);
@@ -158,7 +120,7 @@ const CheckoutPaymentStep = ({ onPrevStep, onOrderSuccess }: CheckoutPaymentStep
     setShowReferenceModal(false);
     setPaymentReference(null);
     clearCart();
-    navigate('/order-success/success?method=appypay_reference');
+    onOrderSuccess(paymentReference?.order_id || '');
   };
 
   return (

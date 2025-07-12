@@ -183,18 +183,21 @@ export class InvoicePDFGenerator {
     // Entidade fixa
     this.doc.text('Entidade: 11333', 15, startY + 7);
 
-    // Verifica se há referências válidas
+    // Verifica se há referências válidas - permitir PDF mesmo sem referência para debugging
     if (!invoice.orders?.payment_references || invoice.orders.payment_references.length === 0) {
-        throw new Error('Invoice requires a valid payment reference before generating PDF');
+        console.warn('No payment references found for invoice - will show placeholder data');
     }
 
-    // Pega a referência mais recente
-    const latestRef = invoice.orders.payment_references
-        .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
-
-    const refValue = latestRef.reference && latestRef.reference !== 'Pendente'
-      ? latestRef.reference
-      : '---'; // ou lance erro
+    // Pega a referência mais recente ou dados da fatura
+    let refValue = '---';
+    if (invoice.orders?.payment_references && invoice.orders.payment_references.length > 0) {
+        const latestRef = invoice.orders.payment_references
+            .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
+        refValue = latestRef.reference && latestRef.reference !== 'Pendente' ? latestRef.reference : '---';
+    } else if (invoice.payment_reference) {
+        // Fallback para payment_reference direto na invoice
+        refValue = invoice.payment_reference;
+    }
 
     this.doc.text(`Referência: ${refValue}`, 15, startY + 14);
 
