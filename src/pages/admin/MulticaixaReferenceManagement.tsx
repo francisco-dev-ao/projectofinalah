@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useAdminAuth } from "@/hooks/use-admin-auth";
+import { useAuth } from "@/contexts/AuthContext";
 import { Eye, RefreshCw, Download, Settings, BarChart3 } from "lucide-react";
 
 interface MulticaixaReferenceConfig {
@@ -41,7 +41,9 @@ interface PaymentReference {
 }
 
 const MulticaixaReferenceManagement = () => {
-  const { user, isAdmin } = useAdminAuth();
+  const { user, profile, isLoading } = useAuth();
+  const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
+  console.log("MulticaixaReferenceManagement - Debug:", { user, isAdmin, role: profile?.role });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [config, setConfig] = useState<MulticaixaReferenceConfig>({
@@ -76,15 +78,23 @@ const MulticaixaReferenceManagement = () => {
         .from('company_settings')
         .select('multicaixa_reference_config')
         .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
+        .limit(1);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error loading config:", error);
+        // Se a coluna não existe, usar configuração padrão
+        if (error.code === '42703') {
+          console.log("Coluna multicaixa_reference_config não existe ainda");
+          return;
+        }
+        throw error;
+      }
 
-      if (data?.multicaixa_reference_config) {
-        const savedConfig = typeof data.multicaixa_reference_config === 'string' 
-          ? JSON.parse(data.multicaixa_reference_config)
-          : data.multicaixa_reference_config;
+      // Se há dados, usar o primeiro registro
+      if (data && data.length > 0 && data[0]?.multicaixa_reference_config) {
+        const savedConfig = typeof data[0].multicaixa_reference_config === 'string' 
+          ? JSON.parse(data[0].multicaixa_reference_config)
+          : data[0].multicaixa_reference_config;
         setConfig({ ...config, ...savedConfig });
       }
     } catch (error) {
@@ -213,13 +223,29 @@ const MulticaixaReferenceManagement = () => {
     return new Date(dateString).toLocaleString('pt-AO');
   };
 
+  console.log("Verificação de acesso:", { isAdmin, role: profile?.role, user });
+  
+  if (isLoading || loading) {
+    return (
+      <AdminLayout>
+        <div className="flex h-screen items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      </AdminLayout>
+    );
+  }
+  
   if (!isAdmin) {
+    console.error("Acesso negado - isAdmin:", isAdmin, "role:", profile?.role);
     return (
       <AdminLayout>
         <div className="text-center py-10">
           <h3 className="text-lg font-medium">Acesso Negado</h3>
           <p className="text-muted-foreground mt-1">
             Você não tem permissão para acessar esta página.
+          </p>
+          <p className="text-sm text-muted-foreground mt-2">
+            Debug: isAdmin={String(isAdmin)}, role={profile?.role}
           </p>
         </div>
       </AdminLayout>
