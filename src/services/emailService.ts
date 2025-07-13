@@ -582,6 +582,565 @@ Seu parceiro digital em Angola
   }
 
   /**
+   * Envia email de confirmação de pagamento recebido
+   */
+  static async sendPaymentConfirmationEmail(
+    customerEmail: string,
+    customerName: string,
+    orderId: string,
+    amount: number,
+    paymentMethod: string = 'AppyPay'
+  ): Promise<{ success: boolean; message?: string; error?: string }> {
+    const formatCurrency = (value: number) => {
+      return `KZ ${new Intl.NumberFormat('pt-PT', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+        useGrouping: true
+      }).format(value)}`;
+    };
+
+    const html = `
+      <!DOCTYPE html>
+      <html lang="pt">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Pagamento Confirmado - AngoHost</title>
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+          <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4;">
+              <tr>
+                  <td align="center" style="padding: 20px 0;">
+                      <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; max-width: 600px; width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                          <!-- Header -->
+                          <tr>
+                              <td style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); padding: 40px 30px; text-align: center;">
+                                  <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: 700; letter-spacing: -0.5px;">
+                                      ✅ Pagamento Confirmado!
+                                  </h1>
+                                  <p style="margin: 15px 0 0 0; color: #e8f5e8; font-size: 16px; line-height: 1.5;">
+                                      Seu pagamento foi processado com sucesso
+                                  </p>
+                              </td>
+                          </tr>
+                          
+                          <!-- Content -->
+                          <tr>
+                              <td style="padding: 40px 30px;">
+                                  <p style="margin: 0 0 25px 0; color: #333333; font-size: 18px; line-height: 1.6;">
+                                      Olá <strong>${customerName}</strong>! 🎉
+                                  </p>
+                                  
+                                  <p style="margin: 0 0 30px 0; color: #555555; font-size: 16px; line-height: 1.7;">
+                                      Confirmamos o recebimento do seu pagamento. Seus serviços serão ativados automaticamente em breve.
+                                  </p>
+                                  
+                                  <!-- Payment Details -->
+                                  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background: linear-gradient(135deg, #f8f9fc 0%, #e8f5e8 100%); border-radius: 12px; margin: 30px 0; padding: 25px;">
+                                      <tr>
+                                          <td>
+                                              <h3 style="margin: 0 0 20px 0; color: #333333; font-size: 20px; font-weight: 600; text-align: center;">
+                                                  📋 Detalhes do Pagamento
+                                              </h3>
+                                              
+                                              <div style="margin: 20px 0;">
+                                                  <div style="display: flex; justify-content: space-between; margin-bottom: 15px; padding: 10px 0; border-bottom: 1px solid #ddd;">
+                                                      <span style="color: #555555; font-weight: 600;">Pedido:</span>
+                                                      <span style="color: #333333; font-family: monospace;">#${orderId.substring(0, 8)}</span>
+                                                  </div>
+                                                  <div style="display: flex; justify-content: space-between; margin-bottom: 15px; padding: 10px 0; border-bottom: 1px solid #ddd;">
+                                                      <span style="color: #555555; font-weight: 600;">Valor Pago:</span>
+                                                      <span style="color: #28a745; font-weight: bold; font-size: 18px;">${formatCurrency(amount)}</span>
+                                                  </div>
+                                                  <div style="display: flex; justify-content: space-between; margin-bottom: 15px; padding: 10px 0; border-bottom: 1px solid #ddd;">
+                                                      <span style="color: #555555; font-weight: 600;">Método:</span>
+                                                      <span style="color: #333333;">${paymentMethod}</span>
+                                                  </div>
+                                                  <div style="display: flex; justify-content: space-between; padding: 10px 0;">
+                                                      <span style="color: #555555; font-weight: 600;">Data:</span>
+                                                      <span style="color: #333333;">${new Date().toLocaleDateString('pt-AO')}</span>
+                                                  </div>
+                                              </div>
+                                          </td>
+                                      </tr>
+                                  </table>
+                                  
+                                  <!-- Next Steps -->
+                                  <div style="background-color: #d1ecf1; border-left: 4px solid #0dcaf0; border-radius: 8px; padding: 20px; margin: 30px 0;">
+                                      <h4 style="margin: 0 0 15px 0; color: #0c5460; font-size: 18px; font-weight: 600;">
+                                          🚀 Próximos Passos:
+                                      </h4>
+                                      <ul style="margin: 0; padding-left: 20px; color: #0c5460; font-size: 15px; line-height: 1.8;">
+                                          <li>Seus serviços serão ativados automaticamente</li>
+                                          <li>Receberá um email com os detalhes de acesso</li>
+                                          <li>Pode acompanhar o status na área do cliente</li>
+                                          <li>Nossa equipe está disponível para suporte</li>
+                                      </ul>
+                                  </div>
+                                  
+                                  <p style="margin: 30px 0 20px 0; color: #555555; font-size: 16px; line-height: 1.7;">
+                                      Obrigado por escolher a AngoHost. Estamos comprometidos em oferecer o melhor serviço!
+                                  </p>
+                                  
+                                  <p style="margin: 20px 0 0 0; color: #333333; font-size: 16px; line-height: 1.6;">
+                                      Atenciosamente,<br>
+                                      <strong>Equipa AngoHost</strong>
+                                  </p>
+                              </td>
+                          </tr>
+                          
+                          <!-- Footer -->
+                          <tr>
+                              <td style="background-color: #f8f9fc; padding: 30px; text-align: center; border-top: 1px solid #e5e5e5;">
+                                  <p style="margin: 0 0 10px 0; color: #666666; font-size: 14px;">
+                                      📧 support@angohost.ao • 📞 +244 999 999 999
+                                  </p>
+                                  <p style="margin: 0; color: #aaaaaa; font-size: 12px;">
+                                      © ${new Date().getFullYear()} AngoHost - Todos os direitos reservados
+                                  </p>
+                              </td>
+                          </tr>
+                      </table>
+                  </td>
+              </tr>
+          </table>
+      </body>
+      </html>
+    `;
+
+    const textContent = `
+Olá ${customerName}!
+
+✅ PAGAMENTO CONFIRMADO!
+
+Confirmamos o recebimento do seu pagamento. Seus serviços serão ativados automaticamente em breve.
+
+DETALHES DO PAGAMENTO:
+Pedido: #${orderId.substring(0, 8)}
+Valor Pago: ${formatCurrency(amount)}
+Método: ${paymentMethod}
+Data: ${new Date().toLocaleDateString('pt-AO')}
+
+PRÓXIMOS PASSOS:
+- Seus serviços serão ativados automaticamente
+- Receberá um email com os detalhes de acesso
+- Pode acompanhar o status na área do cliente
+- Nossa equipe está disponível para suporte
+
+Obrigado por escolher a AngoHost!
+
+Atenciosamente,
+Equipa AngoHost
+    `;
+
+    return this.sendEmail({
+      from: 'pagamentos@angohost.ao',
+      to: customerEmail,
+      subject: `✅ Pagamento Confirmado - Pedido #${orderId.substring(0, 8)} | AngoHost`,
+      html,
+      text: textContent
+    });
+  }
+
+  /**
+   * Envia email de aviso de fatura em atraso
+   */
+  static async sendOverdueInvoiceEmail(
+    customerEmail: string,
+    customerName: string,
+    invoiceNumber: string,
+    amount: number,
+    daysPastDue: number
+  ): Promise<{ success: boolean; message?: string; error?: string }> {
+    const formatCurrency = (value: number) => {
+      return `KZ ${new Intl.NumberFormat('pt-PT', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+        useGrouping: true
+      }).format(value)}`;
+    };
+
+    const html = `
+      <!DOCTYPE html>
+      <html lang="pt">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Fatura em Atraso - AngoHost</title>
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+          <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4;">
+              <tr>
+                  <td align="center" style="padding: 20px 0;">
+                      <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; max-width: 600px; width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                          <!-- Header -->
+                          <tr>
+                              <td style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); padding: 40px 30px; text-align: center;">
+                                  <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">
+                                      ⚠️ Fatura em Atraso
+                                  </h1>
+                                  <p style="margin: 15px 0 0 0; color: #ffe6e6; font-size: 16px; line-height: 1.5;">
+                                      Pagamento pendente há ${daysPastDue} dias
+                                  </p>
+                              </td>
+                          </tr>
+                          
+                          <!-- Content -->
+                          <tr>
+                              <td style="padding: 40px 30px;">
+                                  <p style="margin: 0 0 25px 0; color: #333333; font-size: 18px; line-height: 1.6;">
+                                      Prezado(a) <strong>${customerName}</strong>,
+                                  </p>
+                                  
+                                  <p style="margin: 0 0 30px 0; color: #555555; font-size: 16px; line-height: 1.7;">
+                                      Detectamos que sua fatura está em atraso há <strong>${daysPastDue} dias</strong>. 
+                                      Para evitar a suspensão dos serviços, proceda ao pagamento o mais breve possível.
+                                  </p>
+                                  
+                                  <!-- Invoice Details -->
+                                  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #fff5f5; border: 2px solid #fed7d7; border-radius: 12px; margin: 30px 0; padding: 25px;">
+                                      <tr>
+                                          <td>
+                                              <h3 style="margin: 0 0 20px 0; color: #c53030; font-size: 20px; font-weight: 600; text-align: center;">
+                                                  🧾 Detalhes da Fatura
+                                              </h3>
+                                              
+                                              <div style="margin: 20px 0;">
+                                                  <div style="display: flex; justify-content: space-between; margin-bottom: 15px; padding: 10px 0; border-bottom: 1px solid #fed7d7;">
+                                                      <span style="color: #555555; font-weight: 600;">Fatura:</span>
+                                                      <span style="color: #c53030; font-weight: bold; font-family: monospace;">#${invoiceNumber}</span>
+                                                  </div>
+                                                  <div style="display: flex; justify-content: space-between; margin-bottom: 15px; padding: 10px 0; border-bottom: 1px solid #fed7d7;">
+                                                      <span style="color: #555555; font-weight: 600;">Valor:</span>
+                                                      <span style="color: #c53030; font-weight: bold; font-size: 18px;">${formatCurrency(amount)}</span>
+                                                  </div>
+                                                  <div style="display: flex; justify-content: space-between; padding: 10px 0;">
+                                                      <span style="color: #555555; font-weight: 600;">Dias em Atraso:</span>
+                                                      <span style="color: #c53030; font-weight: bold;">${daysPastDue} dias</span>
+                                                  </div>
+                                              </div>
+                                          </td>
+                                      </tr>
+                                  </table>
+                                  
+                                  <!-- Warning -->
+                                  <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; border-radius: 8px; padding: 20px; margin: 30px 0;">
+                                      <h4 style="margin: 0 0 15px 0; color: #856404; font-size: 18px; font-weight: 600;">
+                                          ⚠️ IMPORTANTE:
+                                      </h4>
+                                      <p style="margin: 0; color: #856404; font-size: 15px; line-height: 1.8;">
+                                          Caso o pagamento não seja efetuado em <strong>7 dias</strong>, seus serviços poderão ser suspensos automaticamente. 
+                                          Para evitar interrupções, recomendamos que proceda ao pagamento imediatamente.
+                                      </p>
+                                  </div>
+                                  
+                                  <!-- Support -->
+                                  <div style="background-color: #d1ecf1; border-radius: 8px; padding: 20px; margin: 30px 0; text-align: center;">
+                                      <h4 style="margin: 0 0 15px 0; color: #0c5460; font-size: 18px; font-weight: 600;">
+                                          💬 Precisa de Ajuda?
+                                      </h4>
+                                      <p style="margin: 0 0 15px 0; color: #0c5460; font-size: 15px; line-height: 1.6;">
+                                          Se tiver dificuldades com o pagamento ou questões sobre a fatura, entre em contacto conosco:
+                                      </p>
+                                      <div style="color: #0c5460; font-size: 14px;">
+                                          📧 <strong>Email:</strong> support@angohost.ao<br>
+                                          📞 <strong>Telefone:</strong> +244 999 999 999
+                                      </div>
+                                  </div>
+                                  
+                                  <p style="margin: 30px 0 20px 0; color: #555555; font-size: 16px; line-height: 1.7;">
+                                      Agradecemos a sua compreensão e aguardamos a regularização da situação.
+                                  </p>
+                                  
+                                  <p style="margin: 20px 0 0 0; color: #333333; font-size: 16px; line-height: 1.6;">
+                                      Atenciosamente,<br>
+                                      <strong>Equipa AngoHost</strong>
+                                  </p>
+                              </td>
+                          </tr>
+                          
+                          <!-- Footer -->
+                          <tr>
+                              <td style="background-color: #f8f9fc; padding: 30px; text-align: center; border-top: 1px solid #e5e5e5;">
+                                  <p style="margin: 0; color: #aaaaaa; font-size: 12px;">
+                                      © ${new Date().getFullYear()} AngoHost - Todos os direitos reservados
+                                  </p>
+                              </td>
+                          </tr>
+                      </table>
+                  </td>
+              </tr>
+          </table>
+      </body>
+      </html>
+    `;
+
+    return this.sendEmail({
+      from: 'billing@angohost.ao',
+      to: customerEmail,
+      subject: `⚠️ Fatura #${invoiceNumber} em atraso há ${daysPastDue} dias | AngoHost`,
+      html
+    });
+  }
+
+  /**
+   * Envia notificação para admin sobre novo ticket
+   */
+  static async sendAdminTicketNotification(
+    adminEmail: string,
+    customerName: string,
+    customerEmail: string,
+    ticketId: string,
+    subject: string,
+    priority: string = 'Média'
+  ): Promise<{ success: boolean; message?: string; error?: string }> {
+    const html = `
+      <!DOCTYPE html>
+      <html lang="pt">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Novo Ticket de Suporte - AngoHost</title>
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+          <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4;">
+              <tr>
+                  <td align="center" style="padding: 20px 0;">
+                      <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; max-width: 600px; width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                          <!-- Header -->
+                          <tr>
+                              <td style="background: linear-gradient(135deg, #6f42c1 0%, #007bff 100%); padding: 30px; text-align: center;">
+                                  <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 700;">
+                                      🎫 Novo Ticket de Suporte
+                                  </h1>
+                                  <p style="margin: 10px 0 0 0; color: #e8e8e8; font-size: 14px;">
+                                      Sistema de Suporte AngoHost
+                                  </p>
+                              </td>
+                          </tr>
+                          
+                          <!-- Content -->
+                          <tr>
+                              <td style="padding: 30px;">
+                                  <p style="margin: 0 0 20px 0; color: #333333; font-size: 16px;">
+                                      Um novo ticket de suporte foi criado no sistema.
+                                  </p>
+                                  
+                                  <!-- Ticket Details -->
+                                  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8f9fc; border-radius: 8px; margin: 20px 0; padding: 20px;">
+                                      <tr>
+                                          <td>
+                                              <h3 style="margin: 0 0 15px 0; color: #333333; font-size: 18px;">Detalhes do Ticket:</h3>
+                                              
+                                              <div style="margin: 10px 0;">
+                                                  <strong>ID:</strong> #${ticketId}<br>
+                                                  <strong>Cliente:</strong> ${customerName}<br>
+                                                  <strong>Email:</strong> ${customerEmail}<br>
+                                                  <strong>Assunto:</strong> ${subject}<br>
+                                                  <strong>Prioridade:</strong> <span style="color: ${priority === 'Alta' ? '#dc3545' : priority === 'Média' ? '#ffc107' : '#28a745'};">${priority}</span><br>
+                                                  <strong>Data:</strong> ${new Date().toLocaleString('pt-AO')}
+                                              </div>
+                                          </td>
+                                      </tr>
+                                  </table>
+                                  
+                                  <div style="text-align: center; margin: 30px 0;">
+                                      <a href="${process.env.NODE_ENV === 'production' ? 'https://angohost.ao' : 'http://localhost:3000'}/admin/tickets/${ticketId}" 
+                                         style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+                                          Ver Ticket
+                                      </a>
+                                  </div>
+                                  
+                                  <p style="margin: 20px 0 0 0; color: #666666; font-size: 14px;">
+                                      Acesse o painel administrativo para responder ao cliente.
+                                  </p>
+                              </td>
+                          </tr>
+                      </table>
+                  </td>
+              </tr>
+          </table>
+      </body>
+      </html>
+    `;
+
+    return this.sendEmail({
+      from: 'system@angohost.ao',
+      to: adminEmail,
+      subject: `🎫 Novo Ticket #${ticketId} - ${subject}`,
+      html
+    });
+  }
+
+  /**
+   * Envia email de confirmação de atualização de dados
+   */
+  static async sendDataUpdateConfirmationEmail(
+    customerEmail: string,
+    customerName: string,
+    updatedFields: string[]
+  ): Promise<{ success: boolean; message?: string; error?: string }> {
+    const fieldsList = updatedFields.map(field => `<li>${field}</li>`).join('');
+
+    const html = `
+      <!DOCTYPE html>
+      <html lang="pt">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Dados Atualizados - AngoHost</title>
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+          <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4;">
+              <tr>
+                  <td align="center" style="padding: 20px 0;">
+                      <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; max-width: 600px; width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                          <!-- Header -->
+                          <tr>
+                              <td style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); padding: 30px; text-align: center;">
+                                  <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 700;">
+                                      🔄 Dados Atualizados
+                                  </h1>
+                                  <p style="margin: 10px 0 0 0; color: #e8f4f8; font-size: 14px;">
+                                      Confirmação de Alteração
+                                  </p>
+                              </td>
+                          </tr>
+                          
+                          <!-- Content -->
+                          <tr>
+                              <td style="padding: 30px;">
+                                  <p style="margin: 0 0 20px 0; color: #333333; font-size: 16px;">
+                                      Olá <strong>${customerName}</strong>,
+                                  </p>
+                                  
+                                  <p style="margin: 0 0 20px 0; color: #555555; font-size: 15px;">
+                                      Confirmamos que os seguintes dados da sua conta foram atualizados com sucesso:
+                                  </p>
+                                  
+                                  <div style="background-color: #d1ecf1; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                                      <h4 style="margin: 0 0 10px 0; color: #0c5460;">Campos Alterados:</h4>
+                                      <ul style="margin: 0; color: #0c5460;">${fieldsList}</ul>
+                                  </div>
+                                  
+                                  <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; border-radius: 8px; padding: 15px; margin: 20px 0;">
+                                      <p style="margin: 0; color: #856404; font-size: 14px;">
+                                          <strong>⚠️ Importante:</strong> Se você não fez essas alterações, entre em contacto conosco imediatamente através do email support@angohost.ao
+                                      </p>
+                                  </div>
+                                  
+                                  <p style="margin: 20px 0; color: #555555; font-size: 15px;">
+                                      Data da alteração: <strong>${new Date().toLocaleString('pt-AO')}</strong>
+                                  </p>
+                                  
+                                  <p style="margin: 20px 0 0 0; color: #333333; font-size: 15px;">
+                                      Atenciosamente,<br>
+                                      <strong>Equipa AngoHost</strong>
+                                  </p>
+                              </td>
+                          </tr>
+                      </table>
+                  </td>
+              </tr>
+          </table>
+      </body>
+      </html>
+    `;
+
+    return this.sendEmail({
+      from: 'security@angohost.ao',
+      to: customerEmail,
+      subject: `🔄 Dados da conta atualizados | AngoHost`,
+      html
+    });
+  }
+
+  /**
+   * Envia código de verificação de identidade
+   */
+  static async sendVerificationCodeEmail(
+    customerEmail: string,
+    customerName: string,
+    verificationCode: string
+  ): Promise<{ success: boolean; message?: string; error?: string }> {
+    const html = `
+      <!DOCTYPE html>
+      <html lang="pt">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Código de Verificação - AngoHost</title>
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+          <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4;">
+              <tr>
+                  <td align="center" style="padding: 20px 0;">
+                      <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; max-width: 600px; width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                          <!-- Header -->
+                          <tr>
+                              <td style="background: linear-gradient(135deg, #fd7e14 0%, #e55100 100%); padding: 30px; text-align: center;">
+                                  <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 700;">
+                                      🔐 Código de Verificação
+                                  </h1>
+                                  <p style="margin: 10px 0 0 0; color: #fff3e0; font-size: 14px;">
+                                      Verificação de Identidade
+                                  </p>
+                              </td>
+                          </tr>
+                          
+                          <!-- Content -->
+                          <tr>
+                              <td style="padding: 30px; text-align: center;">
+                                  <p style="margin: 0 0 20px 0; color: #333333; font-size: 16px;">
+                                      Olá <strong>${customerName}</strong>,
+                                  </p>
+                                  
+                                  <p style="margin: 0 0 30px 0; color: #555555; font-size: 15px;">
+                                      Use o código abaixo para verificar sua identidade:
+                                  </p>
+                                  
+                                  <!-- Verification Code -->
+                                  <div style="background: linear-gradient(135deg, #fd7e14 0%, #e55100 100%); border-radius: 12px; padding: 30px; margin: 30px 0;">
+                                      <div style="background-color: rgba(255, 255, 255, 0.2); border-radius: 8px; padding: 20px;">
+                                          <p style="margin: 0; color: #ffffff; font-family: 'Monaco', 'Menlo', monospace; font-size: 36px; font-weight: bold; letter-spacing: 8px;">
+                                              ${verificationCode}
+                                          </p>
+                                      </div>
+                                  </div>
+                                  
+                                  <div style="background-color: #fff3cd; border-radius: 8px; padding: 20px; margin: 30px 0; text-align: left;">
+                                      <h4 style="margin: 0 0 10px 0; color: #856404;">⚠️ Instruções Importantes:</h4>
+                                      <ul style="margin: 0; color: #856404; font-size: 14px;">
+                                          <li>Este código expira em <strong>10 minutos</strong></li>
+                                          <li>Use apenas uma vez</li>
+                                          <li>Não compartilhe com terceiros</li>
+                                          <li>Se não solicitou, ignore este email</li>
+                                      </ul>
+                                  </div>
+                                  
+                                  <p style="margin: 20px 0 0 0; color: #333333; font-size: 15px;">
+                                      Atenciosamente,<br>
+                                      <strong>Equipa AngoHost</strong>
+                                  </p>
+                              </td>
+                          </tr>
+                      </table>
+                  </td>
+              </tr>
+          </table>
+      </body>
+      </html>
+    `;
+
+    return this.sendEmail({
+      from: 'security@angohost.ao',
+      to: customerEmail,
+      subject: `🔐 Código de verificação: ${verificationCode} | AngoHost`,
+      html
+    });
+  }
+
+  /**
    * Envia email de confirmação de pedido
    */
   static async sendOrderConfirmationEmail(

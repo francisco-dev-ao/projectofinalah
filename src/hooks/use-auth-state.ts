@@ -174,6 +174,14 @@ export const useAuthState = () => {
     try {
       if (!user) return;
       
+      // Identificar campos alterados
+      const updatedFields: string[] = [];
+      if (updates.name && updates.name !== profile?.name) updatedFields.push('Nome');
+      if (updates.email && updates.email !== user.email) updatedFields.push('Email');
+      if (updates.phone && updates.phone !== profile?.phone) updatedFields.push('Telefone');
+      if (updates.company_name && updates.company_name !== profile?.company_name) updatedFields.push('Nome da Empresa');
+      if (updates.address && updates.address !== profile?.address) updatedFields.push('Endereço');
+      
       const { data, error } = await supabase
         .from('profiles')
         .update(updates)
@@ -186,6 +194,22 @@ export const useAuthState = () => {
       } else {
         setProfile(data);
         toast.success('Perfil atualizado com sucesso!');
+        
+        // Enviar email de confirmação se houver campos alterados
+        if (updatedFields.length > 0) {
+          try {
+            const { EmailAutomationService } = await import('@/services/emailAutomationService');
+            await EmailAutomationService.triggerDataUpdateConfirmation(
+              user.email!,
+              data.name || user.email!,
+              updatedFields
+            );
+            console.log('Email de confirmação de atualização enviado');
+          } catch (emailError) {
+            console.error('Erro ao enviar email de confirmação:', emailError);
+            // Não falha a operação se o email falhar
+          }
+        }
       }
     } catch (error) {
       console.error('Error updating user:', error);
