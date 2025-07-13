@@ -27,17 +27,6 @@ serve(async (req) => {
   try {
     const { to, customerName, entity, reference, amount, description, validityDate, instructions, orderData }: EmailRequest = await req.json()
 
-    // Get SMTP configuration from Supabase secrets
-    const SMTP_HOST = Deno.env.get('SMTP_HOST')
-    const SMTP_PORT = Deno.env.get('SMTP_PORT')
-    const SMTP_USER = Deno.env.get('SMTP_USER')
-    const SMTP_PASS = Deno.env.get('SMTP_PASS')
-    const SMTP_FROM = Deno.env.get('SMTP_FROM') || 'noreply@angohost.ao'
-
-    if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
-      throw new Error('Configurações SMTP não encontradas')
-    }
-
     // Create email HTML template
     const emailHTML = `
     <!DOCTYPE html>
@@ -45,7 +34,7 @@ serve(async (req) => {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Referência de Pagamento - AngoHost</title>
+      <title>Dados de Pagamento Disponíveis - Ref: ${reference} - AngoHost</title>
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -192,7 +181,7 @@ serve(async (req) => {
       <div class="container">
         <div class="header">
           <div class="logo">AngoHost</div>
-          <div class="subtitle">Referência de Pagamento Multicaixa</div>
+          <div class="subtitle">Dados de Pagamento Disponíveis - Serviços AngoHost</div>
         </div>
         
         <div class="content">
@@ -215,7 +204,7 @@ serve(async (req) => {
               </div>
               <div class="detail-item amount-highlight">
                 <div class="detail-label">Valor a Pagar</div>
-                <div class="detail-value">${amount}</div>
+                <div class="detail-value">${amount} AOA</div>
               </div>
             </div>
             <p><strong>Descrição:</strong> ${description}</p>
@@ -248,50 +237,33 @@ serve(async (req) => {
     </html>
     `
 
-    // Send email using SMTP
-    const emailData = {
-      from: SMTP_FROM,
+    // Send email using your custom API
+    const emailPayload = {
       to: to,
-      subject: `Referência de Pagamento Multicaixa - AngoHost`,
+      subject: `Dados de Pagamento Disponíveis - Ref: ${reference} - AngoHost`,
       html: emailHTML,
+      from: 'noreply@angohost.ao'
     }
 
-    // Using nodemailer-like approach with fetch to SMTP service
-    const response = await fetch(`https://api.emailjs.com/api/v1.0/email/send`, {
+    console.log('📧 Enviando email via API AngoHost para:', to)
+
+    const response = await fetch('https://mail3.angohost.ao/email/send', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        // Adicione aqui outros headers necessários conforme sua API
       },
-      body: JSON.stringify({
-        service_id: 'smtp',
-        template_id: 'template',
-        user_id: SMTP_USER,
-        template_params: {
-          from_email: SMTP_FROM,
-          to_email: to,
-          subject: emailData.subject,
-          html_content: emailHTML,
-        },
-        accessToken: SMTP_PASS
-      })
+      body: JSON.stringify(emailPayload)
     })
 
     if (!response.ok) {
-      // Fallback: Use simple SMTP connection
-      const smtpResponse = await fetch(`smtp://${SMTP_HOST}:${SMTP_PORT || 587}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Basic ${btoa(`${SMTP_USER}:${SMTP_PASS}`)}`,
-          'Content-Type': 'message/rfc822',
-        },
-        body: `From: ${SMTP_FROM}
-To: ${to}
-Subject: ${emailData.subject}
-Content-Type: text/html; charset=UTF-8
-
-${emailHTML}`
-      })
+      const errorText = await response.text()
+      console.error('Erro da API de email:', errorText)
+      throw new Error(`Erro ao enviar email: ${response.status} - ${errorText}`)
     }
+
+    const result = await response.json()
+    console.log('✅ Email enviado com sucesso:', result)
 
     return new Response(
       JSON.stringify({ 
