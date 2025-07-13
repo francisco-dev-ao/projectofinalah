@@ -51,12 +51,12 @@ export function PrintReferenceButton({ invoiceId, invoiceNumber }: PrintReferenc
         return;
       }
 
-      // HTML para impressão profissional certificada AGT
+      // HTML para fatura pró-forma profissional
       const htmlContent = `
         <!DOCTYPE html>
         <html>
         <head>
-          <title>Referência de Pagamento - AngoHost</title>
+          <title>Fatura Pró-forma - AngoHost</title>
           <meta charset="UTF-8">
           <style>
             * {
@@ -72,242 +72,260 @@ export function PrintReferenceButton({ invoiceId, invoiceNumber }: PrintReferenc
               line-height: 1.4;
               -webkit-print-color-adjust: exact;
               print-color-adjust: exact;
+              font-size: 13px;
             }
             
-            .document {
-              max-width: 800px;
+            .invoice {
+              max-width: 210mm;
               margin: 0 auto;
-              padding: 40px;
+              padding: 20mm;
               background: white;
-              min-height: 100vh;
+              min-height: 297mm;
             }
             
             .header {
-              text-align: center;
-              margin-bottom: 40px;
-              padding-bottom: 30px;
+              display: flex;
+              justify-content: space-between;
+              align-items: flex-start;
+              margin-bottom: 30px;
+              padding-bottom: 20px;
               border-bottom: 3px solid #1e40af;
             }
             
-            .logo {
-              font-size: 32px;
+            .company-info {
+              flex: 1;
+            }
+            
+            .company-logo {
+              font-size: 28px;
               font-weight: 900;
               color: #1e40af;
+              margin-bottom: 10px;
               letter-spacing: -1px;
-              margin-bottom: 8px;
             }
             
-            .document-title {
-              font-size: 18px;
+            .company-details {
               color: #64748b;
-              font-weight: 500;
-              margin-bottom: 20px;
+              line-height: 1.6;
             }
             
-            .document-info {
+            .invoice-info {
               text-align: right;
-              font-size: 12px;
-              color: #64748b;
+              flex: 1;
             }
             
-            .data-grid {
+            .invoice-title {
+              font-size: 24px;
+              font-weight: 700;
+              color: #1e40af;
+              margin-bottom: 10px;
+            }
+            
+            .invoice-meta {
+              color: #64748b;
+              line-height: 1.6;
+            }
+            
+            .client-section {
               display: grid;
               grid-template-columns: 1fr 1fr;
               gap: 40px;
-              margin: 40px 0;
-            }
-            
-            .data-section {
+              margin: 30px 0;
+              padding: 25px;
               background: #f8fafc;
-              border: 1px solid #e2e8f0;
               border-radius: 12px;
-              padding: 24px;
+              border: 1px solid #e2e8f0;
             }
             
             .section-title {
               font-size: 16px;
               font-weight: 700;
               color: #1e40af;
-              margin-bottom: 20px;
+              margin-bottom: 15px;
               padding-bottom: 8px;
               border-bottom: 2px solid #dbeafe;
             }
             
-            .data-row {
+            .info-line {
+              margin-bottom: 8px;
               display: flex;
-              justify-content: space-between;
-              align-items: center;
-              padding: 8px 0;
-              border-bottom: 1px solid #e2e8f0;
+              align-items: flex-start;
             }
             
-            .data-row:last-child {
+            .info-label {
+              font-weight: 600;
+              color: #475569;
+              min-width: 80px;
+              margin-right: 10px;
+            }
+            
+            .info-value {
+              color: #1e293b;
+            }
+            
+            .items-table {
+              width: 100%;
+              border-collapse: collapse;
+              margin: 30px 0;
+              background: white;
+              border-radius: 12px;
+              overflow: hidden;
+              box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            }
+            
+            .items-table th {
+              background: #1e40af;
+              color: white;
+              padding: 15px 12px;
+              text-align: left;
+              font-weight: 600;
+              font-size: 12px;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            }
+            
+            .items-table td {
+              padding: 15px 12px;
+              border-bottom: 1px solid #e2e8f0;
+              vertical-align: top;
+            }
+            
+            .items-table tr:last-child td {
               border-bottom: none;
             }
             
-            .data-label {
+            .items-table tr:nth-child(even) {
+              background: #f8fafc;
+            }
+            
+            .text-right {
+              text-align: right;
+            }
+            
+            .text-center {
+              text-align: center;
+            }
+            
+            .totals-section {
+              display: flex;
+              justify-content: flex-end;
+              margin: 30px 0;
+            }
+            
+            .totals-table {
+              width: 400px;
+              border-collapse: collapse;
+              background: white;
+              border-radius: 12px;
+              overflow: hidden;
+              box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+            
+            .totals-table td {
+              padding: 12px 20px;
+              border-bottom: 1px solid #e2e8f0;
+            }
+            
+            .totals-table tr:last-child td {
+              border-bottom: none;
+              background: #1e40af;
+              color: white;
+              font-weight: 700;
+              font-size: 16px;
+            }
+            
+            .totals-label {
               font-weight: 600;
               color: #475569;
-              font-size: 14px;
             }
             
-            .data-value {
-              color: #1e293b;
-              font-weight: 500;
+            .totals-value {
               text-align: right;
-              font-size: 14px;
+              font-weight: 600;
+              color: #1e293b;
             }
             
-            .reference-highlight {
+            .payment-reference {
               background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
               color: white;
-              padding: 30px;
+              padding: 25px;
               border-radius: 16px;
+              margin: 30px 0;
               text-align: center;
-              margin: 40px 0;
-              box-shadow: 0 10px 25px rgba(30, 64, 175, 0.2);
             }
             
             .reference-title {
               font-size: 18px;
               font-weight: 700;
               margin-bottom: 20px;
-              opacity: 0.9;
+              opacity: 0.95;
             }
             
-            .reference-details {
+            .reference-grid {
               display: grid;
-              grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+              grid-template-columns: repeat(3, 1fr);
               gap: 20px;
               margin-top: 20px;
             }
             
             .reference-item {
-              background: rgba(255, 255, 255, 0.1);
+              background: rgba(255, 255, 255, 0.15);
               padding: 15px;
               border-radius: 10px;
               backdrop-filter: blur(10px);
             }
             
-            .reference-item-label {
-              font-size: 12px;
+            .reference-label {
+              font-size: 11px;
               opacity: 0.8;
               margin-bottom: 5px;
               text-transform: uppercase;
               letter-spacing: 0.5px;
             }
             
-            .reference-item-value {
+            .reference-value {
               font-size: 16px;
               font-weight: 700;
             }
             
-            .amount-value {
-              font-size: 24px;
-              font-weight: 900;
+            .amount-highlight {
+              font-size: 20px;
             }
             
-            .instructions {
-              background: #f0f9ff;
-              border: 1px solid #bae6fd;
-              border-radius: 12px;
-              padding: 30px;
-              margin: 40px 0;
-            }
-            
-            .instructions-title {
-              font-size: 18px;
-              font-weight: 700;
-              color: #0c4a6e;
-              margin-bottom: 20px;
-              display: flex;
-              align-items: center;
-              gap: 10px;
-            }
-            
-            .instruction-step {
-              display: flex;
-              align-items: flex-start;
-              gap: 15px;
-              margin: 15px 0;
-              padding: 15px;
-              background: white;
-              border-radius: 8px;
-              border-left: 4px solid #3b82f6;
-            }
-            
-            .step-number {
-              background: #3b82f6;
-              color: white;
-              width: 24px;
-              height: 24px;
-              border-radius: 50%;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              font-size: 12px;
-              font-weight: 700;
-              flex-shrink: 0;
-              margin-top: 2px;
-            }
-            
-            .step-text {
-              color: #1e293b;
-              font-size: 14px;
-              line-height: 1.5;
-            }
-            
-            .security-note {
+            .observation {
               background: #fef3c7;
               border: 1px solid #f59e0b;
-              border-radius: 8px;
+              border-radius: 12px;
               padding: 20px;
               margin: 30px 0;
               text-align: center;
             }
             
-            .security-note-title {
+            .observation-title {
               font-weight: 700;
               color: #92400e;
-              margin-bottom: 8px;
+              margin-bottom: 10px;
+              font-size: 14px;
             }
             
-            .security-note-text {
-              font-size: 13px;
+            .observation-text {
               color: #a16207;
+              font-style: italic;
             }
             
             .footer {
-              margin-top: 60px;
-              padding-top: 30px;
+              margin-top: 50px;
+              padding-top: 25px;
               border-top: 2px solid #e2e8f0;
               text-align: center;
               color: #64748b;
+              font-size: 11px;
             }
             
-            .company-info {
-              margin-bottom: 15px;
-            }
-            
-            .company-name {
+            .footer-company {
               font-weight: 700;
               color: #1e40af;
-              font-size: 16px;
-            }
-            
-            .company-details {
-              font-size: 12px;
-              line-height: 1.6;
-              margin: 10px 0;
-            }
-            
-            .certification {
-              font-size: 11px;
-              color: #64748b;
-              font-style: italic;
-              margin-top: 20px;
-              padding-top: 15px;
-              border-top: 1px solid #e2e8f0;
+              margin-bottom: 8px;
             }
             
             @media print {
@@ -317,164 +335,181 @@ export function PrintReferenceButton({ invoiceId, invoiceNumber }: PrintReferenc
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
               }
-              .document { 
+              .invoice { 
                 margin: 0; 
-                padding: 20px;
+                padding: 15mm;
                 min-height: auto;
               }
               .no-print { 
                 display: none !important; 
               }
-              .reference-highlight {
-                box-shadow: none;
-              }
             }
             
             @page {
-              margin: 1cm;
+              margin: 0;
               size: A4;
             }
           </style>
         </head>
         <body>
-          <div class="document">
+          <div class="invoice">
             <div class="header">
-              <div class="logo">AngoHost</div>
-              <div class="document-title">Referência de Pagamento Multicaixa</div>
-              <div class="document-info">
-                Documento: REF-${invoiceNumber} | ${new Date().toLocaleDateString('pt-PT', { 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })} às ${new Date().toLocaleTimeString('pt-PT', { 
-                  hour: '2-digit', 
-                  minute: '2-digit' 
-                })}
+              <div class="company-info">
+                <div class="company-logo">AngoHost</div>
+                <div class="company-details">
+                  <strong>ANGOHOST - PRESTAÇÃO DE SERVIÇOS, LDA</strong><br>
+                  Cacuaco Sequele<br>
+                  Email: support@angohost.ao<br>
+                  NIF: 5000088927<br>
+                  Telefone: +244 226 430 401
+                </div>
+              </div>
+              <div class="invoice-info">
+                <div class="invoice-title">FATURA PRÓ-FORMA</div>
+                <div class="invoice-meta">
+                  <strong>Nº:</strong> PRO-${invoiceNumber}<br>
+                  <strong>Data de Emissão:</strong> ${new Date().toLocaleDateString('pt-PT')}<br>
+                  <strong>Data de Vencimento:</strong> ${new Date(Date.now() + 30*24*60*60*1000).toLocaleDateString('pt-PT')}
+                </div>
               </div>
             </div>
 
-            <div class="data-grid">
-              <div class="data-section">
+            <div class="client-section">
+              <div>
                 <div class="section-title">Dados da Empresa</div>
-                <div class="data-row">
-                  <span class="data-label">RAZÃO SOCIAL</span>
-                  <span class="data-value">AngoHost, Lda</span>
+                <div class="info-line">
+                  <span class="info-label">Empresa:</span>
+                  <span class="info-value">ANGOHOST - PRESTAÇÃO DE SERVIÇOS, LDA</span>
                 </div>
-                <div class="data-row">
-                  <span class="data-label">NIF</span>
-                  <span class="data-value">5000000000</span>
+                <div class="info-line">
+                  <span class="info-label">Endereço:</span>
+                  <span class="info-value">Cacuaco Sequele</span>
                 </div>
-                <div class="data-row">
-                  <span class="data-label">ENDEREÇO</span>
-                  <span class="data-value">Rua Principal, 123<br>Luanda, Angola</span>
+                <div class="info-line">
+                  <span class="info-label">Email:</span>
+                  <span class="info-value">support@angohost.ao</span>
                 </div>
-                <div class="data-row">
-                  <span class="data-label">CONTACTOS</span>
-                  <span class="data-value">support@angohost.ao<br>+244 942 090 108<br>www.angohost.ao</span>
+                <div class="info-line">
+                  <span class="info-label">NIF:</span>
+                  <span class="info-value">5000088927</span>
                 </div>
               </div>
-
-              <div class="data-section">
+              <div>
                 <div class="section-title">Dados do Cliente</div>
-                <div class="data-row">
-                  <span class="data-label">NOME</span>
-                  <span class="data-value">${invoice.orders?.customer_name || 'Cliente'}</span>
+                <div class="info-line">
+                  <span class="info-label">Cliente:</span>
+                  <span class="info-value">${invoice.orders?.customer_name || 'Cliente'}</span>
                 </div>
-                <div class="data-row">
-                  <span class="data-label">EMAIL</span>
-                  <span class="data-value">${invoice.orders?.customer_email || 'N/A'}</span>
+                <div class="info-line">
+                  <span class="info-label">Endereço:</span>
+                  <span class="info-value">${invoice.orders?.billing_address || 'N/A'}</span>
                 </div>
-                <div class="data-row">
-                  <span class="data-label">TELEFONE</span>
-                  <span class="data-value">${invoice.orders?.customer_phone || 'N/A'}</span>
+                <div class="info-line">
+                  <span class="info-label">Email:</span>
+                  <span class="info-value">${invoice.orders?.customer_email || 'N/A'}</span>
                 </div>
-                <div class="data-row">
-                  <span class="data-label">DATA DO PEDIDO</span>
-                  <span class="data-value">${invoice.orders?.created_at ? new Date(invoice.orders.created_at).toLocaleDateString('pt-PT') : new Date().toLocaleDateString('pt-PT')}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="reference-highlight">
-              <div class="reference-title">📊 Detalhes da Referência</div>
-              <div class="reference-details">
-                <div class="reference-item">
-                  <div class="reference-item-label">Entidade</div>
-                  <div class="reference-item-value">11533</div>
-                </div>
-                <div class="reference-item">
-                  <div class="reference-item-label">Referência</div>
-                  <div class="reference-item-value">${paymentReference || '566282622'}</div>
-                </div>
-                <div class="reference-item">
-                  <div class="reference-item-label">Valor a Pagar</div>
-                  <div class="reference-item-value amount-value">${amount.toLocaleString('pt-PT', { 
-                    minimumFractionDigits: 2, 
-                    maximumFractionDigits: 2 
-                  })} AOA</div>
+                <div class="info-line">
+                  <span class="info-label">Telefone:</span>
+                  <span class="info-value">${invoice.orders?.customer_phone || 'N/A'}</span>
                 </div>
               </div>
             </div>
 
-            <div class="instructions">
-              <div class="instructions-title">
-                💳 Instruções de Pagamento
-              </div>
-              
-              <div class="instruction-step">
-                <div class="step-number">1</div>
-                <div class="step-text">Acesse seu aplicativo bancário, terminal ATM ou agente Multicaixa</div>
-              </div>
-              
-              <div class="instruction-step">
-                <div class="step-number">2</div>
-                <div class="step-text">Selecione a opção <strong>"Pagamento de Serviços"</strong> ou <strong>"Multicaixa"</strong></div>
-              </div>
-              
-              <div class="instruction-step">
-                <div class="step-number">3</div>
-                <div class="step-text">Digite a <strong>Entidade: 11533</strong></div>
-              </div>
-              
-              <div class="instruction-step">
-                <div class="step-number">4</div>
-                <div class="step-text">Digite a <strong>Referência: ${paymentReference || '566282622'}</strong></div>
-              </div>
-              
-              <div class="instruction-step">
-                <div class="step-number">5</div>
-                <div class="step-text">Confirme o valor: <strong>${amount.toLocaleString('pt-PT', { 
-                  minimumFractionDigits: 2, 
-                  maximumFractionDigits: 2 
-                })} AOA</strong></div>
-              </div>
-              
-              <div class="instruction-step">
-                <div class="step-number">6</div>
-                <div class="step-text">Complete o pagamento e guarde o comprovativo</div>
+            <table class="items-table">
+              <thead>
+                <tr>
+                  <th>Descrição</th>
+                  <th class="text-center">Qtd</th>
+                  <th class="text-right">Preço Unitário</th>
+                  <th class="text-right">Desconto</th>
+                  <th class="text-right">Retenção</th>
+                  <th class="text-right">Imposto</th>
+                  <th class="text-center">Cód. Imposto</th>
+                  <th class="text-right">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${invoice.orders?.order_items?.map(item => `
+                  <tr>
+                    <td>${item.product_name || 'Serviço'}</td>
+                    <td class="text-center">1</td>
+                    <td class="text-right">${(item.price || 0).toLocaleString('pt-PT', { minimumFractionDigits: 2 })} AOA</td>
+                    <td class="text-right">0,00 AOA</td>
+                    <td class="text-right">0,00 AOA</td>
+                    <td class="text-right">14%</td>
+                    <td class="text-center">IVA</td>
+                    <td class="text-right">${(item.price || 0).toLocaleString('pt-PT', { minimumFractionDigits: 2 })} AOA</td>
+                  </tr>
+                `).join('') || `
+                  <tr>
+                    <td>Serviço de Hospedagem</td>
+                    <td class="text-center">1</td>
+                    <td class="text-right">${amount.toLocaleString('pt-PT', { minimumFractionDigits: 2 })} AOA</td>
+                    <td class="text-right">0,00 AOA</td>
+                    <td class="text-right">0,00 AOA</td>
+                    <td class="text-right">14%</td>
+                    <td class="text-center">IVA</td>
+                    <td class="text-right">${amount.toLocaleString('pt-PT', { minimumFractionDigits: 2 })} AOA</td>
+                  </tr>
+                `}
+              </tbody>
+            </table>
+
+            <div class="totals-section">
+              <table class="totals-table">
+                <tr>
+                  <td class="totals-label">Total Ilíquido:</td>
+                  <td class="totals-value">${(amount * 0.877).toLocaleString('pt-PT', { minimumFractionDigits: 2 })} AOA</td>
+                </tr>
+                <tr>
+                  <td class="totals-label">Desconto:</td>
+                  <td class="totals-value">0,00 AOA</td>
+                </tr>
+                <tr>
+                  <td class="totals-label">IVA (14%):</td>
+                  <td class="totals-value">${(amount * 0.123).toLocaleString('pt-PT', { minimumFractionDigits: 2 })} AOA</td>
+                </tr>
+                <tr>
+                  <td class="totals-label">Retenção:</td>
+                  <td class="totals-value">0,00 AOA</td>
+                </tr>
+                <tr>
+                  <td class="totals-label">Total a Pagar:</td>
+                  <td class="totals-value">${amount.toLocaleString('pt-PT', { minimumFractionDigits: 2 })} AOA</td>
+                </tr>
+              </table>
+            </div>
+
+            <div class="payment-reference">
+              <div class="reference-title">📊 Referência de Pagamento Multicaixa</div>
+              <div class="reference-grid">
+                <div class="reference-item">
+                  <div class="reference-label">Entidade</div>
+                  <div class="reference-value">11533</div>
+                </div>
+                <div class="reference-item">
+                  <div class="reference-label">Referência</div>
+                  <div class="reference-value">${paymentReference || '566282622'}</div>
+                </div>
+                <div class="reference-item">
+                  <div class="reference-label">Valor</div>
+                  <div class="reference-value amount-highlight">${amount.toLocaleString('pt-PT', { minimumFractionDigits: 2 })} AOA</div>
+                </div>
               </div>
             </div>
 
-            <div class="security-note">
-              <div class="security-note-title">🔒 Nota de Segurança</div>
-              <div class="security-note-text">
-                Este documento é válido apenas para o pagamento da fatura especificada. 
-                Verifique sempre os dados antes de confirmar o pagamento.
+            <div class="observation">
+              <div class="observation-title">⚠️ OBSERVAÇÃO IMPORTANTE</div>
+              <div class="observation-text">
+                Este documento não serve de fatura. Após o pagamento receberá a fatura final.
               </div>
             </div>
 
             <div class="footer">
-              <div class="company-info">
-                <div class="company-name">AngoHost - Prestação de Serviços, Lda</div>
-                <div class="company-details">
-                  Email: support@angohost.ao | Telefone: +244 942 090 108<br>
-                  Endereço: Rua Principal, 123, Luanda - Angola<br>
-                  NIF: 5000000000 | Regime Geral
-                </div>
-              </div>
-              <div class="certification">
-                Documento gerado eletronicamente e certificado pela AGT (Administração Geral Tributária)<br>
-                Data/Hora de emissão: ${new Date().toLocaleString('pt-PT')} | Válido sem assinatura
+              <div class="footer-company">ANGOHOST - PRESTAÇÃO DE SERVIÇOS, LDA</div>
+              <div>
+                Documento gerado eletronicamente em ${new Date().toLocaleString('pt-PT')}<br>
+                Este documento é uma pró-forma e não tem valor fiscal até confirmação do pagamento
               </div>
             </div>
           </div>
@@ -493,11 +528,11 @@ export function PrintReferenceButton({ invoiceId, invoiceNumber }: PrintReferenc
       printWindow.document.write(htmlContent);
       printWindow.document.close();
       
-      toast.success('Documento de referência aberto para impressão!');
+      toast.success('Fatura pró-forma aberta para impressão!');
       
     } catch (error) {
       console.error('Error printing reference:', error);
-      toast.error('Erro ao preparar impressão da referência');
+      toast.error('Erro ao preparar impressão da fatura');
     } finally {
       setIsPrinting(false);
     }
