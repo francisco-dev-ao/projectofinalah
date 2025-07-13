@@ -873,35 +873,30 @@ export const AppyPayReferenceModal = ({
         user: 'support@angohost.ao'
       });
 
-      // Usar FormSubmit.co com URL dinâmica do cliente
-      const formSubmitUrl = `https://formsubmit.co/ajax/${customerInfo.email}`;
-      
-      const response = await fetch(formSubmitUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          _smtp_server: 'mail.angohost.ao',
-          _smtp_port: '587',
-          _smtp_username: 'support@angohost.ao',
-          _smtp_password: '97z2lh;F4_k5',
-          _subject: 'Referência de Pagamento Multicaixa - AngoHost',
-          _html: templateParams.email_html,
-          _template: 'table',
-          _captcha: 'false',
-          _autoresponse: 'Obrigado! Sua referência de pagamento foi enviada.',
-          name: customerInfo.name || 'Cliente',
-          message: 'Referência de pagamento gerada automaticamente'
-        })
-      });
+      // Configurar EmailJS com configuração simples
+      emailjs.init('angohost_public_key');
 
-      if (response.ok) {
-        toast.success(`✅ Email enviado com sucesso para ${customerInfo.email}`);
-      } else {
-        throw new Error('Falha no envio via FormSubmit');
-      }
+      // Enviar email diretamente usando EmailJS com template personalizado
+      const result = await emailjs.send(
+        'gmail',
+        'template_angohost',
+        {
+          to_email: customerInfo.email,
+          to_name: customerInfo.name || 'Cliente',
+          from_name: 'AngoHost',
+          from_email: 'support@angohost.ao',
+          subject: 'Referência de Pagamento Multicaixa - AngoHost',
+          message_html: templateParams.email_html,
+          reply_to: 'support@angohost.ao',
+          entity: paymentReference.entity,
+          reference: paymentReference.reference,
+          amount: paymentReference.amount.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' }),
+          validity_date: formatDate(paymentReference.validity_date)
+        }
+      );
+
+      console.log('EmailJS Result:', result);
+      toast.success(`✅ Email enviado com sucesso para ${customerInfo.email}`);
       
     } catch (error) {
       console.error('Erro ao enviar email:', error);
