@@ -8,7 +8,7 @@ import { AlertTriangle, Download, Printer, Clock, CreditCard } from "lucide-reac
 import { toast } from "sonner";
 import { saveAs } from 'file-saver';
 // Importar o novo componente ao invés da função direta
-import InvoicePdfGenerator from '@/components/invoice/InvoicePdfGenerator';
+import { PrintReferenceButton } from '@/components/invoice/PrintReferenceButton';
 
 interface UnpaidInvoicesListProps {
   userId: string;
@@ -240,19 +240,9 @@ const UnpaidInvoicesList: React.FC<UnpaidInvoicesListProps> = ({ userId }) => {
                       Download
                     </Button>
                   ) : (
-                    <InvoicePdfGenerator
+                    <PrintReferenceButton
                       invoiceId={invoice.id}
                       invoiceNumber={invoice.invoice_number}
-                      buttonText="Gerar PDF"
-                      onSuccess={(url) => {
-                        // Atualizar o estado local com a nova URL
-                        setUnpaidInvoices(prev => 
-                          prev.map(inv => 
-                            inv.id === invoice.id ? {...inv, pdf_url: url} : inv
-                          )
-                        );
-                      }}
-                      className="rounded-xl border-primary/20 hover:bg-primary/5 transition-all duration-200 hover:scale-105"
                     />
                   )}
                   <Button

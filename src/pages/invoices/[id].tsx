@@ -7,8 +7,7 @@ import { ptBR } from 'date-fns/locale';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Loader2, ChevronLeft } from 'lucide-react';
-import InvoiceDownloadButton from '@/components/invoices/InvoiceDownloadButton';
-import { InvoicePrintButton } from '@/components/invoice/InvoicePrintButton';
+import { PrintReferenceButton } from '@/components/invoice/PrintReferenceButton';
 
 export default function InvoiceDetails() {
   const { id } = useParams();
@@ -84,12 +83,7 @@ export default function InvoiceDetails() {
             <h1 className="text-2xl font-bold">Fatura #{invoice.invoice_number}</h1>
           </div>
           <div className="flex gap-2">
-            <InvoiceDownloadButton 
-              invoice={invoice} 
-              variant="default" 
-              showText={true}
-            />
-            <InvoicePrintButton 
+            <PrintReferenceButton 
               invoiceId={invoice.id}
               invoiceNumber={invoice.invoice_number}
             />
