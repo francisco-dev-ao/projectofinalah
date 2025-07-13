@@ -7,7 +7,7 @@ import { ptBR } from 'date-fns/locale';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Loader2, ChevronLeft } from 'lucide-react';
-import { PrintReferenceButton } from '@/components/invoice/PrintReferenceButton';
+// Print reference system removed
 
 export default function InvoiceDetails() {
   const { id } = useParams();
@@ -82,12 +82,7 @@ export default function InvoiceDetails() {
             </Button>
             <h1 className="text-2xl font-bold">Fatura #{invoice.invoice_number}</h1>
           </div>
-          <div className="flex gap-2">
-            <PrintReferenceButton 
-              invoiceId={invoice.id}
-              invoiceNumber={invoice.invoice_number}
-            />
-          </div>
+          {/* Print reference removed */}
         </div>
 
         <div className="bg-white shadow rounded-lg p-6 mb-6">

@@ -7,7 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { Copy, CheckCircle, Clock, CreditCard, Smartphone, Building2, Banknote, Printer, Loader2, Download, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { generatePaymentReferencePDF, printPaymentReference } from '@/services/payment/referencePrintService';
+// Print reference system removed
 
 interface PaymentReference {
   entity: string;
@@ -141,29 +141,14 @@ export const AppyPayReferenceModal = ({
     }
   };
 
-  // Handler para gerar PDF apenas da referência de pagamento
+  // Handler para gerar PDF removido
   const handleGenerateReferencePDF = async () => {
-    try {
-      setGeneratingReferencePDF(true);
-      await generatePaymentReferencePDF(paymentReference, customerInfo.name, customerInfo.email, orderData);
-      toast.success('PDF da referência gerado com sucesso!');
-    } catch (error) {
-      console.error('Erro ao gerar PDF da referência:', error);
-      toast.error('Erro ao gerar PDF da referência');
-    } finally {
-      setGeneratingReferencePDF(false);
-    }
+    toast.info('Funcionalidade de PDF removida');
   };
 
-  // Handler para imprimir apenas a referência de pagamento
+  // Handler para imprimir apenas a referência de pagamento removido
   const handlePrintReference = () => {
-    try {
-      printPaymentReference(paymentReference, customerInfo.name, customerInfo.email, orderData);
-      toast.success('Documento de referência aberto para impressão!');
-    } catch (error) {
-      console.error('Erro ao imprimir referência:', error);
-      toast.error('Erro ao abrir documento para impressão');
-    }
+    toast.info('Funcionalidade de impressão removida');
   };
 
   if (!paymentReference) return null;

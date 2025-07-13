@@ -7,7 +7,7 @@ import { Eye, Printer } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { formatPrice } from '@/lib/utils';
-import { PrintReferenceButton } from '@/components/invoice/PrintReferenceButton';
+// Print reference system removed
 import { Link } from 'react-router-dom';
 
 interface Invoice {
@@ -110,10 +110,7 @@ export default function InvoiceTableDesktop({
                     </Badge>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <PrintReferenceButton
-                      invoiceId={invoice.id}
-                      invoiceNumber={invoice.invoice_number}
-                    />
+                    {/* Print reference removed */}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right">
                     <div className="flex justify-end space-x-2">

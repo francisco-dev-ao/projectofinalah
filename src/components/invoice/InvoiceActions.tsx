@@ -1,4 +1,4 @@
-import { PrintReferenceButton } from './PrintReferenceButton';
+// Print reference system removed
 import { InvoiceEmailButton } from './InvoiceEmailButton';
 
 interface InvoiceActionsProps {
@@ -15,10 +15,7 @@ export function InvoiceActions({ invoiceId, invoiceNumber, customerEmail }: Invo
         invoiceNumber={invoiceNumber}
         customerEmail={customerEmail}
       />
-      <PrintReferenceButton 
-        invoiceId={invoiceId} 
-        invoiceNumber={invoiceNumber} 
-      />
+      {/* Print reference removed */}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { PrintReferenceButton } from '@/components/invoice/PrintReferenceButton';
+// Print reference system removed
 
 interface InvoiceViewProps {
   invoice: any;
@@ -17,7 +17,7 @@ export default function InvoiceView({ invoice, companySettings }: InvoiceViewPro
       <CardHeader>
         <CardTitle className="flex justify-between items-center">
           <span>Fatura #{invoice?.invoice_number}</span>
-          <PrintReferenceButton invoiceId={invoice?.id} invoiceNumber={invoice?.invoice_number} />
+          {/* Print reference removed */}
         </CardTitle>
       </CardHeader>
       <CardContent>

@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import InvoicePrintTemplate from '@/components/invoice/InvoicePrintTemplate';
 import { useReactToPrint } from 'react-to-print';
-import { updateInvoiceReference } from '@/services/print';
+// Print service removed
 
 /**
  * Página de visualização de fatura para impressão
@@ -45,10 +45,8 @@ export default function InvoicePreview() {
         if (error) throw error;
         if (!data) throw new Error('Fatura não encontrada');
         
-        // Atualizar a referência se necessário
-        const updatedInvoice = await updateInvoiceReference(data, requireReference);
-        
-        setInvoice(updatedInvoice);
+        // Reference system removed - using invoice data directly
+        setInvoice(data);
       } catch (err: any) {
         console.error('Erro ao buscar fatura:', err);
         setError(err.message || 'Erro ao carregar a fatura');
