@@ -396,27 +396,34 @@ export const sendPaymentReferenceEmail = async (
           <!-- Instruções -->
           <div class="instructions">
             <div class="instructions-title">
-              <span>📋</span>
-              <span>Como Efetuar o Pagamento</span>
+              ✅ Como pagar por referência
             </div>
             
             <div class="steps-list">
-              ${instructions.map((step, index) => {
-                // Simplify instructions
-                const simplifiedInstructions = [
-                  "Vá a um ATM ou Multicaixa Express",
-                  "Selecione 'Pagamentos' → 'Outros Serviços'",
-                  `Digite a Entidade: ${entity}`,
-                  `Digite a Referência: ${reference}`,
-                  `Confirme o valor: ${formatAmount(amount)}`,
-                  "Confirme o pagamento"
-                ];
-                return `
-                <div class="step">
-                  <div class="step-number">${index + 1}</div>
-                  <div class="step-text">${simplifiedInstructions[index] || step}</div>
-                </div>
-              `}).join('')}
+              <div class="step">
+                <div class="step-text">Vá até um ATM, Internet Banking ou Multicaixa Express</div>
+              </div>
+              <div class="step">
+                <div class="step-text">Escolha a opção "Pagamentos Por Referencia"</div>
+              </div>
+              <div class="step">
+                <div class="step-text">Insira a Entidade: <strong>${entity}</strong></div>
+              </div>
+              <div class="step">
+                <div class="step-text">Insira a Referência: <strong>${reference}</strong></div>
+              </div>
+              <div class="step">
+                <div class="step-text">Confirme o valor: <strong>${formatAmount(amount)}</strong></div>
+              </div>
+              <div class="step">
+                <div class="step-text">Finalize o pagamento ✅</div>
+              </div>
+            </div>
+            
+            <div style="margin-top: 24px; padding: 16px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; text-align: center;">
+              <div style="font-size: 16px; font-weight: 600; color: #856404; margin-bottom: 8px;">
+                📅 Importante: Esta referência é válida até: <strong>${validityDate}</strong>
+              </div>
             </div>
           </div>
           
