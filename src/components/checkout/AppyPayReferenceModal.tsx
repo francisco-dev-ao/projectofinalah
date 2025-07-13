@@ -4,8 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Copy, CheckCircle, Clock, CreditCard, Smartphone, Building2, Banknote, Printer, Loader2, Download, FileText } from 'lucide-react';
+import { Copy, CheckCircle, Clock, CreditCard, Smartphone, Building2, Banknote, Printer, Loader2, Download, FileText, Mail, Send } from 'lucide-react';
 import { toast } from 'sonner';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 // Print reference system removed
 
@@ -42,6 +44,9 @@ export const AppyPayReferenceModal = ({
   const [generatingReferencePDF, setGeneratingReferencePDF] = useState(false);
   const [customerInfo, setCustomerInfo] = useState<{name?: string, email?: string, phone?: string}>({});
   const [orderData, setOrderData] = useState<any>(null);
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const [webhookUrl, setWebhookUrl] = useState('');
+  const [showEmailSection, setShowEmailSection] = useState(false);
 
   // Carregar informações do cliente e dados do pedido
   useEffect(() => {
@@ -767,6 +772,63 @@ export const AppyPayReferenceModal = ({
     }
   };
 
+  // Handler para enviar email manual
+  const handleSendEmail = async () => {
+    if (!webhookUrl) {
+      toast.error('Por favor, insira a URL do webhook Zapier');
+      return;
+    }
+
+    if (!customerInfo.email) {
+      toast.error('Email do cliente não encontrado');
+      return;
+    }
+
+    setSendingEmail(true);
+    
+    try {
+      const emailData = {
+        to: customerInfo.email,
+        subject: `Referência de Pagamento - AngoHost #${paymentReference.order_id.substring(0, 8)}`,
+        customerName: customerInfo.name || 'Cliente',
+        entity: paymentReference.entity,
+        reference: paymentReference.reference,
+        amount: paymentReference.amount.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' }),
+        description: paymentReference.description,
+        validityDate: formatDate(paymentReference.validity_date),
+        instructions: paymentReference.instructions.pt.steps.join('\n'),
+        timestamp: new Date().toISOString(),
+        type: 'payment_reference'
+      };
+
+      const response = await fetch(webhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        mode: "no-cors",
+        body: JSON.stringify(emailData),
+      });
+
+      toast.success('Email enviado com sucesso para ' + customerInfo.email);
+      
+    } catch (error) {
+      console.error('Erro ao enviar email:', error);
+      toast.error('Erro ao enviar email. Verifique a URL do webhook.');
+    } finally {
+      setSendingEmail(false);
+    }
+  };
+
+  // Handler para envio automático
+  const handleAutoSendEmail = async () => {
+    if (customerInfo.email) {
+      handleSendEmail();
+    } else {
+      toast.error('Email do cliente não encontrado');
+    }
+  };
+
   if (!paymentReference) return null;
 
   return (
@@ -802,6 +864,71 @@ export const AppyPayReferenceModal = ({
               </Button>
             </div>
           </div>
+
+          {/* Seção de Email */}
+          <Card className="border-purple-200 shadow-sm">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Mail className="h-5 w-5 text-purple-600" />
+                Enviar por Email
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between bg-gradient-to-r from-purple-50 to-violet-50 p-4 rounded-lg border border-purple-200">
+                <div>
+                  <p className="text-sm font-medium text-purple-800">Cliente:</p>
+                  <p className="text-purple-700">{customerInfo.name || 'Nome não informado'}</p>
+                  <p className="text-sm text-purple-600">{customerInfo.email || 'Email não informado'}</p>
+                </div>
+                <Button
+                  onClick={handleAutoSendEmail}
+                  disabled={sendingEmail || !customerInfo.email}
+                  variant="outline"
+                  className="bg-purple-100 hover:bg-purple-200 border-purple-300"
+                >
+                  {sendingEmail ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : (
+                    <Send className="h-4 w-4 mr-2" />
+                  )}
+                  Envio Automático
+                </Button>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-gray-500" />
+                  <span className="text-sm font-medium text-gray-700">Envio Manual com Zapier</span>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="webhook-url" className="text-sm">
+                    URL do Webhook Zapier
+                  </Label>
+                  <Input
+                    id="webhook-url"
+                    type="url"
+                    placeholder="https://hooks.zapier.com/hooks/catch/..."
+                    value={webhookUrl}
+                    onChange={(e) => setWebhookUrl(e.target.value)}
+                    className="font-mono text-sm"
+                  />
+                </div>
+                <Button
+                  onClick={handleSendEmail}
+                  disabled={sendingEmail || !webhookUrl}
+                  variant="outline"
+                  className="w-full"
+                >
+                  {sendingEmail ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : (
+                    <Send className="h-4 w-4 mr-2" />
+                  )}
+                  Enviar Email Manual
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
 
           <Separator className="my-6" />
 

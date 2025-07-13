@@ -66,13 +66,14 @@ export function PrintReferenceButton({ invoiceId, invoiceNumber }: PrintReferenc
             }
             
             body {
-              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-              background: white;
-              color: #333;
-              line-height: 1.4;
+              font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+              background: #ffffff;
+              color: #1f2937;
+              line-height: 1.5;
               -webkit-print-color-adjust: exact;
               print-color-adjust: exact;
-              font-size: 13px;
+              font-size: 14px;
+              letter-spacing: -0.01em;
             }
             
             .invoice {
