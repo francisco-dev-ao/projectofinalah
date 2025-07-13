@@ -40,7 +40,7 @@ export const AppyPayReferenceModal = ({
 }: AppyPayReferenceModalProps) => {
   const [timeLeft, setTimeLeft] = useState<string>('');
   const [generatingReferencePDF, setGeneratingReferencePDF] = useState(false);
-  const [customerInfo, setCustomerInfo] = useState<{name?: string, email?: string}>({});
+  const [customerInfo, setCustomerInfo] = useState<{name?: string, email?: string, phone?: string}>({});
   const [orderData, setOrderData] = useState<any>(null);
 
   // Carregar informações do cliente e dados do pedido
@@ -51,7 +51,7 @@ export const AppyPayReferenceModal = ({
           .from("orders")
           .select(`
             *,
-            profiles:user_id (name, email),
+            profiles:user_id (name, email, phone),
             order_items (*)
           `)
           .eq("id", paymentReference.order_id)
@@ -62,7 +62,8 @@ export const AppyPayReferenceModal = ({
           if (order.profiles) {
             setCustomerInfo({
               name: order.profiles.name,
-              email: order.profiles.email
+              email: order.profiles.email,
+              phone: order.profiles.phone
             });
           }
           
@@ -236,6 +237,51 @@ export const AppyPayReferenceModal = ({
             
             .content {
               padding: 40px;
+            }
+            
+            .info-section {
+              margin-bottom: 20px;
+            }
+            
+            .info-title {
+              font-size: 18px;
+              font-weight: 600;
+              color: #2d3748;
+              margin-bottom: 15px;
+              padding-bottom: 8px;
+              border-bottom: 2px solid #e2e8f0;
+            }
+            
+            .info-card {
+              background: white;
+              border: 1px solid #e2e8f0;
+              border-radius: 12px;
+              padding: 20px;
+              box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            
+            .info-item {
+              margin-bottom: 15px;
+            }
+            
+            .info-item:last-child {
+              margin-bottom: 0;
+            }
+            
+            .info-label {
+              font-size: 12px;
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              color: #718096;
+              margin-bottom: 5px;
+            }
+            
+            .info-value {
+              font-size: 14px;
+              font-weight: 500;
+              color: #2d3748;
+              line-height: 1.4;
             }
             
             .reference-section {
@@ -525,6 +571,63 @@ export const AppyPayReferenceModal = ({
             </div>
             
             <div class="content">
+              <!-- Dados da Empresa e Cliente -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+                <div class="info-section">
+                  <div class="info-title">Dados da Empresa</div>
+                  <div class="info-card">
+                    <div class="info-item">
+                      <div class="info-label">Razão Social</div>
+                      <div class="info-value">AngoHost, Lda</div>
+                    </div>
+                    <div class="info-item">
+                      <div class="info-label">NIF</div>
+                      <div class="info-value">5000000000</div>
+                    </div>
+                    <div class="info-item">
+                      <div class="info-label">Endereço</div>
+                      <div class="info-value">Rua Principal, 123<br>Luanda, Angola</div>
+                    </div>
+                    <div class="info-item">
+                      <div class="info-label">Contactos</div>
+                      <div class="info-value">
+                        📧 support@angohost.ao<br>
+                        📞 +244 942 090 108<br>
+                        🌐 www.angohost.ao
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="info-section">
+                  <div class="info-title">Dados do Cliente</div>
+                  <div class="info-card">
+                    <div class="info-item">
+                      <div class="info-label">Nome</div>
+                      <div class="info-value">${customerInfo.name || 'Cliente'}</div>
+                    </div>
+                    <div class="info-item">
+                      <div class="info-label">Email</div>
+                      <div class="info-value">${customerInfo.email || 'Não informado'}</div>
+                    </div>
+                    <div class="info-item">
+                      <div class="info-label">Telefone</div>
+                      <div class="info-value">${customerInfo.phone || 'Não informado'}</div>
+                    </div>
+                    <div class="info-item">
+                      <div class="info-label">Data do Pedido</div>
+                      <div class="info-value">${new Date().toLocaleDateString('pt-PT', { 
+                        day: '2-digit', 
+                        month: 'long', 
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div class="reference-section">
                 <div class="section-title">Detalhes da Referência</div>
                 <div class="reference-grid">
