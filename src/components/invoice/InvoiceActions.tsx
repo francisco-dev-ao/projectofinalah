@@ -1,6 +1,4 @@
-
-import { InvoiceDownloadButton } from './InvoiceDownloadButton';
-import { InvoicePrintButton } from './InvoicePrintButton';
+import { PrintReferenceButton } from './PrintReferenceButton';
 import { InvoiceEmailButton } from './InvoiceEmailButton';
 
 interface InvoiceActionsProps {
@@ -17,11 +15,7 @@ export function InvoiceActions({ invoiceId, invoiceNumber, customerEmail }: Invo
         invoiceNumber={invoiceNumber}
         customerEmail={customerEmail}
       />
-      <InvoiceDownloadButton 
-        invoiceId={invoiceId} 
-        invoiceNumber={invoiceNumber} 
-      />
-      <InvoicePrintButton 
+      <PrintReferenceButton 
         invoiceId={invoiceId} 
         invoiceNumber={invoiceNumber} 
       />

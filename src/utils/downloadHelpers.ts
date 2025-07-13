@@ -2,6 +2,11 @@ import { toast } from 'sonner';
 // PrintService removed - using direct print reference instead
 
 export const downloadHelpers = {
+  // Redirect PDF download to print reference
+  downloadInvoicePDF: async (invoice: any, requireReference = false) => {
+    return downloadHelpers.printInvoiceDirectly(invoice, requireReference);
+  },
+
   printInvoiceDirectly: async (invoice: any, requireReference = false) => {
     const loadingToastId = toast.loading('Preparando impressão da referência...');
     

@@ -7,7 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Eye, Printer } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import InvoicePdfGenerator from '@/components/admin/InvoicePdfGenerator';
+import { PrintReferenceButton } from '@/components/invoice/PrintReferenceButton';
 
 interface Invoice {
   id: string;
@@ -90,12 +90,9 @@ export default function InvoiceCardsMobile({
                     Ver
                   </a>
                 </Button>
-                <InvoicePdfGenerator
+                <PrintReferenceButton
                   invoiceId={invoice.id}
                   invoiceNumber={invoice.invoice_number}
-                  pdfUrl={invoice.pdf_url}
-                  variant="outline"
-                  className="flex-1"
                 />
                 <Button 
                   variant="outline" 
