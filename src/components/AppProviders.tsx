@@ -15,9 +15,9 @@ interface AppProvidersProps {
 }
 
 /**
- * Component that wraps the application with all necessary providers
+ * Component that handles session timeout - must be inside AuthProvider
  */
-const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
+const SessionTimeoutHandler: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Use session timeout hook - automatically logout after 60 minutes of inactivity
   useSessionTimeout({
     timeoutMinutes: 60,
@@ -25,6 +25,13 @@ const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
     showWarning: true,
   });
 
+  return <>{children}</>;
+};
+
+/**
+ * Component that wraps the application with all necessary providers
+ */
+const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
   return (
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
@@ -33,9 +40,11 @@ const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
           <Sonner closeButton={true} />
           <BrowserRouter>
             <AuthProvider>
-              <SafeCartProvider>
-                {children}
-              </SafeCartProvider>
+              <SessionTimeoutHandler>
+                <SafeCartProvider>
+                  {children}
+                </SafeCartProvider>
+              </SessionTimeoutHandler>
             </AuthProvider>
           </BrowserRouter>
         </TooltipProvider>
