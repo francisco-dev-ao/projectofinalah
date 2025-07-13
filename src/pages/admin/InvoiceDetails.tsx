@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { useAdminAuth } from '@/hooks/use-admin-auth';
 import { useInvoices } from '@/hooks/useInvoices';
 import { useInvoiceBucket } from '@/hooks/useInvoiceBucket';
-import { PDFGenerator } from '@/utils/pdfGenerator';
+// PDF functionality removed - using print reference instead
 import { downloadHelpers } from '@/utils/downloadHelpers';
 import AdminInvoiceDetailsHeader from '@/components/invoice/AdminInvoiceDetailsHeader';
 import InvoiceCompanyInfo from '@/components/invoice/InvoiceCompanyInfo';

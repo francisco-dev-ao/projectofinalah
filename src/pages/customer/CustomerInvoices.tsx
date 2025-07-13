@@ -7,7 +7,7 @@ import { Eye, Loader2, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import InvoicePdfGenerator from '@/components/invoice/InvoicePdfGenerator';
+import { PrintReferenceButton } from '@/components/invoice/PrintReferenceButton';
 import { formatPrice } from '@/lib/utils';
 
 export default function CustomerInvoices() {

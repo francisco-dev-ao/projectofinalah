@@ -112,35 +112,18 @@ export function useCheckoutOrder() {
         if (invoiceResult?.success) {
           console.log("Invoice generated successfully:", invoiceResult.invoice);
           
-          // For reference payments, generate and download PDF automatically
+          // For reference payments, reference will be printed separately
           if (paymentMethod === 'appypay_reference') {
             try {
-              // Import PDF generator dynamically to avoid circular imports
-              const { PDFGenerator } = await import('@/utils/pdfGenerator');
-              const { InvoiceService } = await import('@/services/invoiceService');
-              
-              // Get complete invoice data with payment reference
-              const completeInvoiceData = await InvoiceService.getInvoice(invoiceResult.invoice.id);
-              
-              // Generate PDF
-              const pdfBuffer = await PDFGenerator.generateInvoicePDF(completeInvoiceData);
-              const blob = new Blob([pdfBuffer], { type: 'application/pdf' });
-              const url = URL.createObjectURL(blob);
-              
-              // Auto download PDF
-              const link = document.createElement('a');
-              link.href = url;
-              link.download = `fatura-${completeInvoiceData.invoice_number || completeInvoiceData.id.substring(0, 8)}.pdf`;
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              URL.revokeObjectURL(url);
-              
-              console.log("PDF generated and downloaded automatically");
-            } catch (pdfError) {
-              console.error("Error generating PDF:", pdfError);
+              // PDF functionality removed - using print reference instead
+              console.log('Reference payment completed, no automatic PDF generation');
+              // The user can now print the reference separately using the PrintReferenceButton
+            } catch (error) {
+              console.error("Error in reference payment processing:", error);
             }
           }
+        } else {
+          console.error("Error generating invoice:", invoiceResult);
         }
       } catch (error) {
         console.error("Error generating invoice:", error);

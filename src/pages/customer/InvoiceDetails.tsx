@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { useInvoices } from '@/hooks/useInvoices';
 import { useInvoiceBucket } from '@/hooks/useInvoiceBucket';
-import { PDFGenerator } from '@/utils/pdfGenerator';
+// PDF functionality removed - using print reference instead
 import InvoiceDetailsHeader from '@/components/invoice/InvoiceDetailsHeader';
 import InvoiceCompanyInfo from '@/components/invoice/InvoiceCompanyInfo';
 import InvoiceItemsTable from '@/components/invoice/InvoiceItemsTable';
