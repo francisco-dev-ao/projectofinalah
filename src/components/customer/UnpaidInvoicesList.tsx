@@ -8,7 +8,7 @@ import { AlertTriangle, Download, Printer, Clock, CreditCard } from "lucide-reac
 import { toast } from "sonner";
 import { saveAs } from 'file-saver';
 // Importar o novo componente ao invés da função direta
-// Print reference system removed
+import { PrintReferenceButton } from '@/components/invoice/PrintReferenceButton';
 
 interface UnpaidInvoicesListProps {
   userId: string;
@@ -240,7 +240,12 @@ const UnpaidInvoicesList: React.FC<UnpaidInvoicesListProps> = ({ userId }) => {
                       <Download className="h-4 w-4 mr-2" />
                       Download
                     </Button>
-                  ) : null}
+                  ) : (
+                    <PrintReferenceButton
+                      invoiceId={invoice.id}
+                      invoiceNumber={invoice.invoice_number}
+                    />
+                  )}
                   <Button
                     variant="secondary"
                     size="sm"

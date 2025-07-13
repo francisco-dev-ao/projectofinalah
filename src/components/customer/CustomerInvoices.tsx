@@ -7,7 +7,7 @@ import { Download, Eye, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-// Print reference system removed
+import { PrintReferenceButton } from '@/components/invoice/PrintReferenceButton';
 import { invoiceService } from '@/services/invoiceService';
 import { formatPrice } from '@/lib/utils';
 // PDF generation removed - using print reference system

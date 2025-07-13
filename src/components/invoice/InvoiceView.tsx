@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Download, Printer, Loader2 } from 'lucide-react';
-// Print reference system removed
+import { PrintReferenceButton } from './PrintReferenceButton';
 import { toast } from 'sonner';
 import { getInvoiceItems } from '@/utils/invoice/getInvoiceItems';
 import axios from 'axios';
@@ -145,7 +145,10 @@ export default function InvoiceView({ invoiceId }: InvoiceViewProps) {
             <p className="text-gray-600">#{invoice.invoice_number}</p>
           </div>
           <div className="flex gap-2">
-            {/* Print reference removed */}
+            <PrintReferenceButton 
+              invoiceId={invoice.id} 
+              invoiceNumber={invoice.invoice_number}
+            />
           </div>
         </div>
 

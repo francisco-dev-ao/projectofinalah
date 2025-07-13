@@ -7,7 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Eye, Printer } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-// Print reference system removed
+import { PrintReferenceButton } from '@/components/invoice/PrintReferenceButton';
 
 interface Invoice {
   id: string;
@@ -90,7 +90,10 @@ export default function InvoiceCardsMobile({
                     Ver
                   </a>
                 </Button>
-                {/* Print reference removed */}
+                <PrintReferenceButton
+                  invoiceId={invoice.id}
+                  invoiceNumber={invoice.invoice_number}
+                />
                 <Button 
                   variant="outline" 
                   size="sm"
