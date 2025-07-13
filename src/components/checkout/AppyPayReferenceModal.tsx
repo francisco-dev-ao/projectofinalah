@@ -141,14 +141,178 @@ export const AppyPayReferenceModal = ({
     }
   };
 
-  // Handler para gerar PDF removido
-  const handleGenerateReferencePDF = async () => {
-    toast.info('Funcionalidade de PDF removida');
-  };
-
-  // Handler para imprimir apenas a referência de pagamento removido
+  // Handler para imprimir referência de pagamento
   const handlePrintReference = () => {
-    toast.info('Funcionalidade de impressão removida');
+    try {
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        toast.error('Não foi possível abrir a janela de impressão');
+        return;
+      }
+
+      // HTML para impressão da referência
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Referência de Pagamento Multicaixa</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              margin: 20px;
+              line-height: 1.6;
+            }
+            .header {
+              text-align: center;
+              border-bottom: 2px solid #333;
+              padding-bottom: 20px;
+              margin-bottom: 30px;
+            }
+            .company-name {
+              font-size: 24px;
+              font-weight: bold;
+              color: #333;
+            }
+            .reference-box {
+              border: 2px solid #007bff;
+              border-radius: 8px;
+              padding: 20px;
+              margin: 20px 0;
+              background-color: #f8f9fa;
+            }
+            .reference-title {
+              font-size: 18px;
+              font-weight: bold;
+              color: #007bff;
+              margin-bottom: 15px;
+            }
+            .reference-item {
+              margin: 10px 0;
+              font-size: 16px;
+            }
+            .reference-item strong {
+              color: #333;
+            }
+            .amount {
+              font-size: 20px;
+              font-weight: bold;
+              color: #28a745;
+            }
+            .channels {
+              margin: 20px 0;
+              padding: 15px;
+              background-color: #e9ecef;
+              border-radius: 8px;
+            }
+            .instructions {
+              margin-top: 30px;
+              padding: 20px;
+              background-color: #e9ecef;
+              border-radius: 8px;
+            }
+            .instructions h3 {
+              color: #495057;
+              margin-bottom: 15px;
+            }
+            .instructions ol {
+              margin: 0;
+              padding-left: 20px;
+            }
+            .instructions li {
+              margin: 8px 0;
+            }
+            .footer {
+              margin-top: 40px;
+              text-align: center;
+              font-size: 12px;
+              color: #666;
+              border-top: 1px solid #ddd;
+              padding-top: 20px;
+            }
+            @media print {
+              body { margin: 0; }
+              .no-print { display: none; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="company-name">AngoHost</div>
+            <div>Referência de Pagamento Multicaixa</div>
+          </div>
+
+          <div class="reference-box">
+            <div class="reference-title">Detalhes da Referência</div>
+            <div class="reference-item">
+              <strong>Referência:</strong> ${paymentReference.reference}
+            </div>
+            <div class="reference-item">
+              <strong>Entidade:</strong> ${paymentReference.entity}
+            </div>
+            <div class="reference-item">
+              <strong>Montante:</strong> <span class="amount">${paymentReference.amount.toLocaleString('pt-PT', { 
+                style: 'currency', 
+                currency: 'AOA' 
+              })}</span>
+            </div>
+            <div class="reference-item">
+              <strong>Descrição:</strong> ${paymentReference.description}
+            </div>
+            <div class="reference-item">
+              <strong>Data:</strong> ${new Date().toLocaleDateString('pt-PT')}
+            </div>
+            <div class="reference-item">
+              <strong>Válido até:</strong> ${paymentReference.validity_date ? new Date(paymentReference.validity_date).toLocaleDateString('pt-PT') : 'Sem prazo'}
+            </div>
+          </div>
+
+          ${paymentReference.payment_channels?.length ? `
+          <div class="channels">
+            <h3>Canais de Pagamento Disponíveis:</h3>
+            ${paymentReference.payment_channels.map(channel => `<p>• ${channel}</p>`).join('')}
+          </div>
+          ` : ''}
+
+          <div class="instructions">
+            <h3>Instruções de Pagamento:</h3>
+            <ol>
+              ${paymentReference.instructions?.pt?.steps?.map(step => `<li>${step}</li>`).join('') || `
+                <li>Acesse seu aplicativo bancário ou terminal ATM</li>
+                <li>Selecione a opção "Pagamento de Serviços" ou "Multicaixa"</li>
+                <li>Digite a entidade: <strong>${paymentReference.entity}</strong></li>
+                <li>Digite a referência: <strong>${paymentReference.reference}</strong></li>
+                <li>Confirme o valor: <strong>${paymentReference.amount.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' })}</strong></li>
+                <li>Complete o pagamento</li>
+              `}
+            </ol>
+          </div>
+
+          <div class="footer">
+            <p>AngoHost - Soluções em Hospedagem e Domínios</p>
+            <p>Email: support@angohost.ao | Tel: +244 942 090108</p>
+            <p>Este documento foi gerado eletronicamente - ${new Date().toLocaleString('pt-PT')}</p>
+          </div>
+
+          <script>
+            window.onload = function() {
+              setTimeout(function() {
+                window.print();
+              }, 500);
+            };
+          </script>
+        </body>
+        </html>
+      `;
+
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+      
+      toast.success('Documento de referência aberto para impressão!');
+      
+    } catch (error) {
+      console.error('Erro ao imprimir referência:', error);
+      toast.error('Erro ao preparar impressão da referência');
+    }
   };
 
   if (!paymentReference) return null;
@@ -183,24 +347,6 @@ export const AppyPayReferenceModal = ({
               >
                 <Printer className="mr-2 h-4 w-4" />
                 Imprimir Referência
-              </Button>
-              <Button
-                onClick={handleGenerateReferencePDF}
-                disabled={generatingReferencePDF}
-                variant="outline"
-                className="flex-1 border-green-300 hover:bg-green-50"
-              >
-                {generatingReferencePDF ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Gerando PDF...
-                  </>
-                ) : (
-                  <>
-                    <Download className="mr-2 h-4 w-4" />
-                    PDF Referência
-                  </>
-                )}
               </Button>
             </div>
           </div>
