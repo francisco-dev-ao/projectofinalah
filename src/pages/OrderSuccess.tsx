@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Loader2, ArrowLeft, CheckCircle2, AlertCircle, Printer } from 'lucide-react';
 import { toast } from 'sonner';
 import { InvoiceService } from '@/services/invoice';
-import { PDFGenerator } from '@/utils/pdfGenerator';
+// PDFGenerator removed - using print reference instead
 import PaymentStatusChecker from '@/components/invoice/PaymentStatusChecker';
 
 export default function OrderSuccess() {

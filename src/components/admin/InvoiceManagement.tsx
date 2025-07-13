@@ -12,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { InvoiceStatusToggle } from "./InvoiceStatusToggle";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import InvoicePdfGenerator from "./InvoicePdfGenerator";
+// PDF Generator removed - using print reference instead
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
@@ -20,6 +20,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import CreateInvoiceDialog from "./CreateInvoiceDialog";
 import { deleteInvoice } from "@/services/invoice";
+import InvoiceActions from "./InvoiceActions";
 
 const InvoiceManagement = () => {
   const [invoices, setInvoices] = useState<any[]>([]);
@@ -114,12 +115,7 @@ const InvoiceManagement = () => {
     fetchInvoices();
   };
 
-  const handlePdfGenerated = (invoiceId: string, pdfUrl: string) => {
-    // Update the invoice in the local state with the new PDF URL
-    setInvoices(invoices.map(invoice => 
-      invoice.id === invoiceId ? { ...invoice, pdf_url: pdfUrl } : invoice
-    ));
-  };
+  // PDF generation removed - using print reference instead
 
   const handleCreateInvoiceSuccess = () => {
     fetchInvoices();
@@ -261,7 +257,7 @@ const InvoiceManagement = () => {
                 <TableHead>Valor</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Marcar como</TableHead>
-                <TableHead>PDF</TableHead>
+                <TableHead>Ações</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
@@ -297,11 +293,9 @@ const InvoiceManagement = () => {
                       />
                     </TableCell>
                     <TableCell>
-                      <InvoicePdfGenerator
-                        invoiceId={invoice.id}
-                        invoiceNumber={invoice.invoice_number}
-                        pdfUrl={invoice.pdf_url}
-                        onSuccess={(pdfUrl) => handlePdfGenerated(invoice.id, pdfUrl)}
+                      <InvoiceActions 
+                        invoice={invoice}
+                        onEdit={() => {}}
                       />
                     </TableCell>
                     <TableCell className="text-right">

@@ -1,264 +1,157 @@
-import React, { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
   DialogTitle,
-  DialogFooter
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { formatDate } from "@/components/admin/order-details/OrderDetailsUtils";
-import { ServiceStatus } from "@/types/service";
-import { PDFGenerator } from "@/utils/pdfGenerator"; // Importar o gerador
-import { toast } from "react-hot-toast"; // Adicionar toast notifications
+  DialogTrigger 
+} from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { Eye, Printer, Loader2 } from 'lucide-react';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { toast } from 'sonner';
 
 interface ServiceDetailsDialogProps {
-  open: boolean;
-  onClose: () => void;
   service: any;
-  onStatusUpdate: (serviceId: string, newStatus: ServiceStatus) => Promise<void>;
-  onDelete: (serviceId: string) => Promise<void>;
-  onServicesChange: () => Promise<void>;
 }
 
-const ServiceDetailsDialog = ({
-  open,
-  onClose,
-  service,
-  onStatusUpdate,
-  onDelete,
-  onServicesChange
-}: ServiceDetailsDialogProps) => {
-  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
-  
-  if (!service) return null;
+export function ServiceDetailsDialog({ service }: ServiceDetailsDialogProps) {
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  const formatServiceStatus = (status: string) => {
-    switch (status) {
-      case 'active': return 'Ativo';
-      case 'pending': return 'Pendente';
-      case 'canceled': return 'Cancelado';
-      case 'cancelled': return 'Cancelado';
-      case 'suspended': return 'Suspenso';
-      case 'expired': return 'Expirado';
-      default: return status;
+  const handlePrintService = async () => {
+    try {
+      setIsGenerating(true);
+      toast.loading('Preparando impressão...');
+
+      // Criar conteúdo para impressão do serviço
+      const printContent = `
+        <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px;">
+          <h2>Detalhes do Serviço</h2>
+          <hr>
+          <p><strong>Nome:</strong> ${service.service_name || 'N/A'}</p>
+          <p><strong>Status:</strong> ${getStatusInPortuguese(service.status)}</p>
+          <p><strong>Data de Criação:</strong> ${format(new Date(service.created_at), 'dd/MM/yyyy HH:mm', { locale: ptBR })}</p>
+          ${service.activation_date ? 
+            `<p><strong>Data de Ativação:</strong> ${format(new Date(service.activation_date), 'dd/MM/yyyy HH:mm', { locale: ptBR })}</p>` 
+            : ''
+          }
+          <hr>
+          <small>Documento gerado automaticamente pelo sistema AngoHost</small>
+        </div>
+      `;
+
+      // Abrir janela de impressão
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(printContent);
+        printWindow.document.close();
+        printWindow.print();
+        printWindow.close();
+      }
+      
+      toast.success('Informações do serviço preparadas para impressão!');
+    } catch (error: any) {
+      console.error('Erro ao imprimir serviço:', error);
+      toast.error(error.message || 'Erro ao imprimir serviço');
+    } finally {
+      setIsGenerating(false);
+      toast.dismiss();
     }
   };
 
-  // Get badge variant based on status
-  const getStatusBadge = (status: string) => {
+  const getStatusInPortuguese = (status: string) => {
+    const statusMap: Record<string, string> = {
+      'active': 'Ativo',
+      'inactive': 'Inativo',
+      'suspended': 'Suspenso',
+      'canceled': 'Cancelado'
+    };
+    return statusMap[status] || status;
+  };
+
+  const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'outline'; // Changed from 'success' to 'outline'
-      case 'pending':
-      case 'awaiting':
-        return 'default';
+        return 'bg-green-100 text-green-800';
+      case 'inactive':
+        return 'bg-gray-100 text-gray-800';
       case 'suspended':
+        return 'bg-yellow-100 text-yellow-800';
       case 'canceled':
-      case 'cancelled':
-      case 'expired':
-        return 'destructive';
+        return 'bg-red-100 text-red-800';
       default:
-        return 'default';
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const handleGeneratePDF = async () => {
-    try {
-      setIsGeneratingPDF(true);
-      
-      const pdfBuffer = await PDFGenerator.generateServicePDF(service);
-      
-      // Converter buffer para blob
-      const blob = new Blob([pdfBuffer], { type: 'application/pdf' });
-      
-      // Criar URL e iniciar download
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `servico-${service.id}-${new Date().getTime()}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      toast.success('PDF gerado com sucesso!');
-    } catch (error) {
-      console.error('Erro ao gerar PDF:', error);
-      toast.error('Erro ao gerar PDF do serviço');
-    } finally {
-      setIsGeneratingPDF(false);
-    }
-  };
-  
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="sm">
+          <Eye className="h-4 w-4 mr-2" />
+          Ver Detalhes
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="flex items-center justify-between">
-            <span>Detalhes do Serviço</span>
-            <Badge variant={getStatusBadge(service.status)} className="px-3 py-1 text-sm">
-              {formatServiceStatus(service.status)}
-            </Badge>
-          </DialogTitle>
+          <DialogTitle>Detalhes do Serviço</DialogTitle>
         </DialogHeader>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <h3 className="font-medium mb-2">Informações Básicas</h3>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between border-b pb-1">
-                <span className="text-muted-foreground">Nome:</span>
-                <span className="font-medium">{service.name}</span>
-              </div>
-              <div className="flex justify-between border-b pb-1">
-                <span className="text-muted-foreground">ID:</span>
-                <span className="font-mono text-xs">{service.id}</span>
-              </div>
-              <div className="flex justify-between border-b pb-1">
-                <span className="text-muted-foreground">Data de Criação:</span>
-                <span>{formatDate(service.created_at)}</span>
-              </div>
-              <div className="flex justify-between border-b pb-1">
-                <span className="text-muted-foreground">Data de Ativação:</span>
-                <span>{service.activation_date ? formatDate(service.activation_date) : "N/A"}</span>
-              </div>
-              <div className="flex justify-between border-b pb-1">
-                <span className="text-muted-foreground">Data de Expiração:</span>
-                <span>{service.end_date ? formatDate(service.end_date) : "N/A"}</span>
-              </div>
-              <div className="flex justify-between border-b pb-1">
-                <span className="text-muted-foreground">Auto Renovação:</span>
-                <span>{service.auto_renew ? "Sim" : "Não"}</span>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm font-medium text-gray-500">Nome do Serviço</label>
+              <p className="mt-1">{service.service_name || 'N/A'}</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-500">Status</label>
+              <div className="mt-1">
+                <Badge className={getStatusColor(service.status)}>
+                  {getStatusInPortuguese(service.status)}
+                </Badge>
               </div>
             </div>
           </div>
-          
-          <div>
-            <h3 className="font-medium mb-2">Informações do Cliente</h3>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between border-b pb-1">
-                <span className="text-muted-foreground">Nome:</span>
-                <span className="font-medium">{service.profiles?.name || "N/A"}</span>
-              </div>
-              <div className="flex justify-between border-b pb-1">
-                <span className="text-muted-foreground">Email:</span>
-                <span>{service.profiles?.email || "N/A"}</span>
-              </div>
-              <div className="flex justify-between border-b pb-1">
-                <span className="text-muted-foreground">Empresa:</span>
-                <span>{service.profiles?.company_name || "N/A"}</span>
-              </div>
-              <div className="flex justify-between border-b pb-1">
-                <span className="text-muted-foreground">ID do Cliente:</span>
-                <span className="font-mono text-xs">{service.user_id}</span>
-              </div>
+
+          <Separator />
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm font-medium text-gray-500">Data de Criação</label>
+              <p className="mt-1">
+                {format(new Date(service.created_at), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
+              </p>
             </div>
-
-            {service.domains && service.domains.length > 0 && (
-              <div className="mt-4">
-                <h3 className="font-medium mb-2">Domínio Associado</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between border-b pb-1">
-                    <span className="text-muted-foreground">Nome de Domínio:</span>
-                    <span className="font-medium">{service.domains[0].domain_name}</span>
-                  </div>
-                  <div className="flex justify-between border-b pb-1">
-                    <span className="text-muted-foreground">Status do Domínio:</span>
-                    <span>{formatServiceStatus(service.domains[0].status)}</span>
-                  </div>
-                </div>
+            {service.activation_date && (
+              <div>
+                <label className="text-sm font-medium text-gray-500">Data de Ativação</label>
+                <p className="mt-1">
+                  {format(new Date(service.activation_date), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
+                </p>
               </div>
             )}
           </div>
-        </div>
 
-        {service.order_item && (
-          <div className="mb-4">
-            <h3 className="font-medium mb-2">Detalhes do Item de Pedido</h3>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between border-b pb-1">
-                <span className="text-muted-foreground">Preço Unitário:</span>
-                <span>{service.order_item.unit_price ? `${service.order_item.unit_price} AOA` : "N/A"}</span>
-              </div>
-              <div className="flex justify-between border-b pb-1">
-                <span className="text-muted-foreground">Quantidade:</span>
-                <span>{service.order_item.quantity || "1"}</span>
-              </div>
-              <div className="flex justify-between border-b pb-1">
-                <span className="text-muted-foreground">Duração:</span>
-                <span>
-                  {service.order_item.duration ? `${service.order_item.duration} ${service.order_item.duration_unit || "meses"}` : "N/A"}
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
+          <Separator />
 
-        <div className="mb-4">
-          <h3 className="font-medium mb-2">Ações de Status</h3>
-          <div className="flex flex-wrap gap-2">
-            {service.status !== 'active' && (
-              <Button 
-                variant="default" 
-                size="sm"
-                onClick={() => onStatusUpdate(service.id, 'active' as ServiceStatus)}
-              >
-                Ativar Serviço
-              </Button>
-            )}
-            {service.status !== 'pending' && (
-              <Button 
-                variant="secondary" 
-                size="sm"
-                onClick={() => onStatusUpdate(service.id, 'pending' as ServiceStatus)}
-              >
-                Marcar como Pendente
-              </Button>
-            )}
-            {service.status !== 'suspended' && (
-              <Button 
-                variant="secondary" 
-                size="sm"
-                onClick={() => onStatusUpdate(service.id, 'suspended' as ServiceStatus)}
-              >
-                Suspender Serviço
-              </Button>
-            )}
-            {service.status !== 'cancelled' && (
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => onStatusUpdate(service.id, 'cancelled' as ServiceStatus)}
-              >
-                Cancelar Serviço
-              </Button>
-            )}
-          </div>
-        </div>
-
-        <DialogFooter className="flex justify-between items-center">
-          <div className="flex gap-2">
+          <div className="flex justify-end">
             <Button
-              variant="destructive"
-              onClick={() => onDelete(service.id)}
+              onClick={handlePrintService}
+              disabled={isGenerating}
+              className="flex items-center gap-2"
             >
-              Excluir Serviço
-            </Button>
-            
-            <Button
-              variant="default"
-              onClick={handleGeneratePDF}
-              disabled={isGeneratingPDF}
-            >
-              {isGeneratingPDF ? 'Gerando...' : 'Gerar PDF'}
+              {isGenerating ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Printer className="h-4 w-4" />
+              )}
+              Imprimir Detalhes
             </Button>
           </div>
-          <Button variant="outline" onClick={onClose}>Fechar</Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
-};
-
-export default ServiceDetailsDialog;
+}

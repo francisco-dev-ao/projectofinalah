@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { InvoiceService } from '@/services/invoiceService';
 import { Link } from 'react-router-dom';
 import { FileText, Home, List } from 'lucide-react';
-import { PDFGenerator } from '@/utils/pdfGenerator';
+// PDFGenerator removed - using print reference instead
 import { downloadHelpers } from '@/utils/downloadHelpers';
 import { storageUtils } from '@/utils/storageUtils';
 

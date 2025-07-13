@@ -1,19 +1,42 @@
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Printer, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-// PrintService removed - using direct print reference instead
+import { supabase } from '@/integrations/supabase/client';
 
-export const downloadHelpers = {
-  printInvoiceDirectly: async (invoice: any, requireReference = false) => {
-    const loadingToastId = toast.loading('Preparando impressão da referência...');
-    
+export interface PrintReferenceButtonProps {
+  invoiceId: string;
+  invoiceNumber: string;
+}
+
+export function PrintReferenceButton({ invoiceId, invoiceNumber }: PrintReferenceButtonProps) {
+  const [printing, setPrinting] = useState(false);
+
+  const handlePrint = async () => {
     try {
-      // Buscar a referência de pagamento mais recente
+      setPrinting(true);
+      
+      const { data: invoice, error } = await supabase
+        .from('invoices')
+        .select(`
+          *,
+          orders (
+            *,
+            profiles:user_id (*),
+            payment_references (*)
+          )
+        `)
+        .eq('id', invoiceId)
+        .single();
+        
+      if (error) throw new Error(`Erro ao carregar fatura: ${error.message}`);
+      
       const paymentRef = invoice.orders?.payment_references?.[0];
       if (!paymentRef) {
         toast.error('Referência de pagamento não encontrada');
         return;
       }
 
-      // Criar conteúdo para impressão da referência
       const printContent = `
         <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 400px;">
           <h2>Referência de Pagamento</h2>
@@ -29,7 +52,6 @@ export const downloadHelpers = {
         </div>
       `;
 
-      // Abrir janela de impressão
       const printWindow = window.open('', '_blank');
       if (printWindow) {
         printWindow.document.write(printContent);
@@ -38,13 +60,28 @@ export const downloadHelpers = {
         printWindow.close();
       }
       
-      toast.dismiss(loadingToastId);
       toast.success('Referência preparada para impressão!');
     } catch (error: any) {
-      console.error('Erro ao imprimir referência:', error);
-      toast.dismiss(loadingToastId);
+      console.error('Error printing reference:', error);
       toast.error(error.message || 'Erro ao imprimir referência');
-      throw error;
+    } finally {
+      setPrinting(false);
     }
-  }
-};
+  };
+
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={handlePrint}
+      disabled={printing}
+    >
+      {printing ? (
+        <Loader2 className="h-4 w-4 animate-spin" />
+      ) : (
+        <Printer className="h-4 w-4 mr-2" />
+      )}
+      Imprimir Referência
+    </Button>
+  );
+}

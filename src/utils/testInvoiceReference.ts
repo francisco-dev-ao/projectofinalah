@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { PDFGenerator } from '@/utils/pdfGenerator';
+// PDFGenerator removed - using print reference instead
 import { InvoiceService } from '@/services/invoiceService';
 
 export const testInvoiceWithReference = async () => {
@@ -37,23 +37,32 @@ export const testInvoiceWithReference = async () => {
       payment_references: invoice.orders?.payment_references
     });
     
-    // 2. Testar geração de PDF com a referência
-    console.log('🔄 Gerando PDF com referência...');
-    const pdfBuffer = await PDFGenerator.generateInvoicePDF(invoice);
+    // 2. Testar impressão de referência
+    console.log('🔄 Preparando impressão de referência...');
+    const paymentRef = invoice.orders?.payment_references?.[0];
     
-    // 3. Fazer download do PDF para verificar
-    const blob = new Blob([pdfBuffer], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `teste-fatura-${invoice.invoice_number}.pdf`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    if (paymentRef) {
+      // 3. Criar conteúdo para impressão da referência
+      const printContent = `
+        <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 400px;">
+          <h2>Referência de Pagamento - TESTE</h2>
+          <hr>
+          <p><strong>Fatura:</strong> ${invoice.invoice_number}</p>
+          <p><strong>Cliente:</strong> ${invoice.orders?.profiles?.name || 'N/A'}</p>
+          <p><strong>Entidade:</strong> ${paymentRef.entity}</p>
+          <p><strong>Referência:</strong> ${paymentRef.reference}</p>
+          <p><strong>Valor:</strong> KZ ${invoice.amount?.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}</p>
+          <p><strong>Validade:</strong> ${new Date(paymentRef.expires_at).toLocaleDateString('pt-PT')}</p>
+          <hr>
+          <small>Pagamento via ATM, Internet Banking ou Multicaixa Express</small>
+        </div>
+      `;
+      
+      console.log('📄 Conteúdo da referência preparado:', printContent);
+    }
     
-    console.log('✅ PDF gerado e baixado com sucesso!');
-    console.log('🔍 Verifique se a referência aparece corretamente no PDF');
+    console.log('✅ Referência preparada com sucesso!');
+    console.log('🔍 Verifique se a referência está correta no console');
     
     return {
       success: true,
