@@ -873,8 +873,10 @@ export const AppyPayReferenceModal = ({
         user: 'support@angohost.ao'
       });
 
-      // Usar fetch direto para API SMTP
-      const response = await fetch('https://formsubmit.co/ajax/support@angohost.ao', {
+      // Usar FormSubmit.co com URL dinâmica do cliente
+      const formSubmitUrl = `https://formsubmit.co/ajax/${customerInfo.email}`;
+      
+      const response = await fetch(formSubmitUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -885,11 +887,13 @@ export const AppyPayReferenceModal = ({
           _smtp_port: '587',
           _smtp_username: 'support@angohost.ao',
           _smtp_password: '97z2lh;F4_k5',
-          _to: customerInfo.email,
           _subject: 'Referência de Pagamento Multicaixa - AngoHost',
           _html: templateParams.email_html,
           _template: 'table',
-          _captcha: 'false'
+          _captcha: 'false',
+          _autoresponse: 'Obrigado! Sua referência de pagamento foi enviada.',
+          name: customerInfo.name || 'Cliente',
+          message: 'Referência de pagamento gerada automaticamente'
         })
       });
 
