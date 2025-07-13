@@ -150,12 +150,8 @@ export const generatePaymentReference = async (
         })
         .eq('id', invoiceData.id);
       // Enviar fatura por email ao cliente
-      await supabase.functions.invoke('send-invoice-email', {
-        body: {
-          invoiceId: invoiceData.id,
-          forceRegenerate: true
-        }
-      });
+      // Email será enviado automaticamente pelo hook useOrderEmail
+
     }
 
     // Atualizar status do pedido
@@ -201,7 +197,6 @@ export const generatePaymentReference = async (
         "Balcão Bancário"
       ]
     };
-    
   } catch (error: any) {
     console.error('❌ Erro no AppyPay:', error.message);
     

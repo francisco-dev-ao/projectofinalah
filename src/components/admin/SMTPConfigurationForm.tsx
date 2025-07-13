@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2, Mail, Check, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
-import PrintService from '@/services';
+import { EmailService } from '@/services/emailService';
 
 export default function SMTPConfigurationForm() {
   const [loading, setLoading] = useState(false);
@@ -87,7 +87,7 @@ export default function SMTPConfigurationForm() {
       localStorage.setItem('NEXT_PUBLIC_SMTP_FROM', config.smtp_from);
       
       // Enviar e-mail de teste
-      const result = await PrintService.sendTestEmail(testEmail);
+      const result = await EmailService.sendTestEmail(testEmail);
       
       toast.success(`E-mail de teste enviado com sucesso para ${testEmail}`);
     } catch (error: any) {

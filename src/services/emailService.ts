@@ -10,7 +10,7 @@ interface EmailData {
  */
 export class EmailService {
   private static readonly API_URL = 'https://mail3.angohost.ao/email/send';
-  private static readonly API_KEY = 'SUA_CHAVE_SECRETA'; // TODO: Configurar chave real
+  private static readonly API_KEY = 'SUA_CHAVE_SECRETA'; // TODO: Configurar chave real da API
 
   /**
    * Envia um email usando a API AngoHost diretamente
@@ -196,6 +196,119 @@ export class EmailService {
     return this.sendEmail({
       to: customerEmail,
       subject: `Fatura ${invoiceNumber} - AngoHost`,
+      html
+    });
+  }
+
+  /**
+   * Envia email de teste para configuração SMTP
+   */
+  static async sendTestEmail(testEmail: string): Promise<{ success: boolean; message?: string; error?: string }> {
+    const html = `
+      <html>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto;">
+          <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-bottom: 3px solid #0066cc;">
+            <h2 style="margin: 0; color: #0066cc;">AngoHost - Teste de Email</h2>
+          </div>
+          
+          <div style="padding: 20px;">
+            <h3 style="color: #0066cc;">✅ Configuração de Email Funcionando!</h3>
+            
+            <p>Parabéns! Sua configuração de email está funcionando corretamente.</p>
+            
+            <div style="background-color: #d4edda; border: 1px solid #c3e6cb; padding: 15px; border-radius: 4px; margin: 20px 0;">
+              <p style="margin: 0; color: #155724;"><strong>Este é um email de teste enviado em:</strong></p>
+              <p style="margin: 5px 0 0 0; color: #155724;">${new Date().toLocaleString('pt-AO')}</p>
+            </div>
+            
+            <p>Agora você pode:</p>
+            <ul>
+              <li>Enviar faturas por email automaticamente</li>
+              <li>Notificar clientes sobre novos pedidos</li>
+              <li>Enviar confirmações de pagamento</li>
+            </ul>
+            
+            <p>Se você recebeu este email, significa que o sistema está pronto para enviar emails para seus clientes.</p>
+            
+            <p>Atenciosamente,<br>Sistema AngoHost</p>
+          </div>
+          
+          <div style="background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666;">
+            <p>© ${new Date().getFullYear()} AngoHost. Sistema de gestão integrado.</p>
+          </div>
+        </body>
+      </html>
+    `;
+
+    return this.sendEmail({
+      to: testEmail,
+      subject: 'Teste de Configuração Email - AngoHost',
+      html
+    });
+  }
+
+  /**
+   * Envia email de confirmação de pedido
+   */
+  static async sendOrderConfirmationEmail(
+    customerEmail: string,
+    customerName: string,
+    orderId: string,
+    orderData?: any
+  ): Promise<{ success: boolean; message?: string; error?: string }> {
+    const formatCurrency = (value: number) => {
+      return `KZ ${new Intl.NumberFormat('pt-PT', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+        useGrouping: true
+      }).format(value)}`;
+    };
+
+    const orderItems = orderData?.order_items || [];
+    const itemsList = orderItems.map((item: any) => 
+      `<li>${item.name} - ${formatCurrency(item.unit_price)} × ${item.quantity} = ${formatCurrency(item.unit_price * item.quantity)}</li>`
+    ).join('');
+
+    const html = `
+      <html>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto;">
+          <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-bottom: 3px solid #0066cc;">
+            <h2 style="margin: 0; color: #0066cc;">AngoHost</h2>
+          </div>
+          
+          <div style="padding: 20px;">
+            <p>Olá ${customerName},</p>
+            
+            <p>Obrigado por escolher a AngoHost! Seu pedido <strong>#${orderId.substring(0, 8)}</strong> foi confirmado com sucesso.</p>
+            
+            <div style="background-color: #f8f9fa; border-left: 4px solid #0066cc; padding: 15px; margin: 20px 0;">
+              <p><strong>Detalhes do Pedido:</strong></p>
+              <p>Número: ${orderId.substring(0, 8)}</p>
+              <p>Data: ${new Date().toLocaleDateString('pt-AO')}</p>
+              <p>Status: Confirmado</p>
+              
+              ${itemsList ? `<p><strong>Itens:</strong></p><ul>${itemsList}</ul>` : ''}
+              
+              ${orderData?.total_amount ? `<p><strong>Total: ${formatCurrency(orderData.total_amount)}</strong></p>` : ''}
+            </div>
+            
+            <p>Em breve você receberá as instruções de pagamento e ativação dos seus serviços.</p>
+            
+            <p>Se você tiver alguma dúvida, entre em contato com nossa equipe de suporte respondendo a este email.</p>
+            
+            <p>Atenciosamente,<br>Equipe AngoHost</p>
+          </div>
+          
+          <div style="background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666;">
+            <p>© ${new Date().getFullYear()} AngoHost. Todos os direitos reservados.</p>
+          </div>
+        </body>
+      </html>
+    `;
+
+    return this.sendEmail({
+      to: customerEmail,
+      subject: `Confirmação de Pedido #${orderId.substring(0, 8)} - AngoHost`,
       html
     });
   }

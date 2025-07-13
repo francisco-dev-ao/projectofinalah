@@ -89,7 +89,7 @@ export const SmtpTestSection = ({ form }: SmtpTestSectionProps) => {
       if (result.success) {
         console.log("✅ Teste de email concluído com sucesso!");
         setTestStatus(`Email enviado com sucesso para ${testEmail}!`);
-        toast.success(`Email de teste enviado para ${testEmail} via ${result.method || 'SMTP'}!`);
+        toast.success(`Email de teste enviado para ${testEmail}`);
       } else {
         console.error("❌ Falha no teste de email:", result.error);
         setTestStatus(`Falha: ${result.error}`);
