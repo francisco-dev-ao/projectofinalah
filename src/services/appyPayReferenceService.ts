@@ -176,11 +176,11 @@ export const generatePaymentReference = async (
           description: chargeData.description,
           validityDate: validityDate.toLocaleDateString('pt-AO'),
           instructions: [
-            "Dirija-se a um ATM, Internet Banking ou Multicaixa Express",
-            "Selecione \"Pagamentos\" e depois \"Outros Serviços\"",
-            "Insira a Entidade: 11333",
-            `Insira a Referência: ${chargeData.reference || chargeData.merchantTransactionId}`,
-            `Confirme o valor: ${request.amount} AOA`,
+            "Vá a um ATM ou Multicaixa Express",
+            "Selecione 'Pagamentos' → 'Outros Serviços'",
+            "Digite a Entidade: 11333",
+            `Digite a Referência: ${chargeData.reference || chargeData.merchantTransactionId}`,
+            `Confirme o valor: KZ ${request.amount.toLocaleString('pt-AO').replace(/,/g, '.')}`,
             "Confirme o pagamento"
           ],
           orderData: invoiceData?.orders
@@ -213,11 +213,11 @@ export const generatePaymentReference = async (
         pt: {
           title: "Como pagar por referência",
           steps: [
-            "Dirija-se a um ATM, Internet Banking ou Multicaixa Express",
-            "Selecione \"Pagamentos\" e depois \"Outros Serviços\"",
-            "Insira a Entidade: 11333",
-            `Insira a Referência: ${chargeData.reference || chargeData.merchantTransactionId}`,
-            `Confirme o valor: ${request.amount} AOA`,
+            "Vá a um ATM ou Multicaixa Express",
+            "Selecione 'Pagamentos' → 'Outros Serviços'",
+            "Digite a Entidade: 11333",
+            `Digite a Referência: ${chargeData.reference || chargeData.merchantTransactionId}`,
+            `Confirme o valor: KZ ${request.amount.toLocaleString('pt-AO').replace(/,/g, '.')}`,
             "Confirme o pagamento"
           ],
           note: `Esta referência é válida até ${validityDate.toLocaleDateString('pt-AO')}`
@@ -356,11 +356,11 @@ const generateLocalReference = async (
             description: request.description || `Pagamento do pedido ${request.orderId}`,
             validityDate: validityDate.toLocaleDateString('pt-AO'),
             instructions: [
-              "Dirija-se a um ATM, Internet Banking ou Multicaixa Express",
-              "Selecione \"Pagamentos\" e depois \"Outros Serviços\"",
-              "Insira a Entidade: 11333",
-              `Insira a Referência: ${reference}`,
-              `Confirme o valor: ${request.amount} AOA`,
+              "Vá a um ATM ou Multicaixa Express",
+              "Selecione 'Pagamentos' → 'Outros Serviços'",
+              "Digite a Entidade: 11333",
+              `Digite a Referência: ${reference}`,
+              `Confirme o valor: KZ ${request.amount.toLocaleString('pt-AO').replace(/,/g, '.')}`,
               "Confirme o pagamento"
             ],
             orderData: invoiceData.orders
@@ -425,11 +425,11 @@ const generateLocalReference = async (
       pt: {
         title: "Como pagar por referência",
         steps: [
-          "Dirija-se a um ATM, Internet Banking ou Multicaixa Express",
-          "Selecione \"Pagamentos\" e depois \"Outros Serviços\"",
-          "Insira a Entidade: 11333",
-          `Insira a Referência: ${reference}`,
-          `Confirme o valor: ${request.amount} AOA`,
+          "Vá a um ATM ou Multicaixa Express",
+          "Selecione 'Pagamentos' → 'Outros Serviços'",
+          "Digite a Entidade: 11333",
+          `Digite a Referência: ${reference}`,
+          `Confirme o valor: KZ ${request.amount.toLocaleString('pt-AO').replace(/,/g, '.')}`,
           "Confirme o pagamento"
         ],
         note: `Esta referência é válida até ${validityDate.toLocaleDateString('pt-AO')} - ⚠️ Modo de fallback: verificar manualmente no AppyPay`

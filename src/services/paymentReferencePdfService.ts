@@ -401,12 +401,22 @@ export const sendPaymentReferenceEmail = async (
             </div>
             
             <div class="steps-list">
-              ${instructions.map((step, index) => `
+              ${instructions.map((step, index) => {
+                // Simplify instructions
+                const simplifiedInstructions = [
+                  "Vá a um ATM ou Multicaixa Express",
+                  "Selecione 'Pagamentos' → 'Outros Serviços'",
+                  `Digite a Entidade: ${entity}`,
+                  `Digite a Referência: ${reference}`,
+                  `Confirme o valor: ${formatAmount(amount)}`,
+                  "Confirme o pagamento"
+                ];
+                return `
                 <div class="step">
                   <div class="step-number">${index + 1}</div>
-                  <div class="step-text">${step}</div>
+                  <div class="step-text">${simplifiedInstructions[index] || step}</div>
                 </div>
-              `).join('')}
+              `}).join('')}
             </div>
           </div>
           

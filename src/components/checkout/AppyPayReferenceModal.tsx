@@ -667,10 +667,7 @@ export const AppyPayReferenceModal = ({
                   </div>
                   <div class="reference-item amount-highlight">
                     <div class="item-label" style="color: rgba(255,255,255,0.9); margin-bottom: 5px;">Valor a Pagar</div>
-                    <div class="item-value">${paymentReference.amount.toLocaleString('pt-PT', { 
-                      style: 'currency', 
-                      currency: 'AOA' 
-                    })}</div>
+                     <div class="item-value">KZ ${paymentReference.amount.toLocaleString('pt-AO').replace(/,/g, '.')}</div>
                   </div>
                   <div class="reference-item">
                     <div class="item-label">Descrição</div>
@@ -734,7 +731,7 @@ export const AppyPayReferenceModal = ({
                     </li>
                     <li class="instruction-item">
                       <div class="step-number">5</div>
-                      <div>Confirme o valor: <strong>${paymentReference.amount.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' })}</strong></div>
+                      <div>Confirme o valor: <strong>KZ ${paymentReference.amount.toLocaleString('pt-AO').replace(/,/g, '.')}</strong></div>
                     </li>
                     <li class="instruction-item">
                       <div class="step-number">6</div>
@@ -1032,9 +1029,9 @@ export const AppyPayReferenceModal = ({
                 <div className="flex items-center justify-between bg-green-50 hover:bg-green-100 transition-colors p-4 rounded-xl border border-green-200">
                   <div className="flex-1">
                     <p className="text-sm font-medium text-green-600 mb-1">Valor</p>
-                    <p className="text-2xl font-bold text-green-800">
-                      {paymentReference.amount.toLocaleString('pt-AO')} AOA
-                    </p>
+                     <p className="text-2xl font-bold text-green-800">
+                       KZ {paymentReference.amount.toLocaleString('pt-AO').replace(/,/g, '.')}
+                     </p>
                   </div>
                   <Button
                     variant="outline"
