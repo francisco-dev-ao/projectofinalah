@@ -117,23 +117,24 @@ export const useOrderProcessing = () => {
             ]);
             
             if (emailResult.status === 'fulfilled' && emailResult.value.success) {
-              console.log("✅ Email da referência enviado com sucesso");
+              console.log("✅ Email da referência enviado com sucesso para:", user.email);
             } else {
               console.error("❌ Erro ao enviar email da referência:", emailResult);
             }
             
             if (smsResult.status === 'fulfilled' && smsResult.value.success && user.user_metadata?.phone) {
-              console.log("✅ SMS da referência enviado com sucesso");
-              toast.success("Referência enviada por email e SMS!");
+              console.log("✅ SMS da referência enviado com sucesso para:", user.user_metadata.phone);
+              toast.success("📧 Dados de pagamento enviados por email e SMS!");
             } else {
-              toast.success("Referência enviada por email!");
+              toast.success("📧 Dados de pagamento enviados por email!");
               if (user.user_metadata?.phone) {
                 console.error("❌ Erro ao enviar SMS da referência:", smsResult);
+                console.log("ℹ️ SMS não enviado - verifique o número de telefone");
               }
             }
           } catch (notificationError) {
             console.error("Error sending payment reference notifications:", notificationError);
-            toast.success("Referência gerada com sucesso!");
+            toast.success("💳 Referência gerada com sucesso!");
           }
           
           setPaymentReference(referenceResult);

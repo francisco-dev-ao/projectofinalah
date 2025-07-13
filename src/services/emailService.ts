@@ -84,7 +84,8 @@ export class EmailService {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Referência de Pagamento - AngoHost</title>
+    <title>Dados de Pagamento - AngoHost</title>
+    <meta name="description" content="Instruções completas para pagamento via AppyPay e Multicaixa Express">
     <!--[if mso]>
     <noscript>
         <xml>
@@ -95,138 +96,196 @@ export class EmailService {
     </noscript>
     <![endif]-->
 </head>
-<body style="margin: 0; padding: 0; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; background-color: #f4f4f4;">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4;">
+<body style="margin: 0; padding: 0; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f6f9; min-height: 100vh;">
         <tr>
-            <td align="center" style="padding: 20px 0;">
-                <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; max-width: 600px; width: 100%;">
-                    <!-- Header -->
+            <td align="center" style="padding: 30px 20px;">
+                <table border="0" cellpadding="0" cellspacing="0" width="650" style="background-color: #ffffff; max-width: 650px; width: 100%; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden;">
+                    
+                    <!-- Professional Header -->
                     <tr>
-                        <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px 20px; text-align: center;">
-                            <h1 style="margin: 0; color: #ffffff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 28px; font-weight: 600; letter-spacing: -0.5px;">
-                                AngoHost
-                            </h1>
-                            <p style="margin: 8px 0 0 0; color: #e8e8e8; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px;">
-                                Soluções em Hosting e Domínios
+                        <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center; position: relative;">
+                            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>'); opacity: 0.3;"></div>
+                            <div style="position: relative; z-index: 1;">
+                                <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: 300; letter-spacing: -1px;">
+                                    <span style="font-weight: 700;">Ango</span>Host
+                                </h1>
+                                <p style="margin: 12px 0 0 0; color: rgba(255,255,255,0.9); font-size: 16px; font-weight: 500;">
+                                    Dados de Pagamento Gerados
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Welcome Message -->
+                    <tr>
+                        <td style="padding: 35px 30px 25px 30px; background-color: #ffffff;">
+                            <h2 style="margin: 0 0 20px 0; color: #2c3e50; font-size: 24px; font-weight: 600; line-height: 1.3;">
+                                Olá ${customerName},
+                            </h2>
+                            
+                            <p style="margin: 0 0 25px 0; color: #34495e; font-size: 16px; line-height: 1.7;">
+                                Os seus dados de pagamento foram gerados com sucesso. Utilize qualquer uma das opções abaixo para concluir o pagamento dos seus serviços AngoHost.
                             </p>
                         </td>
                     </tr>
                     
-                    <!-- Content -->
+                    <!-- AppyPay Payment Section -->
                     <tr>
-                        <td style="padding: 40px 30px;">
-                            <p style="margin: 0 0 20px 0; color: #333333; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 16px; line-height: 1.6;">
-                                Prezado(a) <strong>${customerName}</strong>,
-                            </p>
-                            
-                            <p style="margin: 0 0 30px 0; color: #555555; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 16px; line-height: 1.6;">
-                                A sua referência de pagamento AppyPay foi gerada com sucesso. Utilize os dados abaixo para concluir o seu pagamento:
-                            </p>
-                            
-                            <!-- Payment Reference Box -->
-                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; margin: 30px 0;">
+                        <td style="padding: 0 30px 25px 30px;">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; overflow: hidden; box-shadow: 0 3px 15px rgba(102, 126, 234, 0.3);">
                                 <tr>
                                     <td style="padding: 30px; text-align: center;">
-                                        <h2 style="margin: 0 0 15px 0; color: #ffffff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 18px; font-weight: 600;">
-                                            Referência de Pagamento
-                                        </h2>
-                                        <div style="background-color: rgba(255, 255, 255, 0.15); border-radius: 8px; padding: 20px; margin: 15px 0;">
-                                            <p style="margin: 0; color: #ffffff; font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; font-size: 32px; font-weight: bold; letter-spacing: 2px;">
+                                        <div style="display: inline-block; background-color: rgba(255,255,255,0.15); border-radius: 50%; padding: 12px; margin-bottom: 15px;">
+                                            <span style="font-size: 24px;">📱</span>
+                                        </div>
+                                        <h3 style="margin: 0 0 20px 0; color: #ffffff; font-size: 20px; font-weight: 600;">
+                                            Pagamento via AppyPay
+                                        </h3>
+                                        
+                                        <div style="background-color: rgba(255, 255, 255, 0.95); border-radius: 10px; padding: 25px; margin: 20px 0; text-align: center;">
+                                            <p style="margin: 0 0 15px 0; color: #2c3e50; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
+                                                Referência de Pagamento
+                                            </p>
+                                            <p style="margin: 0 0 20px 0; color: #2c3e50; font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; font-size: 28px; font-weight: bold; letter-spacing: 3px; background-color: #f8f9fa; padding: 15px; border-radius: 8px; border: 2px dashed #667eea;">
                                                 ${reference}
                                             </p>
-                                        </div>
-                                        <p style="margin: 15px 0 0 0; color: #e8e8e8; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 20px; font-weight: 600;">
-                                            Valor: ${formatCurrency(amount)}
-                                        </p>
-                                    </td>
-                                </tr>
-                            </table>
-                            
-                            <!-- Instructions -->
-                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8f9fc; border-radius: 8px; border-left: 4px solid #667eea; margin: 30px 0;">
-                                <tr>
-                                    <td style="padding: 25px;">
-                                        <h3 style="margin: 0 0 15px 0; color: #333333; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 18px; font-weight: 600;">
-                                            📱 Instruções de Pagamento AppyPay
-                                        </h3>
-                                        <ol style="margin: 0; padding-left: 20px; color: #555555; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 15px; line-height: 1.8;">
-                                            <li>Abra o aplicativo <strong>AppyPay</strong> no seu dispositivo móvel</li>
-                                            <li>Selecione a opção <strong>"Pagar Serviços"</strong></li>
-                                            <li>Insira a referência: <strong style="color: #667eea;">${reference}</strong></li>
-                                            <li>Confirme o valor: <strong style="color: #667eea;">${formatCurrency(amount)}</strong></li>
-                                            <li>Finalize o pagamento seguindo as instruções no app</li>
-                                        </ol>
-                                    </td>
-                                </tr>
-                            </table>
-                            
-                            <!-- Multicaixa Instructions -->
-                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107; margin: 30px 0;">
-                                <tr>
-                                    <td style="padding: 25px;">
-                                        <h3 style="margin: 0 0 15px 0; color: #856404; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 18px; font-weight: 600;">
-                                            🏦 Dados para Pagamento Multicaixa
-                                        </h3>
-                                        <div style="background-color: rgba(255, 193, 7, 0.1); border-radius: 6px; padding: 15px; margin: 15px 0;">
-                                            <p style="margin: 0 0 10px 0; color: #856404; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 15px;">
-                                                <strong>Entidade:</strong> 11333 (AppyPay)
-                                            </p>
-                                            <p style="margin: 0 0 10px 0; color: #856404; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 15px;">
-                                                <strong>Referência:</strong> ${reference}
-                                            </p>
-                                            <p style="margin: 0; color: #856404; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 15px;">
-                                                <strong>Valor:</strong> ${formatCurrency(amount)}
+                                            <p style="margin: 0; color: #27ae60; font-size: 22px; font-weight: 700;">
+                                                ${formatCurrency(amount)}
                                             </p>
                                         </div>
                                         
-                                        <h4 style="margin: 20px 0 10px 0; color: #856404; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 16px; font-weight: 600;">
-                                            Instruções de Pagamento:
-                                        </h4>
-                                        <ol style="margin: 0; padding-left: 20px; color: #856404; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; line-height: 1.7;">
-                                            <li>Acesse o seu homebanking ou dirija-se a um balcão do banco</li>
-                                            <li>Selecione a opção <strong>"Pagamento de Serviços"</strong> ou <strong>"Multicaixa"</strong></li>
-                                            <li>Insira a <strong>Entidade: 11333</strong></li>
-                                            <li>Insira a <strong>Referência: ${reference}</strong></li>
-                                            <li>Confirme o <strong>Valor: ${formatCurrency(amount)}</strong></li>
-                                            <li>Efetue o pagamento e guarde o comprovativo</li>
-                                        </ol>
-                                        
-                                        <div style="background-color: #d1ecf1; border-radius: 6px; padding: 15px; margin: 20px 0;">
-                                            <p style="margin: 0; color: #0c5460; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 13px; font-weight: 600;">
-                                                ⚠️ IMPORTANTE: Após o pagamento, os seus serviços serão ativados automaticamente em até 24 horas. Guarde sempre o comprovativo de pagamento.
-                                            </p>
+                                        <div style="text-align: left; background-color: rgba(255,255,255,0.1); border-radius: 8px; padding: 20px; margin-top: 20px;">
+                                            <h4 style="margin: 0 0 15px 0; color: #ffffff; font-size: 16px; font-weight: 600;">
+                                                💡 Como Pagar via AppyPay:
+                                            </h4>
+                                            <ol style="margin: 0; padding-left: 20px; color: rgba(255,255,255,0.95); font-size: 14px; line-height: 1.8;">
+                                                <li>Abra o aplicativo <strong>AppyPay</strong> no seu telemóvel</li>
+                                                <li>Selecione <strong>"Pagar Serviços"</strong></li>
+                                                <li>Insira a referência: <strong>${reference}</strong></li>
+                                                <li>Confirme o valor: <strong>${formatCurrency(amount)}</strong></li>
+                                                <li>Finalize o pagamento seguindo as instruções</li>
+                                            </ol>
                                         </div>
                                     </td>
                                 </tr>
                             </table>
-                            
-                            <p style="margin: 30px 0 20px 0; color: #555555; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 15px; line-height: 1.6;">
-                                <strong>Importante:</strong> Após a confirmação do pagamento, os seus serviços serão ativados automaticamente dentro de alguns minutos.
-                            </p>
-                            
-                            <p style="margin: 20px 0; color: #555555; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 15px; line-height: 1.6;">
-                                Para qualquer dúvida ou assistência, entre em contacto connosco através do email de suporte ou do nosso chat online.
-                            </p>
-                            
-                            <p style="margin: 30px 0 0 0; color: #333333; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 16px; line-height: 1.6;">
-                                Obrigado por escolher a AngoHost!
-                            </p>
-                            
-                            <p style="margin: 15px 0 0 0; color: #555555; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 15px;">
-                                Atenciosamente,<br>
-                                <strong>Equipa AngoHost</strong>
-                            </p>
                         </td>
                     </tr>
                     
-                    <!-- Footer -->
+                    <!-- Multicaixa Alternative -->
                     <tr>
-                        <td style="background-color: #f8f9fc; padding: 25px 30px; text-align: center; border-top: 1px solid #e5e5e5;">
-                            <p style="margin: 0 0 10px 0; color: #888888; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 13px;">
-                                Este email foi enviado automaticamente pelo sistema AngoHost
+                        <td style="padding: 0 30px 30px 30px;">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); border-radius: 12px; overflow: hidden; box-shadow: 0 3px 15px rgba(243, 156, 18, 0.2);">
+                                <tr>
+                                    <td style="padding: 25px;">
+                                        <div style="text-align: center; margin-bottom: 20px;">
+                                            <div style="display: inline-block; background-color: rgba(255,255,255,0.2); border-radius: 50%; padding: 10px;">
+                                                <span style="font-size: 20px;">🏦</span>
+                                            </div>
+                                            <h3 style="margin: 10px 0 0 0; color: #ffffff; font-size: 18px; font-weight: 600;">
+                                                Alternativa: Pagamento Multicaixa
+                                            </h3>
+                                        </div>
+                                        
+                                        <div style="background-color: rgba(255,255,255,0.95); border-radius: 8px; padding: 20px; margin: 15px 0;">
+                                            <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
+                                                <tr>
+                                                    <td style="padding: 8px 0; font-weight: 600; color: #8b4513; border-bottom: 1px solid #f0f0f0;">Entidade:</td>
+                                                    <td style="padding: 8px 0; color: #2c3e50; font-weight: 700; border-bottom: 1px solid #f0f0f0;">11333 (AppyPay)</td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 8px 0; font-weight: 600; color: #8b4513; border-bottom: 1px solid #f0f0f0;">Referência:</td>
+                                                    <td style="padding: 8px 0; color: #2c3e50; font-family: monospace; font-size: 16px; font-weight: 700; border-bottom: 1px solid #f0f0f0;">${reference}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 8px 0; font-weight: 600; color: #8b4513;">Valor:</td>
+                                                    <td style="padding: 8px 0; color: #27ae60; font-weight: 700; font-size: 16px;">${formatCurrency(amount)}</td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        
+                                        <div style="background-color: rgba(255,255,255,0.1); border-radius: 6px; padding: 15px; margin-top: 15px;">
+                                            <p style="margin: 0 0 10px 0; color: #ffffff; font-size: 14px; font-weight: 600;">
+                                                🔹 Instruções para Multicaixa:
+                                            </p>
+                                            <ul style="margin: 0; padding-left: 20px; color: rgba(255,255,255,0.9); font-size: 13px; line-height: 1.6;">
+                                                <li>Acesse o homebanking ou dirija-se ao balcão</li>
+                                                <li>Selecione "Pagamento de Serviços" → "Multicaixa"</li>
+                                                <li>Entidade: <strong>11333</strong> | Referência: <strong>${reference}</strong></li>
+                                                <li>Confirme o valor e efetue o pagamento</li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Important Notice -->
+                    <tr>
+                        <td style="padding: 0 30px 30px 30px;">
+                            <div style="background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); border-radius: 10px; padding: 25px; border-left: 5px solid #667eea;">
+                                <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                                    <span style="font-size: 20px; margin-right: 10px;">⏱️</span>
+                                    <h4 style="margin: 0; color: #2c3e50; font-size: 16px; font-weight: 600;">
+                                        Informações Importantes
+                                    </h4>
+                                </div>
+                                <ul style="margin: 0; padding-left: 20px; color: #34495e; font-size: 14px; line-height: 1.7;">
+                                    <li><strong>Validade:</strong> Esta referência é válida por <strong>72 horas</strong></li>
+                                    <li><strong>Ativação:</strong> Os serviços são ativados automaticamente em até <strong>30 minutos</strong> após confirmação</li>
+                                    <li><strong>Comprovativo:</strong> Guarde sempre o comprovativo de pagamento</li>
+                                    <li><strong>Suporte:</strong> Para dúvidas, responda este email ou acesse nosso chat online</li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Closing Message -->
+                    <tr>
+                        <td style="padding: 0 30px 35px 30px;">
+                            <p style="margin: 0 0 20px 0; color: #34495e; font-size: 15px; line-height: 1.6; text-align: center;">
+                                Agradecemos a sua confiança nos nossos serviços. A equipe AngoHost está sempre disponível para ajudá-lo.
                             </p>
-                            <p style="margin: 0; color: #aaaaaa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 12px;">
-                                © ${new Date().getFullYear()} AngoHost - Todos os direitos reservados
+                            
+                            <div style="text-align: center; margin: 25px 0;">
+                                <p style="margin: 0; color: #2c3e50; font-size: 16px; font-weight: 600;">
+                                    Atenciosamente,
+                                </p>
+                                <p style="margin: 5px 0 0 0; color: #667eea; font-size: 18px; font-weight: 700;">
+                                    Equipa AngoHost
+                                </p>
+                                <p style="margin: 5px 0 0 0; color: #7f8c8d; font-size: 13px;">
+                                    Suporte Técnico Especializado 24/7
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Professional Footer -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 25px 30px; text-align: center; border-top: 1px solid #dee2e6;">
+                            <p style="margin: 0 0 8px 0; color: #6c757d; font-size: 13px; font-weight: 500;">
+                                AngoHost - Serviços de Hospedagem Premium
+                            </p>
+                            <p style="margin: 0 0 10px 0; color: #868e96; font-size: 12px;">
+                                Este email foi gerado automaticamente pelo nosso sistema de pagamentos seguro
+                            </p>
+                            <p style="margin: 0; color: #adb5bd; font-size: 11px;">
+                                © ${new Date().getFullYear()} AngoHost. Todos os direitos reservados.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Anti-spam footer -->
+                <table border="0" cellpadding="0" cellspacing="0" width="650" style="max-width: 650px; width: 100%; margin-top: 20px;">
+                    <tr>
+                        <td style="text-align: center; padding: 15px;">
+                            <p style="margin: 0; color: #95a5a6; font-size: 11px; line-height: 1.4;">
+                                Recebeu este email porque solicitou serviços da AngoHost. Se não solicitou, pode ignorar esta mensagem.<br>
+                                Para questões de suporte, responda diretamente a este email.
                             </p>
                         </td>
                     </tr>
@@ -240,13 +299,15 @@ export class EmailService {
     const textContent = `
 Prezado(a) ${customerName},
 
-A sua referência de pagamento AppyPay foi gerada com sucesso.
+Os seus dados de pagamento AngoHost foram gerados com sucesso.
 
-REFERÊNCIA: ${reference}
-VALOR: ${formatCurrency(amount)}
+=== DADOS DE PAGAMENTO ===
+Referência: ${reference}
+Valor: ${formatCurrency(amount)}
+Validade: 72 horas
 
-INSTRUÇÕES DE PAGAMENTO AppyPay:
-1. Abra o aplicativo AppyPay no seu dispositivo móvel
+=== OPÇÃO 1: AppyPay ===
+1. Abra o aplicativo AppyPay
 2. Selecione "Pagar Serviços"
 3. Insira a referência: ${reference}
 4. Confirme o valor: ${formatCurrency(amount)}
@@ -276,7 +337,7 @@ Equipa AngoHost
     return this.sendEmail({
       from: 'pagamentos@angohost.ao',
       to: customerEmail,
-      subject: `Referência de Pagamento AppyPay - ${reference} | AngoHost`,
+      subject: `Dados de Pagamento Disponíveis - Serviços AngoHost`,
       html,
       text: textContent
     });
