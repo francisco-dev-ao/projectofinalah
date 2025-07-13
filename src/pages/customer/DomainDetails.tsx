@@ -65,7 +65,14 @@ const DomainDetails = () => {
       // First try to get from domains table
       let { data: domainData, error: domainError } = await supabase
         .from('domains')
-        .select('*')
+        .select(`
+          *,
+          orders:order_id (
+            user_id,
+            total_amount,
+            status
+          )
+        `)
         .eq('id', domainId)
         .single();
       
@@ -77,7 +84,14 @@ const DomainDetails = () => {
         
         const { data: orderData, error: orderError } = await supabase
           .from('domain_orders')
-          .select('*')
+          .select(`
+            *,
+            orders:order_id (
+              user_id,
+              total_amount,
+              status
+            )
+          `)
           .eq('id', domainId)
           .single();
         

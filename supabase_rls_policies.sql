@@ -9,11 +9,32 @@ ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.invoices ENABLE ROW LEVEL SECURITY;
 
 -- ============================================
--- POLÍTICAS RLS PARA PAYMENT_REFERENCES
+-- REMOVE TODAS AS POLÍTICAS EXISTENTES
+-- ============================================
+
+-- Remove políticas antigas que podem estar causando conflitos
+DROP POLICY IF EXISTS "Users can view their own payment references" ON public.payment_references;
+DROP POLICY IF EXISTS "Users can insert their own payment references" ON public.payment_references;
+DROP POLICY IF EXISTS "Users can update their own payment references" ON public.payment_references;
+DROP POLICY IF EXISTS "Service role can manage payment references" ON public.payment_references;
+DROP POLICY IF EXISTS "Admins can view all payment references" ON public.payment_references;
+DROP POLICY IF EXISTS "Admins can manage all payment references" ON public.payment_references;
+
+DROP POLICY IF EXISTS "Users can view their own orders" ON public.orders;
+DROP POLICY IF EXISTS "Users can insert their own orders" ON public.orders;
+DROP POLICY IF EXISTS "Users can update their own orders" ON public.orders;
+DROP POLICY IF EXISTS "Service role can manage orders" ON public.orders;
+DROP POLICY IF EXISTS "Admins can view all orders" ON public.orders;
+
+DROP POLICY IF EXISTS "Users can view their own invoices" ON public.invoices;
+DROP POLICY IF EXISTS "Users can insert invoices for their orders" ON public.invoices;
+DROP POLICY IF EXISTS "Service role can manage invoices" ON public.invoices;
+
+-- ============================================
+-- POLÍTICAS RLS PARA PAYMENT_REFERENCES  
 -- ============================================
 
 -- Política: Usuários podem ver suas próprias referências de pagamento
-DROP POLICY IF EXISTS "Users can view their own payment references" ON public.payment_references;
 CREATE POLICY "Users can view their own payment references" ON public.payment_references
   FOR SELECT
   TO authenticated

@@ -56,9 +56,10 @@ const updateInvoiceReference = async (invoice: any): Promise<any> => {
     }
   }
   
-  // Verificar se existe referência válida
+  // Verificar se existe referência válida, se não usar placeholder
   if (!invoice.payment_reference) {
-    throw new Error('Invoice requires a valid payment reference before printing');
+    console.warn('No payment reference found, will use placeholder');
+    invoice.payment_reference = 'Pendente';
   }
   
   return invoice;

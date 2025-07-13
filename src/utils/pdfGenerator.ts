@@ -364,11 +364,13 @@ export class PDFGenerator {
     // Buscar referência de pagamento associada ao pedido
     doc.text('Entidade: 11333', 15, startY + 7);
     
-    // Verificar se há uma referência válida antes de gerar o PDF
-    if (!invoice.payment_reference) {
-        throw new Error('Invoice requires a valid payment reference before generating PDF');
+    // Usar referência de pagamento ou placeholder se não existir
+    const paymentReference = invoice.payment_reference || 'Pendente';
+    
+    if (paymentReference === 'Pendente') {
+      console.warn('No payment reference found, using placeholder');
     }
-    doc.text(`Referência: ${invoice.payment_reference}`, 15, startY + 14);
+    doc.text(`Referência: ${paymentReference}`, 15, startY + 14);
     
     // Mostrar valor total da fatura
     const totalAmount = invoice.orders?.total_amount || invoice.amount || 0;

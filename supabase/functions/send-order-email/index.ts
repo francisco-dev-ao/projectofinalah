@@ -3,7 +3,9 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, accept',
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE',
+  'Access-Control-Max-Age': '86400',
 }
 
 interface OrderEmailRequest {
@@ -15,18 +17,38 @@ interface OrderEmailRequest {
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response(null, { 
+      headers: corsHeaders,
+      status: 200 
+    })
   }
+
+  console.log('🚀 Edge function started - send-order-email')
 
   try {
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
     )
 
+    console.log('📨 Processing email request...')
     const { orderId, customerEmail, customerName, orderData }: OrderEmailRequest = await req.json()
+    
+    console.log('📋 Request data:', { orderId, customerEmail, customerName })
+
+    if (!orderId) {
+      console.error('❌ Order ID is required')
+      throw new Error('Order ID is required')
+    }
 
     // Get order details from database
+    console.log('🔍 Fetching order data from database...')
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .select(`
@@ -43,8 +65,11 @@ serve(async (req) => {
       .single()
 
     if (orderError || !order) {
+      console.error('❌ Order not found:', orderError)
       throw new Error(`Order not found: ${orderError?.message}`)
     }
+
+    console.log('✅ Order data fetched successfully')
 
     // Use customer email from parameter or order profile
     const recipientEmail = customerEmail || order.profiles?.email
@@ -189,7 +214,8 @@ serve(async (req) => {
     `;
 
     // Send email using SMTP configuration
-    const { error: emailError } = await supabase.functions.invoke('send-test-email', {
+    console.log('📧 Sending email to:', recipientEmail)
+    const { data: emailResult, error: emailError } = await supabase.functions.invoke('send-test-email', {
       body: {
         to: recipientEmail,
         subject: `Novo Pedido #${order.id.substring(0, 8)} - AngoHost`,
@@ -199,8 +225,11 @@ serve(async (req) => {
     });
 
     if (emailError) {
+      console.error('❌ Email sending failed:', emailError)
       throw emailError;
     }
+
+    console.log('✅ Email sent successfully:', emailResult)
 
     return new Response(
       JSON.stringify({ 
@@ -215,11 +244,12 @@ serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Error sending order email:', error)
+    console.error('❌ Error sending order email:', error)
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: error.message 
+        error: error.message,
+        details: error.toString()
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
