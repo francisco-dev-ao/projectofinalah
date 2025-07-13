@@ -10,22 +10,12 @@ interface EmailData {
  */
 export class EmailService {
   private static readonly API_URL = 'https://mail3.angohost.ao/email/send';
-  private static readonly API_KEY = 'SUA_CHAVE_SECRETA'; // TODO: Configurar chave real da API
 
   /**
    * Envia um email usando a API AngoHost diretamente
    */
   static async sendEmail(emailData: EmailData): Promise<{ success: boolean; message?: string; error?: string }> {
     try {
-      // Verificar se a chave da API está configurada
-      if (this.API_KEY === 'SUA_CHAVE_SECRETA') {
-        console.error('❌ Chave da API de email não configurada');
-        return {
-          success: false,
-          error: 'Chave da API de email não configurada. Configure a chave real no EmailService.'
-        };
-      }
-
       console.log('📧 Enviando email via API AngoHost...', {
         to: emailData.to,
         subject: emailData.subject,
@@ -36,7 +26,6 @@ export class EmailService {
       const response = await fetch(this.API_URL, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.API_KEY}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
