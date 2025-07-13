@@ -17,7 +17,7 @@ export const sendPaymentReferenceEmail = async (
   try {
     console.log('📧 Sending payment reference email to:', customerEmail);
 
-    // Create professional email HTML template
+    // Create simple professional email template
     const emailHTML = `
     <!DOCTYPE html>
     <html>
@@ -28,455 +28,276 @@ export const sendPaymentReferenceEmail = async (
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
           line-height: 1.6; 
-          color: #1a202c; 
-          background: #f7fafc;
-          padding: 20px 0;
+          color: #333; 
+          background: #f5f5f5;
+          padding: 20px;
         }
         .email-container { 
-          max-width: 680px; 
+          max-width: 600px; 
           margin: 0 auto; 
           background: #ffffff; 
-          border-radius: 16px;
-          overflow: hidden;
-          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+          border: 1px solid #ddd;
         }
         
-        /* Header com gradiente profissional */
-        .email-header { 
-          background: linear-gradient(135deg, #16a085 0%, #2ecc71 100%);
+        /* Header simples */
+        .header { 
+          background: #2c5282;
           color: white; 
-          padding: 40px 30px; 
+          padding: 30px 25px; 
           text-align: center;
-          position: relative;
         }
-        .email-header::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-          opacity: 0.3;
-        }
-        .email-header * { position: relative; z-index: 1; }
-        
-        .header-icon {
-          width: 64px;
-          height: 64px;
-          background: rgba(255, 255, 255, 0.2);
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin: 0 auto 20px;
-          backdrop-filter: blur(10px);
-          border: 2px solid rgba(255, 255, 255, 0.3);
-        }
-        .company-logo { 
-          font-size: 32px; 
-          font-weight: 800; 
+        .logo { 
+          font-size: 24px; 
+          font-weight: bold; 
           margin-bottom: 8px;
-          letter-spacing: -0.5px;
         }
-        .header-subtitle { 
-          font-size: 18px; 
-          opacity: 0.95;
-          font-weight: 500;
-        }
-        .success-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          background: rgba(255, 255, 255, 0.2);
-          padding: 8px 16px;
-          border-radius: 20px;
-          margin-top: 16px;
-          font-size: 14px;
-          font-weight: 600;
-          backdrop-filter: blur(10px);
+        .subtitle { 
+          font-size: 16px;
         }
         
-        /* Conteúdo principal */
-        .email-content { 
-          padding: 40px 30px;
+        /* Conteúdo */
+        .content { 
+          padding: 30px 25px;
         }
         .greeting { 
-          font-size: 20px; 
+          font-size: 18px; 
           font-weight: 600;
-          margin-bottom: 16px; 
-          color: #2d3748;
+          margin-bottom: 20px; 
+          color: #2c5282;
         }
-        .intro-text {
-          font-size: 16px;
-          color: #4a5568;
-          margin-bottom: 32px;
-          line-height: 1.7;
+        .intro { 
+          margin-bottom: 30px;
+          color: #555;
         }
         
-        /* Card de referência melhorado */
-        .reference-card {
-          background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-          border: 1px solid #e2e8f0;
-          border-radius: 16px;
-          padding: 32px;
-          margin: 32px 0;
-          position: relative;
-          overflow: hidden;
+        /* Dados de pagamento */
+        .payment-section {
+          border: 2px solid #2c5282;
+          padding: 25px;
+          margin: 25px 0;
+          background: #f8f9fa;
         }
-        .reference-card::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 4px;
-          background: linear-gradient(90deg, #16a085, #2ecc71);
-        }
-        
-        .reference-title {
-          font-size: 24px;
-          font-weight: 700;
-          color: #1a202c;
-          margin-bottom: 24px;
-          text-align: center;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 12px;
-        }
-        
-        .payment-details {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-          gap: 20px;
-          margin-bottom: 24px;
-        }
-        .detail-card {
-          background: white;
-          padding: 24px;
-          border-radius: 12px;
-          border: 1px solid #e2e8f0;
-          box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-          transition: all 0.2s ease;
-        }
-        .detail-label {
-          font-size: 12px;
-          font-weight: 600;
-          text-transform: uppercase;
-          color: #718096;
-          margin-bottom: 8px;
-          letter-spacing: 0.5px;
-        }
-        .detail-value {
+        .section-title {
           font-size: 18px;
-          font-weight: 700;
-          color: #1a202c;
-          font-family: 'Monaco', 'Menlo', monospace;
-        }
-        .amount-card {
-          background: linear-gradient(135deg, #16a085 0%, #2ecc71 100%);
-          color: white !important;
-          grid-column: 1 / -1;
+          font-weight: bold;
+          color: #2c5282;
+          margin-bottom: 20px;
           text-align: center;
         }
-        .amount-card .detail-label { color: rgba(255, 255, 255, 0.9); }
-        .amount-card .detail-value { 
-          color: white; 
-          font-size: 28px;
-          margin: 8px 0;
+        
+        .payment-data {
+          background: white;
+          padding: 20px;
+          border: 1px solid #ddd;
+          margin-bottom: 15px;
+        }
+        .data-row {
+          display: flex;
+          justify-content: space-between;
+          padding: 8px 0;
+          border-bottom: 1px solid #eee;
+        }
+        .data-row:last-child {
+          border-bottom: none;
+        }
+        .data-label {
+          font-weight: 600;
+          color: #666;
+        }
+        .data-value {
+          font-weight: bold;
+          color: #2c5282;
+          font-family: monospace;
+        }
+        .amount-value {
+          color: #d69e2e;
+          font-size: 18px;
         }
         
         .payment-info {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 16px;
-          margin-top: 20px;
-          padding: 20px;
-          background: #f7fafc;
-          border-radius: 12px;
-          border: 1px solid #e2e8f0;
+          margin-top: 15px;
+          padding: 15px;
+          background: #fff3cd;
+          border: 1px solid #ffeaa7;
         }
-        .info-item {
-          display: flex;
-          flex-direction: column;
+        .info-row {
+          margin-bottom: 8px;
         }
         .info-label {
-          font-size: 13px;
           font-weight: 600;
-          color: #718096;
-          margin-bottom: 4px;
+          color: #856404;
         }
         .info-value {
-          font-size: 15px;
-          font-weight: 600;
-          color: #2d3748;
+          color: #856404;
         }
         
-        /* Seção de instruções melhorada */
+        /* Instruções */
         .instructions-section {
-          background: linear-gradient(135deg, #f0fff4 0%, #e6fffa 100%);
-          border: 1px solid #9ae6b4;
-          border-radius: 16px;
-          padding: 32px;
-          margin: 32px 0;
-          position: relative;
+          margin: 30px 0;
         }
-        .instructions-section::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 4px;
-          background: linear-gradient(90deg, #48bb78, #38a169);
-          border-radius: 16px 16px 0 0;
-        }
-        
         .instructions-title {
-          font-size: 22px;
-          font-weight: 700;
-          color: #22543d;
-          margin-bottom: 24px;
-          text-align: center;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 12px;
+          font-size: 18px;
+          font-weight: bold;
+          color: #2c5282;
+          margin-bottom: 15px;
         }
-        
         .instructions-list {
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
-        }
-        .instruction-item {
           background: white;
+          border: 1px solid #ddd;
           padding: 20px;
-          border-radius: 12px;
-          border-left: 4px solid #48bb78;
-          box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-          display: flex;
-          align-items: center;
-          gap: 16px;
-          transition: all 0.2s ease;
         }
-        .instruction-item:hover {
-          transform: translateX(4px);
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        .instruction {
+          margin-bottom: 12px;
+          padding: 8px 0;
+          border-bottom: 1px solid #f0f0f0;
         }
-        
+        .instruction:last-child {
+          border-bottom: none;
+          margin-bottom: 0;
+        }
         .step-number {
-          background: linear-gradient(135deg, #48bb78, #38a169);
+          display: inline-block;
+          background: #2c5282;
           color: white;
-          width: 32px;
-          height: 32px;
+          width: 24px;
+          height: 24px;
           border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: 700;
-          font-size: 14px;
-          flex-shrink: 0;
-          box-shadow: 0 2px 4px rgba(72, 187, 120, 0.3);
+          text-align: center;
+          line-height: 24px;
+          font-size: 12px;
+          font-weight: bold;
+          margin-right: 10px;
         }
         .step-text {
-          font-size: 15px;
-          color: #2d3748;
-          font-weight: 500;
+          color: #555;
         }
         
-        /* Seção de suporte */
-        .support-section {
-          background: #f7fafc;
-          border-radius: 12px;
-          padding: 24px;
-          margin: 32px 0;
-          text-align: center;
-          border: 1px solid #e2e8f0;
+        /* Observações */
+        .notes {
+          margin: 30px 0;
+          padding: 20px;
+          background: #e6f3ff;
+          border: 1px solid #cce7ff;
         }
-        .support-title {
-          font-size: 18px;
-          font-weight: 600;
-          color: #2d3748;
-          margin-bottom: 12px;
+        .notes-title {
+          font-weight: bold;
+          color: #2c5282;
+          margin-bottom: 10px;
         }
-        .support-text {
-          color: #4a5568;
-          margin-bottom: 16px;
-        }
-        .support-contact {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          background: white;
-          padding: 12px 20px;
-          border-radius: 8px;
-          color: #16a085;
-          text-decoration: none;
-          font-weight: 600;
-          border: 1px solid #e2e8f0;
-          transition: all 0.2s ease;
+        .notes-text {
+          color: #555;
         }
         
-        /* Rodapé profissional */
-        .email-footer {
-          background: #1a202c;
-          color: #e2e8f0;
-          padding: 32px 30px;
-          text-align: center;
-        }
-        .footer-company {
-          font-size: 18px;
-          font-weight: 700;
-          margin-bottom: 12px;
+        /* Footer */
+        .footer {
+          background: #2c5282;
           color: white;
+          padding: 25px;
+          text-align: center;
         }
-        .footer-details {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-          gap: 16px;
-          margin: 20px 0;
-          padding: 20px 0;
-          border-top: 1px solid #2d3748;
-          border-bottom: 1px solid #2d3748;
+        .company-name {
+          font-size: 16px;
+          font-weight: bold;
+          margin-bottom: 15px;
         }
-        .footer-item {
+        .contact-info {
           font-size: 14px;
-          opacity: 0.9;
+          line-height: 1.8;
         }
-        .footer-copyright {
-          font-size: 12px;
-          opacity: 0.7;
-          margin-top: 16px;
+        .contact-row {
+          margin-bottom: 5px;
         }
         
         /* Responsivo */
         @media (max-width: 600px) {
-          .email-container { margin: 0 10px; border-radius: 12px; }
-          .email-content, .email-header, .email-footer { padding: 24px 20px; }
-          .payment-details { grid-template-columns: 1fr; }
-          .payment-info { grid-template-columns: 1fr; }
-          .footer-details { grid-template-columns: 1fr; }
-          .instruction-item { flex-direction: column; text-align: center; }
-          .step-number { margin-bottom: 8px; }
+          body { padding: 10px; }
+          .content, .header, .footer { padding: 20px 15px; }
+          .data-row { flex-direction: column; }
+          .data-label { margin-bottom: 5px; }
         }
       </style>
     </head>
     <body>
       <div class="email-container">
-        <!-- Header Profissional -->
-        <div class="email-header">
-          <div class="header-icon">
-            <span style="font-size: 24px;">💳</span>
-          </div>
-          <div class="company-logo">AngoHost</div>
-          <div class="header-subtitle">Prestação de Serviços, LDA</div>
-          <div class="success-badge">
-            <span style="font-size: 16px;">✅</span>
-            <span>Referência Gerada com Sucesso</span>
-          </div>
+        <!-- Header -->
+        <div class="header">
+          <div class="logo">AngoHost</div>
+          <div class="subtitle">Dados de Pagamento Disponíveis - Ref: ${reference}</div>
         </div>
         
-        <!-- Conteúdo Principal -->
-        <div class="email-content">
-          <div class="greeting">Olá, ${customerName}!</div>
-          <div class="intro-text">
+        <!-- Conteúdo -->
+        <div class="content">
+          <div class="greeting">Caro(a) ${customerName},</div>
+          <div class="intro">
             Sua referência de pagamento Multicaixa foi gerada com sucesso. 
-            Utilize os dados abaixo para efetuar o pagamento de forma rápida e segura.
+            Por favor, utilize os dados abaixo para efetuar o pagamento.
           </div>
           
-          <!-- Card de Dados de Pagamento -->
-          <div class="reference-card">
-            <div class="reference-title">
-              <span>💳</span>
-              <span>Dados para Pagamento</span>
-            </div>
+          <!-- Dados de Pagamento -->
+          <div class="payment-section">
+            <div class="section-title">DADOS PARA PAGAMENTO</div>
             
-            <div class="payment-details">
-              <div class="detail-card">
-                <div class="detail-label">Entidade</div>
-                <div class="detail-value">${entity}</div>
+            <div class="payment-data">
+              <div class="data-row">
+                <span class="data-label">Entidade:</span>
+                <span class="data-value">${entity}</span>
               </div>
-              <div class="detail-card">
-                <div class="detail-label">Referência</div>
-                <div class="detail-value">${reference}</div>
+              <div class="data-row">
+                <span class="data-label">Referência:</span>
+                <span class="data-value">${reference}</span>
               </div>
-              <div class="detail-card amount-card">
-                <div class="detail-label">Valor a Pagar</div>
-                <div class="detail-value">${amount} AOA</div>
+              <div class="data-row">
+                <span class="data-label">Valor a Pagar:</span>
+                <span class="data-value amount-value">${amount} AOA</span>
               </div>
             </div>
             
             <div class="payment-info">
-              <div class="info-item">
-                <div class="info-label">Descrição</div>
-                <div class="info-value">${description}</div>
+              <div class="info-row">
+                <span class="info-label">Descrição:</span>
+                <span class="info-value">${description}</span>
               </div>
-              <div class="info-item">
-                <div class="info-label">Válido até</div>
-                <div class="info-value">${validityDate}</div>
+              <div class="info-row">
+                <span class="info-label">Válido até:</span>
+                <span class="info-value">${validityDate}</span>
               </div>
             </div>
           </div>
           
-          <!-- Instruções de Pagamento -->
+          <!-- Instruções -->
           <div class="instructions-section">
-            <div class="instructions-title">
-              <span>📋</span>
-              <span>Como Efetuar o Pagamento</span>
-            </div>
-            
+            <div class="instructions-title">INSTRUÇÕES DE PAGAMENTO</div>
             <div class="instructions-list">
               ${instructions.map((step, index) => `
-                <div class="instruction-item">
-                  <div class="step-number">${index + 1}</div>
-                  <div class="step-text">${step}</div>
+                <div class="instruction">
+                  <span class="step-number">${index + 1}</span>
+                  <span class="step-text">${step}</span>
                 </div>
               `).join('')}
             </div>
           </div>
           
-          <!-- Seção de Suporte -->
-          <div class="support-section">
-            <div class="support-title">Precisa de Ajuda?</div>
-            <div class="support-text">
-              Após o pagamento, você receberá automaticamente a confirmação e a fatura final. 
-              Para qualquer dúvida, nossa equipe está à disposição.
+          <!-- Observações -->
+          <div class="notes">
+            <div class="notes-title">Observações Importantes:</div>
+            <div class="notes-text">
+              • Após o pagamento, você receberá automaticamente a confirmação por email.<br>
+              • Guarde esta referência até a confirmação do pagamento.<br>
+              • Em caso de dúvidas, entre em contato conosco através do email support@angohost.ao
             </div>
-            <a href="mailto:support@angohost.ao" class="support-contact">
-              <span>📧</span>
-              <span>Contatar Suporte</span>
-            </a>
           </div>
         </div>
         
-        <!-- Rodapé Profissional -->
-        <div class="email-footer">
-          <div class="footer-company">ANGOHOST - PRESTAÇÃO DE SERVIÇOS, LDA</div>
-          <div class="footer-details">
-            <div class="footer-item">
-              <strong>Email:</strong><br>
-              support@angohost.ao
-            </div>
-            <div class="footer-item">
-              <strong>Telefone:</strong><br>
-              +244 226 430 401
-            </div>
-            <div class="footer-item">
-              <strong>Endereço:</strong><br>
-              Cacuaco Sequele - Angola
-            </div>
-            <div class="footer-item">
-              <strong>NIF:</strong><br>
-              5000088927
-            </div>
-          </div>
-          <div class="footer-copyright">
-            © 2024 AngoHost. Todos os direitos reservados.<br>
-            Este é um email automático, não responda a esta mensagem.
+        <!-- Footer -->
+        <div class="footer">
+          <div class="company-name">ANGOHOST - PRESTAÇÃO DE SERVIÇOS, LDA</div>
+          <div class="contact-info">
+            <div class="contact-row">Email: support@angohost.ao</div>
+            <div class="contact-row">Telefone: +244 226 430 401</div>
+            <div class="contact-row">Endereço: Cacuaco Sequele - Angola</div>
+            <div class="contact-row">NIF: 5000088927</div>
           </div>
         </div>
       </div>
