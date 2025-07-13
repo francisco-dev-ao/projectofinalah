@@ -10,7 +10,7 @@ import { toast } from 'react-hot-toast';
 import { PrintReferenceButton } from '@/components/invoice/PrintReferenceButton';
 import { invoiceService } from '@/services/invoiceService';
 import { formatPrice } from '@/lib/utils';
-import { generateInvoicePDF } from '@/services/invoice/invoicePrintService';
+// PDF generation removed - using print reference system
 
 export default function CustomerInvoices() {
   const [invoices, setInvoices] = useState<any[]>([]);
@@ -109,20 +109,8 @@ export default function CustomerInvoices() {
         phone: profile?.phone
       };
 
-      // Generate PDF using the new service
-      const pdfBlob = await generateInvoicePDF(invoice, customerData);
-      
-      // Create download link
-      const url = URL.createObjectURL(pdfBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `fatura-${invoice.invoice_number || invoice.id}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      
-      toast.success('PDF gerado com sucesso!');
+      // PDF generation removed - redirect to print reference
+      toast.error('Download de PDF removido. Use a opção "Imprimir Referência" na página de detalhes da fatura.');
     } catch (error: any) {
       console.error('Erro ao processar PDF:', error);
       toast.error(error.message || 'Erro ao processar PDF');

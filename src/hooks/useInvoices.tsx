@@ -3,7 +3,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { PDFGenerator } from '@/utils/pdfGenerator';
+// PDF generation removed - using print reference system
 
 export const useInvoices = (userId?: string) => {
   const [isGeneratingPDF, setIsGeneratingPDF] = useState<boolean>(false);
@@ -48,7 +48,7 @@ export const useInvoices = (userId?: string) => {
     return refetchInvoicesInternal();
   };
 
-  // Generate PDF for invoice using jsPDF
+  // PDF generation removed - using print reference system
   const generatePDF = async (invoiceId: string, invoiceNumber: string) => {
     try {
       setIsGeneratingPDF(true);
@@ -70,12 +70,12 @@ export const useInvoices = (userId?: string) => {
         
       if (error) throw new Error(`Erro ao carregar fatura: ${error.message}`);
       
-      // Gerar PDF usando jsPDF
-      const pdfBuffer = PDFGenerator.generateInvoicePDF(invoice);
+      // PDF generation removed - using print reference system
+      console.log('PDF generation disabled, redirecting to invoice details');
       
-      // Criar blob para download
-      const blob = new Blob([pdfBuffer], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
+      // PDF generation disabled - using print reference system
+      toast.error('PDF generation removed. Use print reference instead.');
+      return null;
       
       await refetchInvoices(); // Refetch invoices to get updated data
       toast.success('PDF gerado com sucesso!');
@@ -113,19 +113,12 @@ export const useInvoices = (userId?: string) => {
         
       if (error) throw new Error(`Erro ao carregar fatura: ${error.message}`);
       
-      // Gerar PDF usando jsPDF
-      const pdfBuffer = PDFGenerator.generateInvoicePDF(invoice);
+      // PDF generation removed - using print reference system
+      console.log('PDF generation disabled, redirecting to invoice details');
       
-      // Fazer download
-      const blob = new Blob([pdfBuffer], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `fatura-${invoiceNumber}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      // PDF download disabled - redirect to print reference
+      toast.error('PDF download removed. Use print reference instead.');
+      return;
       
       toast.success('Download iniciado com sucesso!');
     } catch (error) {

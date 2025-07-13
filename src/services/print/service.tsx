@@ -121,8 +121,7 @@ const printInvoice = async (invoice: any, requireReference = true): Promise<void
  */
 
 
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+// HTML printing only - PDF generation removed
 const generateInvoicePDF = async (invoice: any, requireReference = true): Promise<Uint8Array> => {
   try {
     // Atualizar a referência de pagamento, se necessário
@@ -246,22 +245,12 @@ const generateInvoicePDF = async (invoice: any, requireReference = true): Promis
       </div>
     `;
 
-    // Usar html2canvas e jsPDF para converter o HTML em PDF
+    // PDF generation removed - only HTML printing available
     try {
-      const canvas = await html2canvas(container, {
-        scale: 2,
-        useCORS: true,
-        logging: false
-      });
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-      const imgData = canvas.toDataURL('image/png');
-      pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
-      const arrayBuffer = pdf.output('arraybuffer');
-      return new Uint8Array(arrayBuffer);
+      console.log('PDF generation disabled, showing print dialog instead');
+      window.print();
+      // Return empty array since PDF generation is disabled
+      return new Uint8Array(0);
     } finally {
       document.body.removeChild(container);
     }
@@ -330,27 +319,12 @@ const generateOrderPDF = async (order: any): Promise<Uint8Array> => {
       // Simular a renderização
       printableElement.innerHTML = '<div id="order-content" style="width: 210mm;"></div>';
       
-      // Capturar como canvas
-      const canvas = await html2canvas(printableElement, {
-        scale: 2,
-        useCORS: true,
-        logging: false
-      });
+      // PDF generation removed - only HTML printing available
+      console.log('Order PDF generation disabled, using HTML print only');
+      window.print();
       
-      // Criar PDF
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-      
-      // Adicionar a imagem do canvas ao PDF
-      const imgData = canvas.toDataURL('image/png');
-      pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
-      
-      // Converter para ArrayBuffer e depois para Uint8Array
-      const arrayBuffer = pdf.output('arraybuffer');
-      return new Uint8Array(arrayBuffer);
+      // Return empty array since PDF generation is disabled
+      return new Uint8Array(0);
     } finally {
       document.body.removeChild(container);
     }
@@ -418,23 +392,12 @@ const generateServicePDF = async (service: any): Promise<Uint8Array> => {
     try {
       printableElement.innerHTML = '<div id="service-content" style="width: 210mm;"></div>';
       
-      const canvas = await html2canvas(printableElement, {
-        scale: 2,
-        useCORS: true,
-        logging: false
-      });
+      // PDF generation removed - only HTML printing available
+      console.log('Service PDF generation disabled, using HTML print only');
+      window.print();
       
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-      
-      const imgData = canvas.toDataURL('image/png');
-      pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
-      
-      const arrayBuffer = pdf.output('arraybuffer');
-      return new Uint8Array(arrayBuffer);
+      // Return empty array since PDF generation is disabled
+      return new Uint8Array(0);
     } finally {
       document.body.removeChild(container);
     }

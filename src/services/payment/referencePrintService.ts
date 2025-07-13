@@ -1,5 +1,4 @@
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+// HTML printing only - PDF generation removed
 
 interface PaymentReference {
   entity: string;
@@ -221,43 +220,10 @@ export const generatePaymentReferencePDF = async (
       </div>
     `;
 
-    // Usar html2canvas e jsPDF para converter o HTML em PDF
+    // PDF generation removed - only HTML printing available
     try {
-      const canvas = await html2canvas(container, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        allowTaint: true
-      });
-      
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-      
-      const imgData = canvas.toDataURL('image/png');
-      const imgWidth = 210; // A4 width in mm
-      const pageHeight = 295; // A4 height in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-      
-      let position = 0;
-      
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-      
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
-      
-      // Fazer download do PDF
-      const filename = `referencia-multicaixa-${paymentReference.reference}.pdf`;
-      pdf.save(filename);
-      
+      console.log('PDF generation disabled, showing print dialog instead');
+      window.print();
     } finally {
       document.body.removeChild(container);
     }
