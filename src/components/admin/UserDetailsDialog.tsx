@@ -33,7 +33,7 @@ import ManageUserServicesDialog from "./ManageUserServicesDialog";
 import { formatDateTime } from "@/utils/formatters";
 
 const roleSchema = z.object({
-  role: z.enum(['admin', 'super_admin', 'support', 'sales', 'cliente', 'suporte', 'comercial']),
+  role: z.enum(['admin', 'cliente', 'suporte']),
 });
 
 export type UserDetailsDialogProps = {
@@ -235,12 +235,8 @@ const UserDetailsDialog = ({
                                 </FormControl>
                                 <SelectContent>
                                   <SelectItem value="admin">Admin</SelectItem>
-                                  <SelectItem value="super_admin">Super Admin</SelectItem>
-                                  <SelectItem value="support">Support</SelectItem>
-                                  <SelectItem value="sales">Sales</SelectItem>
                                   <SelectItem value="cliente">Cliente</SelectItem>
                                   <SelectItem value="suporte">Suporte</SelectItem>
-                                  <SelectItem value="comercial">Comercial</SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>

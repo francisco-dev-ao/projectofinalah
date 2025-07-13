@@ -166,8 +166,6 @@ const UserManagement = () => {
 
   const getRoleBadge = (role: string) => {
     switch (role) {
-      case "super_admin":
-        return <Badge className="bg-purple-500">Super Admin</Badge>;
       case "admin":
         return <Badge className="bg-blue-500">Admin</Badge>;
       case "suporte":

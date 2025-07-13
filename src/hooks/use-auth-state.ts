@@ -178,11 +178,11 @@ export const useAuthState = () => {
   };
   
   const isAdmin = () => {
-    return profile?.role === 'admin' || profile?.role === 'super_admin';
+    return profile?.role === 'admin';
   };
   
   const isSupport = () => {
-    return profile?.role === 'suporte' || profile?.role === 'admin' || profile?.role === 'super_admin';
+    return profile?.role === 'suporte' || profile?.role === 'admin';
   };
 
   return {

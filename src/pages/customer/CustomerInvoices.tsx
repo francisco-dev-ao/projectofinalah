@@ -152,7 +152,7 @@ export default function CustomerInvoices() {
         .eq('id', user.id)
         .single();
       
-      if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
+      if (profile?.role !== 'admin') {
         console.log('CustomerInvoices: Usuário não é admin, não pode limpar dados de exemplo');
         return;
       }
@@ -191,7 +191,7 @@ export default function CustomerInvoices() {
         .eq('id', user.id)
         .single();
       
-      if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
+      if (profile?.role !== 'admin') {
         console.log('CustomerInvoices: Usuário não é admin, não pode verificar faturas órfãs');
         return;
       }

@@ -3,7 +3,7 @@ import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { lazy, Suspense, ReactNode } from 'react';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import AdminRoute from '@/components/auth/AdminRoute';
-import SuperAdminRoute from '@/components/auth/SuperAdminRoute';
+
 import { publicRoutes } from './publicRoutes';
 import { adminRoutes } from './adminRoutes';
 import { customerRoutes } from './customerRoutes';

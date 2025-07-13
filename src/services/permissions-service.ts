@@ -30,10 +30,6 @@ export const checkPermission = async (userId: string, resource: Resource, action
 
     const role = userData.role as UserRole;
 
-    // Super admins have all permissions
-    if (role === 'super_admin') {
-      return true;
-    }
 
     // Regular admins have all permissions except some restricted actions
     if (role === 'admin') {
@@ -75,10 +71,6 @@ export const checkPermission = async (userId: string, resource: Resource, action
  * Check if a user role has a specific permission for a resource
  */
 export const hasPermission = (role: UserRole, resource: Resource, requiredPermission: Permission): boolean => {
-  // Super admins have all permissions
-  if (role === 'super_admin') {
-    return true;
-  }
 
   // Admins have all permissions
   if (role === 'admin') {
@@ -106,12 +98,6 @@ export const hasPermission = (role: UserRole, resource: Resource, requiredPermis
       }
       return false;
       
-    case 'comercial':
-      // Sales can access customer info and orders
-      if (['profiles', 'orders', 'invoices'].includes(resource) && requiredPermission === 'read') {
-        return true;
-      }
-      return false;
       
     default:
       return false;
@@ -139,9 +125,6 @@ export const getUserPermissions = async (userId: string): Promise<string[]> => {
     const permissions: string[] = [];
     const role = userData.role as UserRole;
 
-    if (role === 'super_admin') {
-      return ['*:*']; // Super admin has all permissions
-    }
     
     if (role === 'admin') {
       return ['*:*']; // Admin has all permissions

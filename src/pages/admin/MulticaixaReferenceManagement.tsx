@@ -42,7 +42,7 @@ interface PaymentReference {
 
 const MulticaixaReferenceManagement = () => {
   const { user, profile, isLoading } = useAuth();
-  const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
+  const isAdmin = profile?.role === 'admin';
   console.log("MulticaixaReferenceManagement - Debug:", { user, isAdmin, role: profile?.role });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

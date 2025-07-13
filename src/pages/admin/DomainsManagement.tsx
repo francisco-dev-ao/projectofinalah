@@ -25,7 +25,7 @@ const DomainsManagement = () => {
   
   // Check admin authentication
   const { user, profile, isLoading } = useAuth();
-  const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
+  const isAdmin = profile?.role === 'admin';
 
   useEffect(() => {
     fetchDomains();

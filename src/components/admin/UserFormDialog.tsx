@@ -191,8 +191,6 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
                 <SelectItem value="admin">Admin</SelectItem>
                 <SelectItem value="cliente">Cliente</SelectItem>
                 <SelectItem value="suporte">Suporte</SelectItem>
-                <SelectItem value="comercial">Comercial</SelectItem>
-                <SelectItem value="super_admin">Super Admin</SelectItem>
               </SelectContent>
             </Select>
           </div>

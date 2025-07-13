@@ -101,7 +101,7 @@ const CompanySettings = () => {
 
   const saveCompanyDetails = async (details: { name: string; details: string }) => {
     // Only admin role can edit settings
-    if (role !== 'admin' && role !== 'super_admin') {
+    if (role !== 'admin') {
       toast.error("Apenas administradores podem alterar as configurações da empresa");
       return;
     }
@@ -141,7 +141,7 @@ const CompanySettings = () => {
     bankTransfer: string;
     multicaixa: string;
   }) => {
-    if (role !== 'admin' && role !== 'super_admin') {
+    if (role !== 'admin') {
       toast.error("Apenas administradores podem alterar as configurações de pagamento");
       return;
     }
@@ -187,7 +187,7 @@ const CompanySettings = () => {
     success: string;
     error: string;
   }) => {
-    if (role !== 'admin' && role !== 'super_admin') {
+    if (role !== 'admin') {
       toast.error("Apenas administradores podem alterar as configurações de Multicaixa Express");
       return;
     }

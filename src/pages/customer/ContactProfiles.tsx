@@ -27,7 +27,7 @@ const ContactProfiles = () => {
         .eq('id', user.id)
         .single();
       
-      if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
+      if (profile?.role !== 'admin') {
         console.log('ContactProfiles: Usuário não é admin, não pode limpar dados de exemplo');
         return;
       }
@@ -65,7 +65,7 @@ const ContactProfiles = () => {
         .eq('id', user.id)
         .single();
       
-      if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
+      if (profile?.role !== 'admin') {
         console.log('ContactProfiles: Usuário não é admin, não pode analisar dados');
         return;
       }

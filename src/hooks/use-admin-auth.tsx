@@ -37,16 +37,16 @@ export const AdminAuthProvider = ({ children }: { children: React.ReactNode }) =
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState<AdminRole>('cliente');
 
-  // Check if the user's role is admin or super_admin
-  const isAdmin = role === 'admin' || role === 'super_admin';
-  const isSuperAdmin = role === 'super_admin';
+  // Check if the user's role is admin
+  const isAdmin = role === 'admin';
+  const isSuperAdmin = false;
   
   // Function to check if user has a specific permission
   const checkPermission = (resource: Resource, requiredPermission: Permission): boolean => {
     if (!user) return false;
     
-    // Super admins always have access to everything
-    if (role === 'super_admin') return true;
+    // Admins have access to everything
+    if (role === 'admin') return true;
     
     return hasPermission(role, resource, requiredPermission);
   };

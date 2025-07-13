@@ -141,7 +141,7 @@ const Navbar = () => {
                 <DropdownMenuItem onClick={() => navigate('/customer/profile')}>
                   <Settings className="mr-2 h-4 w-4" /> Configurações
                 </DropdownMenuItem>
-                {(profile?.role === 'admin' || profile?.role === 'super_admin') && (
+                {profile?.role === 'admin' && (
                   <DropdownMenuItem onClick={() => navigate('/admin')}>
                     <UserCheck className="mr-2 h-4 w-4" /> Admin
                   </DropdownMenuItem>

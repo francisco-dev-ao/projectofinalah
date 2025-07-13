@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Route, Navigate } from "react-router-dom";
-import SuperAdminRoute from "../components/auth/SuperAdminRoute";
+
 import AdminRoute from "../components/auth/AdminRoute";
 
 // Admin Pages
@@ -12,7 +12,7 @@ import HostingManagement from "../pages/admin/HostingManagement";
 import PriceManagement from "../pages/admin/PriceManagement";
 import CompanySettings from "../pages/admin/CompanySettings";
 import SecurityManagement from "../pages/admin/SecurityManagement";
-import SuperAdminDashboard from "../pages/admin/SuperAdminDashboard";
+
 import UserCleanup from "../pages/admin/UserCleanup";
 import PaymentsPage from "../pages/admin/PaymentsPage";
 import EmailSettings from "../pages/admin/EmailSettings";
@@ -196,16 +196,6 @@ export const adminRoutes = [
     } 
   />,
   
-  // Super admin only routes
-  <Route 
-    key="/admin/super" 
-    path="/admin/super" 
-    element={
-      <SuperAdminRoute>
-        <SuperAdminDashboard />
-      </SuperAdminRoute>
-    } 
-  />,
   
   // Admin routes (access: admin, super-admin)
   <Route 

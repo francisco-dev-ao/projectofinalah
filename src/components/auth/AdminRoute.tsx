@@ -22,8 +22,8 @@ const AdminRoute = ({ children }: AdminRouteProps) => {
     return <Navigate to="/login" replace />;
   }
 
-  // Check if the user is an admin or super_admin
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
+  // Check if the user is an admin
+  if (profile?.role !== 'admin') {
     return <Navigate to="/" replace />;
   }
 

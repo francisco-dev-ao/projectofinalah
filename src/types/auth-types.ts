@@ -19,7 +19,7 @@ export interface AuthContextType {
 export interface UserProfile {
   id: string;
   name?: string;
-  role?: 'admin' | 'suporte' | 'cliente' | 'super_admin';
+  role?: 'admin' | 'suporte' | 'cliente';
   nif?: string;
   company_name?: string;
   phone?: string;

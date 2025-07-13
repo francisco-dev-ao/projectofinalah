@@ -17,7 +17,7 @@ const UserCleanup = () => {
   const navigate = useNavigate();
 
   // Check if user has admin rights
-  if (role !== 'admin' && role !== 'super_admin') {
+  if (role !== 'admin') {
     navigate("/admin");
     toast.error("Você não tem permissão para acessar esta página");
     return null;

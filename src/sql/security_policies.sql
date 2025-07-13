@@ -20,7 +20,7 @@ CREATE POLICY "Admins can manage all wallets"
     EXISTS (
       SELECT 1 FROM profiles 
       WHERE id = auth.uid() 
-      AND role IN ('admin', 'super_admin')
+      AND role = 'admin'
     )
   );
 
@@ -41,7 +41,7 @@ CREATE POLICY "Admins can view all transactions"
     EXISTS (
       SELECT 1 FROM profiles 
       WHERE id = auth.uid() 
-      AND role IN ('admin', 'super_admin')
+      AND role = 'admin'
     )
   );
 
@@ -57,7 +57,7 @@ CREATE POLICY "Users can view own invoices"
     EXISTS (
       SELECT 1 FROM profiles 
       WHERE id = auth.uid() 
-      AND role IN ('admin', 'super_admin', 'suporte')
+      AND role IN ('admin', 'suporte')
     )
   );
 
@@ -67,7 +67,7 @@ CREATE POLICY "Only system can create invoices"
     EXISTS (
       SELECT 1 FROM profiles 
       WHERE id = auth.uid() 
-      AND role IN ('admin', 'super_admin')
+      AND role = 'admin'
     )
   );
 
@@ -80,7 +80,7 @@ CREATE POLICY "Users can view own orders"
     EXISTS (
       SELECT 1 FROM profiles 
       WHERE id = auth.uid() 
-      AND role IN ('admin', 'super_admin', 'suporte')
+      AND role IN ('admin', 'suporte')
     )
   );
 
@@ -97,7 +97,7 @@ CREATE POLICY "Users can view own profile"
     EXISTS (
       SELECT 1 FROM profiles p
       WHERE p.id = auth.uid() 
-      AND p.role IN ('admin', 'super_admin', 'suporte')
+      AND p.role IN ('admin', 'suporte')
     )
   );
 
@@ -111,7 +111,7 @@ CREATE POLICY "Users can update own profile"
       OR EXISTS (
         SELECT 1 FROM profiles p
         WHERE p.id = auth.uid() 
-        AND p.role IN ('admin', 'super_admin')
+        AND p.role = 'admin'
       )
     )
   );
@@ -134,6 +134,6 @@ CREATE POLICY "Users can view own payment references"
     EXISTS (
       SELECT 1 FROM profiles 
       WHERE id = auth.uid() 
-      AND role IN ('admin', 'super_admin')
+      AND role = 'admin'
     )
   );
