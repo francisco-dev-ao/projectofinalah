@@ -8,8 +8,8 @@ import { Copy, CheckCircle, Clock, CreditCard, Smartphone, Building2, Banknote, 
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import emailjs from 'emailjs-com';
 import { supabase } from '@/integrations/supabase/client';
+import { EmailService } from '@/services/emailService';
 // Print reference system removed
 
 interface PaymentReference {
@@ -771,7 +771,7 @@ export const AppyPayReferenceModal = ({
     }
   };
 
-  // Handler para enviar email usando SMTP direto sem Edge Function
+  // Handler para enviar email usando o serviço centralizado
   const handleSendEmail = async () => {
     if (!customerInfo.email) {
       toast.error('Email do cliente não encontrado');
@@ -781,165 +781,24 @@ export const AppyPayReferenceModal = ({
     setSendingEmail(true);
     
     try {
-      // Configurar EmailJS com SMTP direto
-      const serviceID = 'service_smtp'; // Será configurado
-      const templateID = 'template_payment_ref';
-      const userID = 'smtp_user_id';
+      console.log('Enviando email de referência para:', customerInfo.email);
 
-      // Template de dados para o email
-      const templateParams = {
-        to_email: customerInfo.email,
-        to_name: customerInfo.name || 'Cliente',
-        from_name: 'AngoHost',
-        from_email: 'support@angohost.ao',
-        subject: 'Referência de Pagamento Multicaixa - AngoHost',
-        entity: paymentReference.entity,
-        reference: paymentReference.reference,
-        amount: paymentReference.amount.toLocaleString('pt-PT', { 
-          style: 'currency', 
-          currency: 'AOA' 
-        }),
-        description: paymentReference.description,
-        validity_date: formatDate(paymentReference.validity_date),
-        instructions: paymentReference.instructions.pt.steps.join('\n'),
-        // Dados SMTP diretos para envio
-        smtp_host: 'mail.angohost.ao',
-        smtp_port: '587',
-        smtp_user: 'support@angohost.ao',
-        smtp_pass: '97z2lh;F4_k5',
-        email_html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center;">
-              <h1 style="margin: 0; font-size: 28px; font-weight: 700;">AngoHost</h1>
-              <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">Referência de Pagamento Multicaixa</p>
-            </div>
-            
-            <div style="padding: 30px;">
-              <p style="font-size: 18px; margin-bottom: 20px; color: #2d3748;">Olá ${customerInfo.name || 'Cliente'},</p>
-              
-              <p style="margin-bottom: 25px; color: #4a5568;">Sua referência de pagamento foi gerada com sucesso:</p>
-              
-              <div style="background: #f7fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 25px; margin: 25px 0; text-align: center;">
-                <h2 style="color: #2d3748; margin-bottom: 20px;">💳 Dados para Pagamento</h2>
-                
-                <div style="margin-bottom: 20px;">
-                  <div style="display: inline-block; background: white; padding: 15px; margin: 10px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                    <div style="font-size: 12px; font-weight: 600; color: #718096; margin-bottom: 5px;">ENTIDADE</div>
-                    <div style="font-size: 20px; font-weight: 600; color: #2d3748;">${paymentReference.entity}</div>
-                  </div>
-                  
-                  <div style="display: inline-block; background: white; padding: 15px; margin: 10px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                    <div style="font-size: 12px; font-weight: 600; color: #718096; margin-bottom: 5px;">REFERÊNCIA</div>
-                    <div style="font-size: 20px; font-weight: 600; color: #2d3748;">${paymentReference.reference}</div>
-                  </div>
-                </div>
-                
-                <div style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; padding: 20px; border-radius: 12px; margin: 20px 0;">
-                  <div style="font-size: 14px; margin-bottom: 5px;">VALOR A PAGAR</div>
-                  <div style="font-size: 28px; font-weight: 700;">${paymentReference.amount.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' })}</div>
-                </div>
-                
-                <p><strong>Descrição:</strong> ${paymentReference.description}</p>
-                <p><strong>Válido até:</strong> ${formatDate(paymentReference.validity_date)}</p>
-              </div>
-              
-              <div style="background: #f0fff4; border: 1px solid #9ae6b4; border-radius: 8px; padding: 20px; margin: 20px 0;">
-                <h3 style="color: #22543d; margin-bottom: 15px;">📋 Como Pagar</h3>
-                ${paymentReference.instructions.pt.steps.map((step, index) => `
-                  <div style="margin-bottom: 10px; padding: 10px; background: white; border-radius: 6px; border-left: 4px solid #48bb78;">
-                    <strong>${index + 1}.</strong> ${step}
-                  </div>
-                `).join('')}
-              </div>
-              
-              <p>Após o pagamento, você receberá a confirmação e a fatura final.</p>
-            </div>
-            
-            <div style="background: #2d3748; color: #e2e8f0; padding: 25px; text-align: center;">
-              <div style="font-weight: 600; margin-bottom: 5px;">ANGOHOST - PRESTAÇÃO DE SERVIÇOS, LDA</div>
-              <div style="font-size: 14px;">
-                Email: support@angohost.ao | Telefone: +244 226 430 401<br>
-                Cacuaco Sequele - Angola | NIF: 5000088927
-              </div>
-            </div>
-          </div>
-        `
-      };
+      const result = await EmailService.sendPaymentReferenceEmail(
+        customerInfo.email,
+        customerInfo.name || 'Cliente',
+        paymentReference.reference,
+        paymentReference.amount
+      );
 
-      console.log('Enviando email via SMTP direto para:', customerInfo.email);
-      console.log('Configurações SMTP:', {
-        host: 'mail.angohost.ao',
-        port: 587,
-        user: 'support@angohost.ao'
-      });
-
-      // Usar Edge Function do Supabase para envio real de email
-      const { data: { session } } = await supabase.auth.getSession()
-      
-      const emailResponse = await supabase.functions.invoke('send-real-email', {
-        body: {
-          to: customerInfo.email,
-          subject: 'Referência de Pagamento Multicaixa - AngoHost',
-          html: templateParams.email_html,
-          from: 'support@angohost.ao'
-        }
-      })
-
-      console.log('Resposta da Edge Function:', emailResponse)
-
-      if (emailResponse.error) {
-        throw new Error(`Erro na Edge Function: ${emailResponse.error.message}`)
-      }
-
-      if (emailResponse.data?.success) {
-        toast.success(`✅ Email enviado com sucesso para ${customerInfo.email}`)
-        console.log('✅ Email enviado via Edge Function:', emailResponse.data.details)
+      if (result.success) {
+        toast.success(`✅ Email enviado com sucesso para ${customerInfo.email}`);
       } else {
-        throw new Error('Falha no envio via Edge Function')
+        throw new Error(result.error || 'Falha no envio do email');
       }
       
     } catch (error) {
       console.error('Erro ao enviar email:', error);
-      
-      // Como alternativa, usar envio nativo SMTP (simulado)
-      try {
-        const smtpData = {
-          host: 'mail.angohost.ao',
-          port: 587,
-          secure: false,
-          auth: {
-            user: 'support@angohost.ao',
-            pass: '97z2lh;F4_k5'
-          },
-          from: 'support@angohost.ao',
-          to: customerInfo.email,
-          subject: 'Referência de Pagamento Multicaixa - AngoHost',
-          text: `Olá ${customerInfo.name || 'Cliente'},
-
-Sua referência de pagamento:
-• Entidade: ${paymentReference.entity}
-• Referência: ${paymentReference.reference}  
-• Valor: ${paymentReference.amount.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' })}
-• Descrição: ${paymentReference.description}
-• Válido até: ${formatDate(paymentReference.validity_date)}
-
-Como pagar:
-${paymentReference.instructions.pt.steps.map((step, index) => `${index + 1}. ${step}`).join('\n')}
-
-Atenciosamente,
-Equipe AngoHost`
-        };
-
-        console.log('Dados SMTP preparados:', smtpData);
-        
-        // Simular envio bem-sucedido
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        toast.success(`✅ Email processado via SMTP para ${customerInfo.email}`);
-        
-      } catch (smtpError) {
-        console.error('Erro no SMTP alternativo:', smtpError);
-        toast.error(`❌ Falha no envio automático. Verifique as configurações SMTP.`);
-      }
+      toast.error(`❌ Erro ao enviar email: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
     } finally {
       setSendingEmail(false);
     }

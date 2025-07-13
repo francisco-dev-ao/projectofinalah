@@ -8,8 +8,8 @@ const corsHeaders = {
 interface EmailRequest {
   to: string
   subject: string
-  html: string
-  from?: string
+  html?: string
+  text?: string
 }
 
 serve(async (req) => {
@@ -19,61 +19,68 @@ serve(async (req) => {
   }
 
   try {
-    const { to, subject, html, from = 'support@angohost.ao' }: EmailRequest = await req.json()
+    const { to, subject, html, text }: EmailRequest = await req.json()
 
     console.log('Enviando email para:', to)
     console.log('Assunto:', subject)
 
-    // Configurações SMTP do AngoHost
-    const smtpConfig = {
-      hostname: 'mail.angohost.ao',
-      port: 587,
-      username: 'support@angohost.ao',
-      password: '97z2lh;F4_k5'
+    // Get API key from Supabase secrets
+    const apiKey = Deno.env.get('ANGOHOST_EMAIL_API_KEY')
+    
+    if (!apiKey) {
+      throw new Error('Chave da API de email não configurada')
     }
 
-    // Simular envio de email via SMTP
-    // Em produção, aqui você usaria uma biblioteca SMTP real
+    // Prepare email data for AngoHost API
     const emailData = {
-      from: from,
       to: to,
       subject: subject,
-      html: html,
-      smtp: smtpConfig
+      ...(html && { html }),
+      ...(text && { text })
     }
 
-    console.log('Dados do email preparados:', {
-      de: emailData.from,
-      para: emailData.to,
-      servidor: `${smtpConfig.hostname}:${smtpConfig.port}`,
-      usuario: smtpConfig.username
+    console.log('Enviando email via API AngoHost:', {
+      para: to,
+      assunto: subject,
+      temHtml: !!html,
+      temTexto: !!text
     })
 
-    // Aqui seria feita a conexão SMTP real
-    // Por enquanto, vamos simular o sucesso
-    const emailSent = true
+    // Send email using AngoHost API
+    const response = await fetch('https://mail3.angohost.ao/email/send', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(emailData)
+    })
 
-    if (emailSent) {
-      console.log('✅ Email enviado com sucesso!')
-      
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          message: 'Email enviado com sucesso',
-          details: {
-            to: to,
-            subject: subject,
-            timestamp: new Date().toISOString()
-          }
-        }),
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200,
-        }
-      )
-    } else {
-      throw new Error('Falha no envio do email')
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('Erro na API AngoHost:', response.status, errorText)
+      throw new Error(`Erro na API de email: ${response.status} - ${errorText}`)
     }
+
+    const result = await response.json()
+    console.log('✅ Email enviado com sucesso via API AngoHost!', result)
+    
+    return new Response(
+      JSON.stringify({ 
+        success: true, 
+        message: 'Email enviado com sucesso',
+        details: {
+          to: to,
+          subject: subject,
+          timestamp: new Date().toISOString(),
+          apiResponse: result
+        }
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      }
+    )
 
   } catch (error) {
     console.error('Erro ao enviar email:', error)
