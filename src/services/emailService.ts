@@ -295,7 +295,7 @@ Seu parceiro digital em Angola
     return this.sendEmail({
       from: 'pagamentos@angohost.ao',
       to: customerEmail,
-      subject: `Dados de Pagamento Disponíveis - Serviços AngoHost`,
+      subject: `Dados de Pagamento Disponíveis - Ref: ${reference} - AngoHost`,
       html,
       text: textContent
     });
