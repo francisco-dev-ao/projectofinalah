@@ -147,7 +147,7 @@ export class EmailService {
                                 <tr>
                                     <td style="padding: 25px;">
                                         <h3 style="margin: 0 0 15px 0; color: #333333; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 18px; font-weight: 600;">
-                                            📱 Instruções de Pagamento
+                                            📱 Instruções de Pagamento AppyPay
                                         </h3>
                                         <ol style="margin: 0; padding-left: 20px; color: #555555; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 15px; line-height: 1.8;">
                                             <li>Abra o aplicativo <strong>AppyPay</strong> no seu dispositivo móvel</li>
@@ -156,6 +156,46 @@ export class EmailService {
                                             <li>Confirme o valor: <strong style="color: #667eea;">${formatCurrency(amount)}</strong></li>
                                             <li>Finalize o pagamento seguindo as instruções no app</li>
                                         </ol>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Multicaixa Instructions -->
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107; margin: 30px 0;">
+                                <tr>
+                                    <td style="padding: 25px;">
+                                        <h3 style="margin: 0 0 15px 0; color: #856404; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 18px; font-weight: 600;">
+                                            🏦 Dados para Pagamento Multicaixa
+                                        </h3>
+                                        <div style="background-color: rgba(255, 193, 7, 0.1); border-radius: 6px; padding: 15px; margin: 15px 0;">
+                                            <p style="margin: 0 0 10px 0; color: #856404; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 15px;">
+                                                <strong>Entidade:</strong> 11333 (AppyPay)
+                                            </p>
+                                            <p style="margin: 0 0 10px 0; color: #856404; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 15px;">
+                                                <strong>Referência:</strong> ${reference}
+                                            </p>
+                                            <p style="margin: 0; color: #856404; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 15px;">
+                                                <strong>Valor:</strong> ${formatCurrency(amount)}
+                                            </p>
+                                        </div>
+                                        
+                                        <h4 style="margin: 20px 0 10px 0; color: #856404; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 16px; font-weight: 600;">
+                                            Instruções de Pagamento:
+                                        </h4>
+                                        <ol style="margin: 0; padding-left: 20px; color: #856404; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; line-height: 1.7;">
+                                            <li>Acesse o seu homebanking ou dirija-se a um balcão do banco</li>
+                                            <li>Selecione a opção <strong>"Pagamento de Serviços"</strong> ou <strong>"Multicaixa"</strong></li>
+                                            <li>Insira a <strong>Entidade: 11333</strong></li>
+                                            <li>Insira a <strong>Referência: ${reference}</strong></li>
+                                            <li>Confirme o <strong>Valor: ${formatCurrency(amount)}</strong></li>
+                                            <li>Efetue o pagamento e guarde o comprovativo</li>
+                                        </ol>
+                                        
+                                        <div style="background-color: #d1ecf1; border-radius: 6px; padding: 15px; margin: 20px 0;">
+                                            <p style="margin: 0; color: #0c5460; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 13px; font-weight: 600;">
+                                                ⚠️ IMPORTANTE: Após o pagamento, os seus serviços serão ativados automaticamente em até 24 horas. Guarde sempre o comprovativo de pagamento.
+                                            </p>
+                                        </div>
                                     </td>
                                 </tr>
                             </table>
@@ -205,14 +245,27 @@ A sua referência de pagamento AppyPay foi gerada com sucesso.
 REFERÊNCIA: ${reference}
 VALOR: ${formatCurrency(amount)}
 
-INSTRUÇÕES DE PAGAMENTO:
+INSTRUÇÕES DE PAGAMENTO AppyPay:
 1. Abra o aplicativo AppyPay no seu dispositivo móvel
 2. Selecione "Pagar Serviços"
 3. Insira a referência: ${reference}
 4. Confirme o valor: ${formatCurrency(amount)}
 5. Finalize o pagamento
 
-Após a confirmação do pagamento, os seus serviços serão ativados automaticamente.
+DADOS PARA PAGAMENTO MULTICAIXA:
+Entidade: 11333 (AppyPay)
+Referência: ${reference}
+Valor: ${formatCurrency(amount)}
+
+INSTRUÇÕES MULTICAIXA:
+1. Acesse o seu homebanking ou dirija-se a um balcão do banco
+2. Selecione "Pagamento de Serviços" ou "Multicaixa"
+3. Insira a Entidade: 11333
+4. Insira a Referência: ${reference}
+5. Confirme o Valor: ${formatCurrency(amount)}
+6. Efetue o pagamento e guarde o comprovativo
+
+IMPORTANTE: Após o pagamento, os seus serviços serão ativados automaticamente em até 24 horas. Guarde sempre o comprovativo de pagamento.
 
 Obrigado por escolher a AngoHost!
 

@@ -96,16 +96,27 @@ export const useOrderProcessing = () => {
         if (referenceResult.success) {
           console.log("Payment reference generated successfully:", referenceResult);
           
-          // Enviar email automático com a referência de pagamento
+          // Enviar email automático com a referência de pagamento usando EmailService
           try {
-            console.log("Sending automatic email with payment reference for order:", orderId);
-            await triggerOrderEmail(orderId, user.email, user.user_metadata?.name, { 
-              silent: false, 
-              retry: true 
-            });
-            console.log("Email with payment reference sent successfully");
+            console.log("Sending automatic payment reference email for order:", orderId);
+            const { EmailService } = await import('@/services/emailService');
+            
+            const emailResult = await EmailService.sendPaymentReferenceEmail(
+              user.email!,
+              user.user_metadata?.name || user.email || 'Cliente',
+              referenceResult.reference,
+              orderData.totalAmount
+            );
+            
+            if (emailResult.success) {
+              console.log("Payment reference email sent successfully");
+              toast.success("Referência de pagamento enviada por email!");
+            } else {
+              console.error("Error sending payment reference email:", emailResult.error);
+              toast.error("Email enviado, mas houve um problema na confirmação");
+            }
           } catch (emailError) {
-            console.error("Error sending automatic email with payment reference:", emailError);
+            console.error("Error sending payment reference email:", emailError);
             // Não falha o processo se o email falhar
           }
           
