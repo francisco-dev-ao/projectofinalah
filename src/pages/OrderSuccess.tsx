@@ -69,53 +69,11 @@ export default function OrderSuccess() {
             if (existingInvoice) {
               setInvoice(existingInvoice);
               
-              // ✅ IMPRESSÃO AUTOMÁTICA DA FATURA
-              try {
-                console.log('🖨️ Iniciando impressão automática da fatura...');
-                const { downloadHelpers } = await import("@/utils/downloadHelpers");
-                await downloadHelpers.printInvoiceDirectly(existingInvoice);
-                console.log('✅ Fatura impressa automaticamente');
-                toast.success('Fatura sendo impressa automaticamente...');
-              } catch (printError) {
-                console.error('❌ Erro na impressão automática:', printError);
-                toast.warning('Erro na impressão automática. Use o botão de impressão.');
-              }
-              
             } else {
               // Generate invoice if it doesn't exist
               const invoiceResult = await InvoiceService.generateInvoice(orderId);
               if (invoiceResult?.success && invoiceResult?.invoice) {
                 setInvoice(invoiceResult.invoice);
-                
-                // ✅ IMPRESSÃO AUTOMÁTICA DA NOVA FATURA
-                try {
-                  console.log('🖨️ Iniciando impressão automática da nova fatura...');
-                  const { downloadHelpers } = await import("@/utils/downloadHelpers");
-                  
-                  // Buscar dados completos da fatura recém-criada
-                  const { data: completeInvoice } = await supabase
-                    .from('invoices')
-                    .select(`
-                      *,
-                      orders (
-                        *,
-                        profiles:user_id (*),
-                        payment_references (*),
-                        order_items (*)
-                      )
-                    `)
-                    .eq('id', invoiceResult.invoice.id)
-                    .single();
-                    
-                  if (completeInvoice) {
-                    await downloadHelpers.printInvoiceDirectly(completeInvoice);
-                    console.log('✅ Nova fatura impressa automaticamente');
-                    toast.success('Fatura gerada e sendo impressa automaticamente...');
-                  }
-                } catch (printError) {
-                  console.error('❌ Erro na impressão automática da nova fatura:', printError);
-                  toast.warning('Fatura gerada com sucesso. Use o botão de impressão.');
-                }
               }
             }
           } catch (invoiceError) {
@@ -273,7 +231,7 @@ export default function OrderSuccess() {
           <div className="mt-6 p-4 bg-gray-50 rounded-lg">
             <h3 className="font-semibold text-lg mb-3">Fatura</h3>
             <p className="text-sm text-gray-600 mb-4">
-              Sua fatura foi impressa automaticamente. Caso precise imprimir novamente, use o botão abaixo.
+              Sua fatura está disponível para impressão.
             </p>
             <Button
               onClick={handlePrintInvoice}
