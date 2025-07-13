@@ -8,6 +8,7 @@ import { Copy, CheckCircle, Clock, CreditCard, Smartphone, Building2, Banknote, 
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import emailjs from '@emailjs/browser';
 import { supabase } from '@/integrations/supabase/client';
 // Print reference system removed
 
@@ -770,7 +771,7 @@ export const AppyPayReferenceModal = ({
     }
   };
 
-  // Handler para enviar email usando SMTP
+  // Handler para enviar email usando Edge Function SMTP
   const handleSendEmail = async () => {
     if (!customerInfo.email) {
       toast.error('Email do cliente não encontrado');
@@ -791,11 +792,10 @@ export const AppyPayReferenceModal = ({
         }),
         description: paymentReference.description,
         validityDate: formatDate(paymentReference.validity_date),
-        instructions: paymentReference.instructions.pt.steps,
-        orderData: orderData
+        instructions: paymentReference.instructions.pt.steps
       };
 
-      const { error } = await supabase.functions.invoke('send-payment-reference-email', {
+      const { data, error } = await supabase.functions.invoke('send-smtp-email', {
         body: emailData
       });
 
@@ -804,10 +804,33 @@ export const AppyPayReferenceModal = ({
       }
 
       toast.success(`Email enviado com sucesso para ${customerInfo.email}`);
+      console.log('Email enviado:', data);
       
     } catch (error) {
       console.error('Erro ao enviar email:', error);
-      toast.error('Erro ao enviar email. Verifique as configurações SMTP.');
+      
+      // Fallback: abrir cliente de email do usuário
+      const subject = encodeURIComponent('Referência de Pagamento Multicaixa - AngoHost');
+      const body = encodeURIComponent(`Olá ${customerInfo.name || 'Cliente'},
+
+Sua referência de pagamento foi gerada:
+
+🏦 Entidade: ${paymentReference.entity}
+🔢 Referência: ${paymentReference.reference}
+💰 Valor: ${paymentReference.amount.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' })}
+📝 Descrição: ${paymentReference.description}
+⏰ Válido até: ${formatDate(paymentReference.validity_date)}
+
+Como pagar:
+${paymentReference.instructions.pt.steps.map((step, index) => `${index + 1}. ${step}`).join('\n')}
+
+Atenciosamente,
+Equipe AngoHost`);
+      
+      const mailtoLink = `mailto:${customerInfo.email}?subject=${subject}&body=${body}`;
+      window.open(mailtoLink, '_blank');
+      
+      toast.success('Cliente de email aberto! Complete o envio manualmente.');
     } finally {
       setSendingEmail(false);
     }
