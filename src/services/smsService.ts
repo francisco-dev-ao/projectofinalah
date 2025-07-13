@@ -16,13 +16,14 @@ interface SMSResponse {
 }
 
 export class SMSService {
-  private static readonly QAS_API_KEY = 'qasc286d208556410d8be7930979d';
-  private static readonly PRD_API_KEY = 'prdc821442f717b71ceab02b35df7';
+  private static readonly QAS_SENDER_TOKEN = 'qasc286d208556410d8be7930979d';
+  private static readonly PRD_SENDER_TOKEN = 'prdc821442f717b71ceab02b35df7';
+  private static readonly API_TOKEN = 'b8a2bde6ee90fcdb7ee6495889';
   private static readonly BASE_URL = 'https://api.sms-service.com'; // URL da API do Postman
   private static readonly IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
-  private static getApiKey(): string {
-    return this.IS_PRODUCTION ? this.PRD_API_KEY : this.QAS_API_KEY;
+  private static getSenderToken(): string {
+    return this.IS_PRODUCTION ? this.PRD_SENDER_TOKEN : this.QAS_SENDER_TOKEN;
   }
 
   /**
@@ -36,12 +37,14 @@ export class SMSService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.getApiKey()}`,
+          'api-token': this.API_TOKEN,
+          'sender-token': this.getSenderToken(),
         },
         body: JSON.stringify({
           to: request.to,
           message: request.message,
-          from: request.from || 'AngoHost'
+          from: request.from || 'AngoHost',
+          origin: ''
         })
       });
 
