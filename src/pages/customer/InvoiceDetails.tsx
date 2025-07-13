@@ -77,8 +77,7 @@ const InvoiceDetails = () => {
           *,
           orders:order_id (
             *,
-            order_items(*),
-            profiles:user_id(*)
+            order_items(*)
           )
         `)
         .eq('id', invoiceId)
@@ -186,7 +185,6 @@ const InvoiceDetails = () => {
           *,
           orders (
             *,
-            profiles:user_id (*),
             payment_references (*),
             order_items (*)
           )

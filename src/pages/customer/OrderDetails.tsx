@@ -35,7 +35,6 @@ const OrderDetails = () => {
         .from('orders')
         .select(`
           *,
-          profiles:user_id (*),
           order_items (*),
           invoices:invoices (*)
         `)
