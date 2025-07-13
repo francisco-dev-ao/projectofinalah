@@ -23,7 +23,7 @@ export {
 } from './retrieval';
 
 // PDF operations  
-export { generateInvoicePDF } from './pdfGeneration';
+// PDF generation removed - using print reference instead
 
 // Email operations
 export { sendInvoiceViaEmail } from './emailService';
@@ -63,9 +63,7 @@ import {
   recordInvoicePayment,
   getPublicInvoiceURL
 } from './paymentService';
-import {
-  generateInvoicePDF
-} from './pdfGeneration';
+// PDF generation removed - using print reference instead
 
 // Export the InvoiceService object
 export const InvoiceService = {
@@ -105,7 +103,7 @@ export const InvoiceService = {
   getInvoiceByPublicToken,
   sendInvoiceViaEmail,
   recordInvoicePayment,
-  generateInvoicePDF,
+  // PDF generation removed
   getPublicInvoiceURL
 };
 

@@ -136,13 +136,9 @@ export const generatePaymentReference = async (
     }
 
     if (invoiceData) {
-      // Import PDF generator dinamicamente
-      const { PDFGenerator } = await import('@/utils/pdfGenerator');
-      const pdfBuffer = await PDFGenerator.generateInvoicePDF(invoiceData);
-      const pdfBlob = new Blob([pdfBuffer], { type: 'application/pdf' });
-      // Salvar PDF no storage
-      const { PDFStorageManager } = await import('@/services/invoice/pdf/storageManager');
-      const pdfUrl = await PDFStorageManager.savePDFToStorage(invoiceData.id, invoiceData.invoice_number, pdfBlob);
+      // PDF functionality removed - print reference instead
+      console.log('Reference payment completed - PDF generation disabled');
+      // Users can now print reference using PrintReferenceButton
       // Atualizar a fatura com o link do PDF
       await supabase
         .from('invoices')
@@ -150,7 +146,7 @@ export const generatePaymentReference = async (
           status: 'pending_payment',
           pdf_generated_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
-          pdf_url: pdfUrl
+          pdf_url: null // PDF generation removed
         })
         .eq('id', invoiceData.id);
       // Enviar fatura por email ao cliente
@@ -328,29 +324,11 @@ const generateLocalReference = async (
     
     if (invoiceData) {
       // Import PDF generator dynamically
-      const { PDFGenerator } = await import('@/utils/pdfGenerator');
+      // PDF functionality removed - using print reference instead
+      console.log('Local reference generated - PDF generation disabled');
       
-      // Generate PDF with the new reference data
-      const pdfBuffer = await PDFGenerator.generateInvoicePDF(invoiceData);
-      const blob = new Blob([pdfBuffer], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      
-      // Auto print PDF
-      const printWindow = window.open(url, '_blank');
-      if (printWindow) {
-        printWindow.onload = () => {
-          // Wait a bit for the PDF to fully load, then print
-          setTimeout(() => {
-            printWindow.print();
-            console.log('✅ Invoice PDF printed automatically (local reference)');
-          }, 1000);
-        };
-        
-        // Clean up the URL after printing
-        setTimeout(() => {
-          URL.revokeObjectURL(url);
-        }, 5000);
-      }
+      // PDF functionality removed - print reference button available instead
+      console.log('Local reference generated - Users can print reference via UI button');
     }
   } catch (error) {
     console.error('Error in automatic invoice generation and printing (local):', error);

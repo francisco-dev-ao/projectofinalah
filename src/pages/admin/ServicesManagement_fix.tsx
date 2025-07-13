@@ -1,0 +1,1 @@
+import { ServiceDetailsDialog } from '@/components/admin/ServiceDetailsDialog';

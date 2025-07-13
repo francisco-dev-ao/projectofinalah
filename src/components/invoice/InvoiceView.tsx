@@ -12,11 +12,12 @@ import { toast } from 'sonner';
 import { getInvoiceItems } from '@/utils/invoice/getInvoiceItems';
 import axios from 'axios';
 
-interface InvoiceItem {
+// Define interface for invoice items that matches the component needs
+interface InvoiceItemLocal {
   id: string;
   invoice_id: string;
   service_name: string;
-  description: string | null;
+  description?: string | null;
   quantity: number;
   unit_price: number;
   total_price: number;
@@ -24,16 +25,30 @@ interface InvoiceItem {
   duration_unit?: string;
 }
 
+// Extended Invoice type with orders
+interface InvoiceWithOrders extends Invoice {
+  orders?: {
+    profiles?: {
+      name?: string;
+      email?: string;
+      phone?: string;
+    };
+    payment_references?: Array<{
+      entity: string;
+      reference: string;
+    }>;
+  };
+}
+
 interface InvoiceViewProps {
   invoiceId: string;
 }
 
 export default function InvoiceView({ invoiceId }: InvoiceViewProps) {
-  const [invoice, setInvoice] = useState<Invoice | null>(null);
-  const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([]);
+  const [invoice, setInvoice] = useState<InvoiceWithOrders | null>(null);
+  const [invoiceItems, setInvoiceItems] = useState<InvoiceItemLocal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [printing, setPrinting] = useState(false);
 
   useEffect(() => {
     if (invoiceId) {
@@ -76,7 +91,19 @@ export default function InvoiceView({ invoiceId }: InvoiceViewProps) {
 
       // Fetch invoice items using the utility function
       const items = await getInvoiceItems(invoiceId);
-      setInvoiceItems(items);
+      // Map to local interface with safe property access
+      const mappedItems: InvoiceItemLocal[] = items.map(item => ({
+        id: item.id || '',
+        invoice_id: item.invoice_id,
+        service_name: item.service_name,
+        description: (item as any).description || null,
+        quantity: item.quantity || 1,
+        unit_price: item.unit_price || 0,
+        total_price: (item.quantity || 1) * (item.unit_price || 0),
+        duration: (item as any).duration,
+        duration_unit: (item as any).duration_unit
+      }));
+      setInvoiceItems(mappedItems);
 
     } catch (error: any) {
       console.error('Error in fetchInvoiceData:', error);
