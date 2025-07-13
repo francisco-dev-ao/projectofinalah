@@ -873,43 +873,29 @@ export const AppyPayReferenceModal = ({
         user: 'support@angohost.ao'
       });
 
-      // Enviar email diretamente usando seus dados SMTP via fetch nativo
-      const emailData = {
-        smtp_server: 'mail.angohost.ao',
-        smtp_port: 587,
-        smtp_user: 'support@angohost.ao',
-        smtp_password: '97z2lh;F4_k5',
-        from: 'support@angohost.ao',
-        to: customerInfo.email,
-        subject: 'Referência de Pagamento Multicaixa - AngoHost',
-        html: templateParams.email_html
-      };
+      // Usar Edge Function do Supabase para envio real de email
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      const emailResponse = await supabase.functions.invoke('send-real-email', {
+        body: {
+          to: customerInfo.email,
+          subject: 'Referência de Pagamento Multicaixa - AngoHost',
+          html: templateParams.email_html,
+          from: 'support@angohost.ao'
+        }
+      })
 
-      console.log('Enviando email SMTP direto para:', customerInfo.email);
-      console.log('Usando servidor SMTP:', emailData.smtp_server);
+      console.log('Resposta da Edge Function:', emailResponse)
 
-      // Simular envio direto via SMTP (substituir por implementação real)
-      const smtpResult = await fetch('/api/send-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(emailData)
-      }).catch(() => {
-        // Se não houver API, simular sucesso com log detalhado
-        console.log('✅ Email enviado via SMTP:', {
-          servidor: 'mail.angohost.ao:587',
-          de: 'support@angohost.ao',
-          para: customerInfo.email,
-          assunto: 'Referência de Pagamento Multicaixa - AngoHost'
-        });
-        return { ok: true };
-      });
+      if (emailResponse.error) {
+        throw new Error(`Erro na Edge Function: ${emailResponse.error.message}`)
+      }
 
-      if (smtpResult.ok) {
-        toast.success(`✅ Email enviado com sucesso para ${customerInfo.email}`);
+      if (emailResponse.data?.success) {
+        toast.success(`✅ Email enviado com sucesso para ${customerInfo.email}`)
+        console.log('✅ Email enviado via Edge Function:', emailResponse.data.details)
       } else {
-        throw new Error('Falha no envio SMTP');
+        throw new Error('Falha no envio via Edge Function')
       }
       
     } catch (error) {
