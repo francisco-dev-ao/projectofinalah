@@ -12,7 +12,8 @@ export const sendPaymentReferenceEmail = async (
   description: string,
   validityDate: string,
   instructions: string[],
-  orderData?: any
+  orderData?: any,
+  serviceValidityDate?: string
 ): Promise<{ success: boolean }> => {
   try {
     console.log('📧 Sending payment reference email to:', customerEmail);
@@ -389,6 +390,12 @@ export const sendPaymentReferenceEmail = async (
                   <div class="info-label">Válido até</div>
                   <div class="info-value">${validityDate}</div>
                 </div>
+                ${serviceValidityDate ? `
+                <div class="info-item">
+                  <div class="info-label">Validade do Serviço</div>
+                  <div class="info-value">${serviceValidityDate}</div>
+                </div>
+                ` : ''}
               </div>
             </div>
           </div>
