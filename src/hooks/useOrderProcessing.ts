@@ -6,6 +6,7 @@ import { useCart } from "@/contexts/CartContext";
 import { createOrderService } from "@/services/orderCreationService";
 import { generateInvoice } from "@/services/invoice";
 import { generatePaymentReference } from "@/services/appyPayReferenceService";
+import { triggerOrderEmail } from "@/utils/orderEmailTrigger";
 import { toast } from "sonner";
 
 export type PaymentMethodType = "appypay_reference" | "bank_transfer";
@@ -94,6 +95,19 @@ export const useOrderProcessing = () => {
         
         if (referenceResult.success) {
           console.log("Payment reference generated successfully:", referenceResult);
+          
+          // Enviar email automático com a referência de pagamento
+          try {
+            console.log("Sending automatic email with payment reference for order:", orderId);
+            await triggerOrderEmail(orderId, user.email, user.user_metadata?.name, { 
+              silent: false, 
+              retry: true 
+            });
+            console.log("Email with payment reference sent successfully");
+          } catch (emailError) {
+            console.error("Error sending automatic email with payment reference:", emailError);
+            // Não falha o processo se o email falhar
+          }
           
           setPaymentReference(referenceResult);
           setShowReferenceModal(true);
