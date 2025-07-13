@@ -36,7 +36,7 @@ const clientSecret = 'U5W8Q~YFBrH8zktWmEIPDPsZGWskKWNCtTsyYbi4';
 // === Criar cobrança via API AngoHost ===
 async function criarCobranca(cartItems: any[], orderId: string) {
   const amount = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-  const description = cartItems.map(item => item.name).join(', ');
+  const description = cartItems?.map(item => item.name).join(', ') || 'Serviços diversos';
 
   console.log('🔄 Chamando API AngoHost com:', { amount, description });
 
@@ -238,7 +238,7 @@ export const criarCobrancaComCarrinho = async (cartItems: any[], orderId: string
       data: chargeData,
       reference: paymentReference,
       amount: cartItems.reduce((total, item) => total + (item.price * item.quantity), 0),
-      description: cartItems.map(item => item.name).join(', ')
+      description: cartItems?.map(item => item.name).join(', ') || 'Serviços diversos'
     };
     
   } catch (error: any) {

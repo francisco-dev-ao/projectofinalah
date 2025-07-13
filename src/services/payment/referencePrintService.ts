@@ -115,7 +115,7 @@ export const generatePaymentReferencePDF = async (
                 <div style="text-align: center; font-size: 14px; color: #374151;">${item.quantity || 1}</div>
                 <div style="text-align: right; font-weight: 500; color: #1f2937;">${formatCurrency(item.unit_price || 0)}</div>
               </div>
-            `).join('')}
+            `).join('') || ''}
             <div style="padding: 12px; background: #f9fafb; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 16px; align-items: center; font-weight: bold;">
               <span style="color: #1f2937;">Total</span>
               <span></span>
@@ -173,7 +173,7 @@ export const generatePaymentReferencePDF = async (
                 <span style="color: #2563eb; margin-right: 8px;">✓</span>
                 <span style="font-weight: 500; color: #1e40af;">${channel}</span>
               </div>
-            `).join('')}
+            `).join('') || ''}
           </div>
         </div>
 
@@ -186,7 +186,7 @@ export const generatePaymentReferencePDF = async (
             <ol style="margin: 0; padding-left: 20px;">
               ${paymentReference.instructions.pt.steps.map(step => `
                 <li style="margin: 8px 0; font-size: 14px; color: #374151; line-height: 1.5;">${step}</li>
-              `).join('')}
+              `).join('') || ''}
             </ol>
             
             <div style="margin-top: 16px; background: #eff6ff; border: 1px solid #bfdbfe; padding: 12px; border-radius: 8px;">

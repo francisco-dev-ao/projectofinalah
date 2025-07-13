@@ -109,7 +109,7 @@ const generateEmailHTML = (data: InvoiceEmailData): string => {
     }).format(amount)}`;
   };
 
-  const itemsList = data.items.map(item => 
+  const itemsList = (data.items || []).map(item => 
     `<li>${item.name} - ${formatCurrency(item.unit_price)} × ${item.quantity}</li>`
   ).join('');
 
