@@ -9,7 +9,7 @@ interface EmailData {
  * Centralizado serviço de envio de emails usando a API AngoHost
  */
 export class EmailService {
-  private static readonly API_URL = 'https://mail3.angohost.ao/email/send';
+  private static readonly API_URL = 'https://api.angohost.ao/email/send';
   private static readonly API_KEY = 'SUA_CHAVE_SECRETA'; // TODO: Configurar chave real da API
 
   /**
