@@ -387,12 +387,12 @@ export const sendPaymentReferenceEmail = async (
                   <div class="info-value">${description}</div>
                 </div>
                 <div class="info-item">
-                  <div class="info-label">Válido até</div>
+                  <div class="info-label">Validade da Referência</div>
                   <div class="info-value">${validityDate}</div>
                 </div>
                 ${serviceValidityDate ? `
                 <div class="info-item">
-                  <div class="info-label">Validade do Serviço</div>
+                  <div class="info-label">Período de Expiração do Serviço</div>
                   <div class="info-value">${serviceValidityDate}</div>
                 </div>
                 ` : ''}
