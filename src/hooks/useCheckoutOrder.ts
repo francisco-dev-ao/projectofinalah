@@ -204,7 +204,7 @@ export function useCheckoutOrder() {
             const { data: insertedDomain, error } = await supabase
               .from('domains')
               .insert({
-                domain_name: domainName,
+                domain_name: name, // Usar apenas o nome sem TLD
                 tld: tld,
                 user_id: user.id,
                 order_id: result.orderId,

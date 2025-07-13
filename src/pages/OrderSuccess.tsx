@@ -40,7 +40,6 @@ export default function OrderSuccess() {
               reference,
               amount,
               status,
-              entity,
               created_at
             )
           `)
