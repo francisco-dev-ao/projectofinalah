@@ -63,10 +63,7 @@ const DomainDetails = () => {
       // Get domain data
       const { data: domainData, error: domainError } = await supabase
         .from('domains')
-        .select(`
-          *,
-          profiles:user_id (*)
-        `)
+        .select('*')
         .eq('id', domainId)
         .single();
       
