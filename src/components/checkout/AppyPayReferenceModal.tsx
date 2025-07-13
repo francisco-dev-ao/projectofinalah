@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
-import { EmailService } from '@/services/emailService';
+import { sendPaymentReferenceEmail } from '@/services/paymentReferencePdfService';
 // Print reference system removed
 
 interface PaymentReference {
@@ -46,6 +46,7 @@ export const AppyPayReferenceModal = ({
   const [customerInfo, setCustomerInfo] = useState<{name?: string, email?: string, phone?: string}>({});
   const [orderData, setOrderData] = useState<any>(null);
   const [sendingEmail, setSendingEmail] = useState(false);
+  const [emailAutoSent, setEmailAutoSent] = useState(false);
 
   // Carregar informações do cliente e dados do pedido
   useEffect(() => {
@@ -83,6 +84,27 @@ export const AppyPayReferenceModal = ({
       loadOrderData();
     }
   }, [paymentReference?.order_id]);
+
+  // Auto send email when modal opens with payment reference data
+  useEffect(() => {
+    const autoSendEmail = async () => {
+      if (paymentReference && customerInfo.email && !emailAutoSent && orderData) {
+        console.log('🤖 Auto-enviando email de fatura com dados de referência...');
+        setEmailAutoSent(true);
+        
+        try {
+          await handleSendEmail(true); // Pass true to indicate auto-send
+          console.log('✅ Email de fatura enviado automaticamente');
+        } catch (error) {
+          console.error('❌ Erro no envio automático:', error);
+        }
+      }
+    };
+
+    // Wait a moment to ensure all data is loaded
+    const timer = setTimeout(autoSendEmail, 1000);
+    return () => clearTimeout(timer);
+  }, [paymentReference, customerInfo.email, orderData, emailAutoSent]);
 
   // Calculate time remaining
   useEffect(() => {
@@ -771,34 +793,50 @@ export const AppyPayReferenceModal = ({
     }
   };
 
-  // Handler para enviar email usando o serviço centralizado
-  const handleSendEmail = async () => {
-    if (!customerInfo.email) {
-      toast.error('Email do cliente não encontrado');
+  // Handler para enviar email com dados de referência incluídos
+  const handleSendEmail = async (isAutoSend?: boolean) => {
+    if (!customerInfo.email || !orderData) {
+      if (!isAutoSend) {
+        toast.error('Email do cliente ou dados do pedido não encontrados');
+      }
       return;
     }
 
     setSendingEmail(true);
     
     try {
-      console.log('Enviando email de referência para:', customerInfo.email);
-
-      const result = await EmailService.sendPaymentReferenceEmail(
+      if (!isAutoSend) {
+        console.log('📧 Enviando email manual com dados de referência...');
+      }
+      
+      // Enviar email com dados de referência incluídos
+      const emailResult = await sendPaymentReferenceEmail(
         customerInfo.email,
         customerInfo.name || 'Cliente',
+        paymentReference.entity,
         paymentReference.reference,
-        paymentReference.amount
+        paymentReference.amount.toString(),
+        paymentReference.description,
+        formatDate(paymentReference.validity_date),
+        paymentReference.instructions.pt.steps,
+        orderData
       );
 
-      if (result.success) {
-        toast.success(`✅ Email enviado com sucesso para ${customerInfo.email}`);
+      if (emailResult.success) {
+        if (!isAutoSend) {
+          toast.success('✅ Email enviado com sucesso!');
+        } else {
+          console.log('✅ Email automático enviado com dados de referência');
+        }
       } else {
-        throw new Error(result.error || 'Falha no envio do email');
+        throw new Error('Erro desconhecido ao enviar email');
       }
       
     } catch (error) {
       console.error('Erro ao enviar email:', error);
-      toast.error(`❌ Erro ao enviar email: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+      if (!isAutoSend) {
+        toast.error(`❌ Erro ao enviar email: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+      }
     } finally {
       setSendingEmail(false);
     }
@@ -855,10 +893,16 @@ export const AppyPayReferenceModal = ({
                   <p className="text-sm font-medium text-purple-800">Cliente:</p>
                   <p className="text-purple-700">{customerInfo.name || 'Nome não informado'}</p>
                   <p className="text-sm text-purple-600">{customerInfo.email || 'Email não informado'}</p>
+                  {emailAutoSent && (
+                    <div className="flex items-center gap-1 mt-2">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      <span className="text-xs text-green-600 font-medium">Email enviado automaticamente</span>
+                    </div>
+                  )}
                 </div>
                 <div className="flex gap-2">
                   <Button
-                    onClick={handleSendEmail}
+                    onClick={() => handleSendEmail(false)}
                     disabled={sendingEmail || !customerInfo.email}
                     variant="outline"
                     className="bg-purple-100 hover:bg-purple-200 border-purple-300"
@@ -868,7 +912,7 @@ export const AppyPayReferenceModal = ({
                     ) : (
                       <Send className="h-4 w-4 mr-2" />
                     )}
-                    Enviar Email
+                    {emailAutoSent ? 'Reenviar Email' : 'Enviar Email'}
                   </Button>
                 </div>
               </div>
@@ -877,6 +921,20 @@ export const AppyPayReferenceModal = ({
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
                   <p className="text-sm text-yellow-800">
                     ⚠️ Email do cliente não encontrado. Verifique se o cliente tem email cadastrado.
+                  </p>
+                </div>
+              )}
+              
+              {emailAutoSent && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <p className="text-sm text-green-800 font-medium">
+                      Fatura enviada automaticamente com dados de pagamento incluídos
+                    </p>
+                  </div>
+                  <p className="text-xs text-green-700 mt-1">
+                    O cliente recebeu um email com todos os dados necessários para pagamento
                   </p>
                 </div>
               )}
