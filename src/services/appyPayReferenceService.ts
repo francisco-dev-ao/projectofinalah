@@ -164,25 +164,37 @@ export const generatePaymentReference = async (
       })
       .eq("id", request.orderId);
 
-    // Enviar email automático com dados de pagamento
-    await sendPaymentReferenceEmail(
-      invoiceData?.orders?.profiles?.email || 'email@example.com',
-      invoiceData?.orders?.profiles?.name || 'Cliente',
-      '11333',
-      chargeData.reference || chargeData.merchantTransactionId,
-      request.amount.toString(),
-      chargeData.description,
-      validityDate.toLocaleDateString('pt-AO'),
-      [
-        "Dirija-se a um ATM, Internet Banking ou Multicaixa Express",
-        "Selecione \"Pagamentos\" e depois \"Outros Serviços\"",
-        "Insira a Entidade: 11333",
-        `Insira a Referência: ${chargeData.reference || chargeData.merchantTransactionId}`,
-        `Confirme o valor: ${request.amount} AOA`,
-        "Confirme o pagamento"
-      ],
-      invoiceData?.orders
-    );
+    // Enviar email automático com dados de pagamento (sem PDF)
+    try {
+      const response = await supabase.functions.invoke('send-payment-reference-email', {
+        body: {
+          to: invoiceData?.orders?.profiles?.email || 'email@example.com',
+          customerName: invoiceData?.orders?.profiles?.name || 'Cliente',
+          entity: '11333',
+          reference: chargeData.reference || chargeData.merchantTransactionId,
+          amount: request.amount.toString(),
+          description: chargeData.description,
+          validityDate: validityDate.toLocaleDateString('pt-AO'),
+          instructions: [
+            "Dirija-se a um ATM, Internet Banking ou Multicaixa Express",
+            "Selecione \"Pagamentos\" e depois \"Outros Serviços\"",
+            "Insira a Entidade: 11333",
+            `Insira a Referência: ${chargeData.reference || chargeData.merchantTransactionId}`,
+            `Confirme o valor: ${request.amount} AOA`,
+            "Confirme o pagamento"
+          ],
+          orderData: invoiceData?.orders
+        }
+      });
+
+      if (response.error) {
+        console.error('Erro ao enviar email:', response.error);
+      } else {
+        console.log('Email enviado com sucesso');
+      }
+    } catch (emailError) {
+      console.error('Erro ao enviar email automático:', emailError);
+    }
 
     // Também enviar email automático de confirmação do pedido
     triggerOrderEmail(request.orderId, undefined, undefined, { silent: false, retry: true });
@@ -331,26 +343,38 @@ const generateLocalReference = async (
       .eq("order_id", request.orderId)
       .single();
 
-    // Enviar email automático com dados de pagamento (modo fallback)
+    // Enviar email automático com dados de pagamento (modo fallback, sem PDF)
     if (invoiceData?.orders?.profiles?.email) {
-      await sendPaymentReferenceEmail(
-        invoiceData.orders.profiles.email,
-        invoiceData.orders.profiles.name || 'Cliente',
-        '11333',
-        reference,
-        request.amount.toString(),
-        request.description || `Pagamento do pedido ${request.orderId}`,
-        validityDate.toLocaleDateString('pt-AO'),
-        [
-          "Dirija-se a um ATM, Internet Banking ou Multicaixa Express",
-          "Selecione \"Pagamentos\" e depois \"Outros Serviços\"",
-          "Insira a Entidade: 11333",
-          `Insira a Referência: ${reference}`,
-          `Confirme o valor: ${request.amount} AOA`,
-          "Confirme o pagamento"
-        ],
-        invoiceData.orders
-      );
+      try {
+        const response = await supabase.functions.invoke('send-payment-reference-email', {
+          body: {
+            to: invoiceData.orders.profiles.email,
+            customerName: invoiceData.orders.profiles.name || 'Cliente',
+            entity: '11333',
+            reference: reference,
+            amount: request.amount.toString(),
+            description: request.description || `Pagamento do pedido ${request.orderId}`,
+            validityDate: validityDate.toLocaleDateString('pt-AO'),
+            instructions: [
+              "Dirija-se a um ATM, Internet Banking ou Multicaixa Express",
+              "Selecione \"Pagamentos\" e depois \"Outros Serviços\"",
+              "Insira a Entidade: 11333",
+              `Insira a Referência: ${reference}`,
+              `Confirme o valor: ${request.amount} AOA`,
+              "Confirme o pagamento"
+            ],
+            orderData: invoiceData.orders
+          }
+        });
+
+        if (response.error) {
+          console.error('Erro ao enviar email (fallback):', response.error);
+        } else {
+          console.log('Email enviado com sucesso (fallback)');
+        }
+      } catch (emailError) {
+        console.error('Erro ao enviar email automático (fallback):', emailError);
+      }
     }
 
     // Também enviar email automático de confirmação do pedido (modo fallback)
