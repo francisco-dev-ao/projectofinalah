@@ -163,46 +163,115 @@ serve(async (req) => {
     await client.send({
       from: `${config.from_name} <${config.from_email}>`,
       to: userEmail,
-      subject: `Fatura ${invoice.invoice_number} - AngoHost`,
+      subject: `Nova Fatura Disponível - Serviços AngoHost`,
       content: `
-      <html>
-        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto;">
-          <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-bottom: 3px solid #0066cc;">
-            <h2 style="margin: 0; color: #0066cc;">AngoHost</h2>
+      <!DOCTYPE html>
+      <html lang="pt">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Nova Fatura - AngoHost</title>
+      </head>
+      <body style="margin: 0; padding: 20px; background-color: #f4f6f9;">
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.8; color: #2c3e50; max-width: 650px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e1e8ed; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px 20px; text-align: center;">
+            <h1 style="margin: 0; color: white; font-size: 28px; font-weight: 300;">
+              <span style="font-weight: 700;">Ango</span>Host
+            </h1>
+            <p style="margin: 10px 0 0 0; color: rgba(255,255,255,0.9); font-size: 16px;">
+              Serviços de Hospedagem Premium
+            </p>
           </div>
           
-          <div style="padding: 20px;">
-            <p>Olá ${userName},</p>
+          <div style="padding: 30px 25px; background-color: #ffffff;">
+            <h2 style="color: #2c3e50; margin-bottom: 20px; font-size: 24px; font-weight: 600;">
+              Olá ${userName},
+            </h2>
             
-            <p>Sua fatura <strong>#${invoice.invoice_number}</strong> foi gerada e está disponível para pagamento.</p>
+            <p style="font-size: 16px; margin-bottom: 25px;">
+              Esperamos que esteja bem! Uma nova fatura foi gerada para sua conta AngoHost.
+            </p>
             
-            <div style="background-color: #f8f9fa; border-left: 4px solid #0066cc; padding: 15px; margin: 20px 0;">
-              <p><strong>Detalhes da Fatura:</strong></p>
-              <p>Número: ${invoice.invoice_number}</p>
-              <p>Data de Vencimento: ${new Date(invoice.due_date).toLocaleDateString('pt-AO')}</p>
-              <p>Total: ${formattedTotal}</p>
+            <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; margin: 25px 0; border-left: 4px solid #667eea;">
+              <h3 style="margin: 0 0 15px 0; color: #495057; font-size: 18px;">📋 Detalhes da Fatura</h3>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                  <td style="padding: 8px 0; font-weight: 600; color: #6c757d;">Número da Fatura:</td>
+                  <td style="padding: 8px 0; color: #2c3e50;">${invoice.invoice_number}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; font-weight: 600; color: #6c757d;">Data de Vencimento:</td>
+                  <td style="padding: 8px 0; color: #dc3545; font-weight: 600;">
+                    ${new Date(invoice.due_date).toLocaleDateString('pt-AO', { 
+                      weekday: 'long', 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; font-weight: 600; color: #6c757d;">Valor Total:</td>
+                  <td style="padding: 8px 0; color: #28a745; font-weight: 700; font-size: 18px;">
+                    ${formattedTotal}
+                  </td>
+                </tr>
+              </table>
               
-              <p><strong>Itens:</strong></p>
-              ${itemsList}
+              ${itemsList ? `
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #dee2e6;">
+                  <h4 style="margin: 0 0 10px 0; color: #495057;">Serviços Contratados:</h4>
+                  ${itemsList}
+                </div>
+              ` : ''}
             </div>
             
-            <p>Você pode visualizar e pagar sua fatura através do nosso portal:</p>
+            <p style="font-size: 16px; margin: 25px 0;">
+              Para visualizar os detalhes completos e efetuar o pagamento, clique no botão abaixo:
+            </p>
             
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="${invoiceLink}" style="background-color: #0066cc; color: white; padding: 12px 20px; text-decoration: none; border-radius: 4px; font-weight: bold;">Visualizar Fatura</a>
+            <div style="text-align: center; margin: 35px 0;">
+              <a href="${invoiceLink}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white !important; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; text-align: center; font-size: 16px; letter-spacing: 0.5px;">
+                💳 Visualizar e Pagar Fatura
+              </a>
             </div>
             
-            ${pdfLink ? `<p>Você também pode baixar a fatura em PDF <a href="${pdfLink}" style="color: #0066cc; text-decoration: underline;">clicando aqui</a>.</p>` : ''}
+            ${pdfLink ? `
+              <div style="text-align: center; margin: 20px 0;">
+                <a href="${pdfLink}" style="color: #667eea; text-decoration: underline; font-size: 14px;">
+                  📄 Baixar Fatura em PDF
+                </a>
+              </div>
+            ` : ''}
             
-            <p>Se você tiver alguma dúvida, entre em contato com nossa equipe de suporte respondendo a este email ou através do nosso chat.</p>
+            <div style="background-color: #e8f4fd; border: 1px solid #bee5eb; border-radius: 6px; padding: 15px; margin: 25px 0;">
+              <p style="margin: 0; color: #0c5460; font-size: 14px;">
+                <strong>💡 Dica:</strong> Mantenha seus serviços sempre ativos pagando antes do vencimento. 
+                Isso evita interrupções e garante a melhor experiência com nossos serviços.
+              </p>
+            </div>
             
-            <p>Atenciosamente,<br>Equipe AngoHost</p>
+            <p style="font-size: 16px; margin-top: 30px;">
+              Se tiver alguma dúvida, nossa equipe de suporte está sempre disponível para ajudar.
+            </p>
+            
+            <p style="font-size: 16px; margin-bottom: 0;">
+              Atenciosamente,<br>
+              <strong>Equipe AngoHost</strong><br>
+              <span style="color: #6c757d; font-size: 14px;">Suporte Técnico Especializado</span>
+            </p>
           </div>
           
-          <div style="background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666;">
-            <p>© ${new Date().getFullYear()} AngoHost. Todos os direitos reservados.</p>
+          <div style="background-color: #f8f9fa; padding: 20px 25px; text-align: center; font-size: 13px; color: #6c757d; border-top: 1px solid #e9ecef;">
+            <p style="margin: 0 0 10px 0;">
+              © ${new Date().getFullYear()} AngoHost - Serviços de Hospedagem Premium
+            </p>
+            <p style="margin: 0; font-size: 12px;">
+              Este é um email automático. Para suporte, responda este email ou acesse nosso portal.
+            </p>
           </div>
-        </body>
+        </div>
+      </body>
       </html>`,
       html: true,
     });
