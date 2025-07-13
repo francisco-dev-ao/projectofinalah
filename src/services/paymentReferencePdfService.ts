@@ -425,6 +425,12 @@ export const sendPaymentReferenceEmail = async (
                 📅 Importante: Esta referência é válida até: <strong>${validityDate}</strong>
               </div>
             </div>
+            
+            <div style="margin-top: 16px; padding: 16px; background: #e7f3ff; border: 1px solid #b3d9ff; border-radius: 8px; text-align: center;">
+              <div style="font-size: 14px; font-weight: 600; color: #0066cc; line-height: 1.6;">
+                ✅ <strong>Importante:</strong> A Fatura final certificada pela AGT será emitida automaticamente assim que seu pagamento for confirmado. Este processo é automático, por tanto sinta-se seguro em pagar esta referência.
+              </div>
+            </div>
           </div>
           
           <!-- Call to Action -->
