@@ -88,17 +88,17 @@ export default function OrderSuccess() {
         // Busca a fatura completa
         const invoiceData = await InvoiceService.getInvoice(data.id);
         
-        // Gera e baixa o PDF usando o novo sistema
-        await downloadHelpers.downloadInvoicePDF(invoiceData);
+        // Usa a mesma lógica do PrintReferenceButton
+        await downloadHelpers.printInvoiceDirectly(invoiceData);
       } else {
         // Se já temos a invoice no estado, usamos ela diretamente
-        await downloadHelpers.downloadInvoicePDF(invoice);
+        await downloadHelpers.printInvoiceDirectly(invoice);
       }
       
-      toast.success('Fatura baixada com sucesso!');
+      toast.success('Abrindo janela de impressão...');
     } catch (error: any) {
-      console.error('Erro ao baixar fatura:', error);
-      toast.error(error.message || 'Erro ao baixar fatura');
+      console.error('Erro ao imprimir fatura:', error);
+      toast.error(error.message || 'Erro ao imprimir fatura');
     } finally {
       setIsGeneratingPdf(false);
     }
@@ -156,7 +156,7 @@ export default function OrderSuccess() {
                     disabled={isGeneratingPdf}
                     className="w-full"
                   >
-                    {isGeneratingPdf ? 'Gerando PDF...' : 'Baixar Fatura Provisória'}
+                    {isGeneratingPdf ? 'Abrindo...' : 'Imprimir Fatura'}
                   </Button>
                   <p className="mt-2 text-xs text-gray-500 text-center">
                     Uma fatura final será gerada após a confirmação do pagamento
