@@ -35,25 +35,47 @@ export class EmailAutomationService {
 
       const customerEmail = order.profiles?.email;
       const customerName = order.profiles?.name || 'Cliente';
+      const customerPhone = order.profiles?.phone;
 
       if (!customerEmail) {
         console.error('Email do cliente não encontrado');
         return { success: false, error: 'Email do cliente não encontrado' };
       }
 
-      const result = await EmailService.sendPaymentConfirmationEmail(
-        customerEmail,
-        customerName,
-        orderId,
-        amount,
-        paymentMethod
-      );
+      // Enviar confirmação por email e SMS em paralelo
+      const { SMSService } = await import('@/services/smsService');
+      
+      const [emailResult, smsResult] = await Promise.allSettled([
+        EmailService.sendPaymentConfirmationEmail(
+          customerEmail,
+          customerName,
+          orderId,
+          amount,
+          paymentMethod
+        ),
+        customerPhone ? SMSService.sendPaymentNotification(customerPhone, orderId, amount) 
+          : Promise.resolve({ success: false, error: 'Telefone não disponível' })
+      ]);
 
-      if (result.success) {
+      let overallSuccess = false;
+      let messages = [];
+
+      if (emailResult.status === 'fulfilled' && emailResult.value.success) {
         console.log('✅ Email de confirmação de pagamento enviado com sucesso');
+        overallSuccess = true;
+        messages.push('Email enviado');
       }
 
-      return result;
+      if (smsResult.status === 'fulfilled' && smsResult.value.success && customerPhone) {
+        console.log('✅ SMS de confirmação de pagamento enviado com sucesso');
+        overallSuccess = true;
+        messages.push('SMS enviado');
+      }
+
+      return { 
+        success: overallSuccess, 
+        message: messages.length > 0 ? messages.join(' e ') : 'Nenhuma notificação enviada'
+      };
     } catch (error) {
       console.error('❌ Erro ao enviar email de confirmação de pagamento:', error);
       return { success: false, error: error.message };

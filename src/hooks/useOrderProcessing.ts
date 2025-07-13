@@ -96,28 +96,44 @@ export const useOrderProcessing = () => {
         if (referenceResult.success) {
           console.log("Payment reference generated successfully:", referenceResult);
           
-          // Enviar email automático com a referência de pagamento usando EmailService
+          // Enviar email e SMS automático com a referência de pagamento
           try {
-            console.log("Sending automatic payment reference email for order:", orderId);
+            console.log("Sending automatic payment reference notifications for order:", orderId);
             const { EmailService } = await import('@/services/emailService');
+            const { SMSService } = await import('@/services/smsService');
             
-            const emailResult = await EmailService.sendPaymentReferenceEmail(
-              user.email!,
-              user.user_metadata?.name || user.email || 'Cliente',
-              referenceResult.reference,
-              orderData.totalAmount
-            );
+            // Enviar email e SMS em paralelo
+            const [emailResult, smsResult] = await Promise.allSettled([
+              EmailService.sendPaymentReferenceEmail(
+                user.email!,
+                user.user_metadata?.name || user.email || 'Cliente',
+                referenceResult.reference,
+                orderData.totalAmount
+              ),
+              user.user_metadata?.phone ? SMSService.sendSMS({
+                to: user.user_metadata.phone,
+                message: `AngoHost: Referência AppyPay ${referenceResult.reference} - ${orderData.totalAmount.toLocaleString('pt-AO', { style: 'currency', currency: 'AOA' })}. Entidade Multicaixa: 11333. Válida por 3 dias.`
+              }) : Promise.resolve({ success: false, error: 'Telefone não disponível' })
+            ]);
             
-            if (emailResult.success) {
-              console.log("Payment reference email sent successfully");
-              toast.success("Referência de pagamento enviada por email!");
+            if (emailResult.status === 'fulfilled' && emailResult.value.success) {
+              console.log("✅ Email da referência enviado com sucesso");
             } else {
-              console.error("Error sending payment reference email:", emailResult.error);
-              toast.error("Email enviado, mas houve um problema na confirmação");
+              console.error("❌ Erro ao enviar email da referência:", emailResult);
             }
-          } catch (emailError) {
-            console.error("Error sending payment reference email:", emailError);
-            // Não falha o processo se o email falhar
+            
+            if (smsResult.status === 'fulfilled' && smsResult.value.success && user.user_metadata?.phone) {
+              console.log("✅ SMS da referência enviado com sucesso");
+              toast.success("Referência enviada por email e SMS!");
+            } else {
+              toast.success("Referência enviada por email!");
+              if (user.user_metadata?.phone) {
+                console.error("❌ Erro ao enviar SMS da referência:", smsResult);
+              }
+            }
+          } catch (notificationError) {
+            console.error("Error sending payment reference notifications:", notificationError);
+            toast.success("Referência gerada com sucesso!");
           }
           
           setPaymentReference(referenceResult);

@@ -138,24 +138,35 @@ export const useAuthState = () => {
       } else {
         console.log('useAuthState: SignUp bem-sucedido!');
         
-        // Enviar email de boas-vindas automaticamente
+        // Enviar email de boas-vindas e SMS automaticamente
         try {
-          console.log('Enviando email de boas-vindas para:', email);
+          console.log('Enviando email e SMS de boas-vindas para:', email);
           const { EmailService } = await import('@/services/emailService');
+          const { SMSService } = await import('@/services/smsService');
           
-          const welcomeEmailResult = await EmailService.sendWelcomeEmail(
-            email,
-            name || 'Cliente'
-          );
+          // Enviar email e SMS em paralelo
+          const [emailResult, smsResult] = await Promise.allSettled([
+            EmailService.sendWelcomeEmail(email, name || 'Cliente'),
+            phone ? SMSService.sendSMS({
+              to: phone,
+              message: `AngoHost: Bem-vindo ${name}! Sua conta foi criada com sucesso. Acesse angohost.ao para começar. Suporte: +244 999 999 999`
+            }) : Promise.resolve({ success: false, error: 'Telefone não fornecido' })
+          ]);
           
-          if (welcomeEmailResult.success) {
-            console.log('Email de boas-vindas enviado com sucesso');
+          if (emailResult.status === 'fulfilled' && emailResult.value.success) {
+            console.log('✅ Email de boas-vindas enviado com sucesso');
           } else {
-            console.error('Erro ao enviar email de boas-vindas:', welcomeEmailResult.error);
+            console.error('❌ Erro ao enviar email de boas-vindas:', emailResult);
           }
-        } catch (emailError) {
-          console.error('Erro crítico ao enviar email de boas-vindas:', emailError);
-          // Não falha o registro se o email falhar
+          
+          if (smsResult.status === 'fulfilled' && smsResult.value.success && phone) {
+            console.log('✅ SMS de boas-vindas enviado com sucesso');
+          } else if (phone) {
+            console.error('❌ Erro ao enviar SMS de boas-vindas:', smsResult);
+          }
+        } catch (error) {
+          console.error('❌ Erro crítico ao enviar boas-vindas:', error);
+          // Não falha o registro se email/SMS falharem
         }
         
         toast.success('Conta criada! Verifique seu email para confirmar.');
