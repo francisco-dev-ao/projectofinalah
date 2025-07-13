@@ -60,28 +60,65 @@ const DomainDetails = () => {
       setLoading(true);
       setError(null);
       
-      // Get domain data
-      const { data: domainData, error: domainError } = await supabase
+      console.log('Loading domain data for ID:', domainId);
+      
+      // First try to get from domains table
+      let { data: domainData, error: domainError } = await supabase
         .from('domains')
         .select('*')
         .eq('id', domainId)
         .single();
       
-      if (domainError) {
-        console.error("Error loading domain details:", domainError);
-        setError("Não foi possível carregar os detalhes do domínio");
-        toast.error("Não foi possível carregar os detalhes do domínio");
-        return;
+      console.log('Domains table query result:', { domainData, domainError });
+      
+      // If not found in domains table, try domain_orders table
+      if (domainError || !domainData) {
+        console.log('Domain not found in domains table, trying domain_orders...');
+        
+        const { data: orderData, error: orderError } = await supabase
+          .from('domain_orders')
+          .select('*')
+          .eq('id', domainId)
+          .single();
+        
+        console.log('Domain orders query result:', { orderData, orderError });
+        
+        if (orderError || !orderData) {
+          console.error("Domain not found in either table:", { domainError, orderError });
+          setError("Domínio não encontrado");
+          toast.error("Domínio não encontrado");
+          return;
+        }
+        
+        // Convert domain_orders format to domains format
+        domainData = {
+          id: orderData.id,
+          domain_name: orderData.domain_name,
+          tld: orderData.tld_type,
+          user_id: orderData.user_id,
+          order_id: orderData.order_id,
+          status: orderData.status,
+          auto_renew: true,
+          is_locked: false,
+          privacy_protection: false,
+          transfer_lock: false,
+          registration_date: orderData.created_at,
+          expiration_date: new Date(new Date(orderData.created_at).getTime() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+          nameservers: ['ns1.angohost.co.ao', 'ns2.angohost.co.ao'],
+          created_at: orderData.created_at,
+          updated_at: orderData.updated_at
+        };
       }
       
       // Verify this domain belongs to the current user
       if (domainData.user_id !== user?.id) {
+        console.error('Permission denied - user mismatch:', { domainUserId: domainData.user_id, currentUserId: user?.id });
         setError("Você não tem permissão para visualizar este domínio");
         toast.error("Você não tem permissão para visualizar este domínio");
         return;
       }
       
-      // Carrega apenas os dados do domínio
+      console.log('Domain data loaded successfully:', domainData);
       setDomain(domainData);
     } catch (error: any) {
       console.error("Error loading domain details:", error);
