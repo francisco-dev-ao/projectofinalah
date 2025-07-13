@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { PaymentMethodType } from "./CheckoutPaymentOptions";
 import { generatePaymentReference } from "@/services/appyPayReferenceService";
 import { toast } from "sonner";
+import { validateCartDomainRequirements } from "@/utils/cartValidation";
 
 interface CheckoutPaymentStepProps {
   onPrevStep: () => void;
@@ -34,6 +35,14 @@ const CheckoutPaymentStep = ({ onPrevStep, onOrderSuccess }: CheckoutPaymentStep
   const handleFinalizePurchase = async () => {
     console.log("🛒 Finalizando compra com método:", selectedPaymentMethod);
     console.log("🛒 Itens do carrinho:", cartItems);
+    
+    // Validate domain requirements for email/hosting services
+    const validation = validateCartDomainRequirements(cartItems);
+    if (!validation.isValid) {
+      toast.error(validation.errorMessage);
+      return;
+    }
+    
     setIsLoading(true);
     
     try {

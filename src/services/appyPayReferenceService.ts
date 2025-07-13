@@ -2,6 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { sendAutomaticOrderEmail } from '@/services/order/emailService';
 import { triggerOrderEmail } from '@/utils/orderEmailTrigger';
+import { sendPaymentReferenceEmail } from '@/services/paymentReferencePdfService';
 
 export interface AppyPayReferenceRequest {
   orderId: string;
@@ -163,7 +164,27 @@ export const generatePaymentReference = async (
       })
       .eq("id", request.orderId);
 
-    // Enviar email automático de confirmação do pedido
+    // Enviar email automático com dados de pagamento
+    await sendPaymentReferenceEmail(
+      invoiceData?.orders?.profiles?.email || 'email@example.com',
+      invoiceData?.orders?.profiles?.name || 'Cliente',
+      '11333',
+      chargeData.reference || chargeData.merchantTransactionId,
+      request.amount.toString(),
+      chargeData.description,
+      validityDate.toLocaleDateString('pt-AO'),
+      [
+        "Dirija-se a um ATM, Internet Banking ou Multicaixa Express",
+        "Selecione \"Pagamentos\" e depois \"Outros Serviços\"",
+        "Insira a Entidade: 11333",
+        `Insira a Referência: ${chargeData.reference || chargeData.merchantTransactionId}`,
+        `Confirme o valor: ${request.amount} AOA`,
+        "Confirme o pagamento"
+      ],
+      invoiceData?.orders
+    );
+
+    // Também enviar email automático de confirmação do pedido
     triggerOrderEmail(request.orderId, undefined, undefined, { silent: false, retry: true });
 
     // Retornar resposta formatada
@@ -295,7 +316,44 @@ const generateLocalReference = async (
     })
       .eq("id", request.orderId);
 
-    // Enviar email automático de confirmação do pedido (modo fallback)
+    // Buscar dados da fatura para enviar email
+    const { data: invoiceData } = await supabase
+      .from("invoices")
+      .select(`
+        *,
+        orders (
+          *,
+          profiles:user_id (*),
+          payment_references (*),
+          order_items (*)
+        )
+      `)
+      .eq("order_id", request.orderId)
+      .single();
+
+    // Enviar email automático com dados de pagamento (modo fallback)
+    if (invoiceData?.orders?.profiles?.email) {
+      await sendPaymentReferenceEmail(
+        invoiceData.orders.profiles.email,
+        invoiceData.orders.profiles.name || 'Cliente',
+        '11333',
+        reference,
+        request.amount.toString(),
+        request.description || `Pagamento do pedido ${request.orderId}`,
+        validityDate.toLocaleDateString('pt-AO'),
+        [
+          "Dirija-se a um ATM, Internet Banking ou Multicaixa Express",
+          "Selecione \"Pagamentos\" e depois \"Outros Serviços\"",
+          "Insira a Entidade: 11333",
+          `Insira a Referência: ${reference}`,
+          `Confirme o valor: ${request.amount} AOA`,
+          "Confirme o pagamento"
+        ],
+        invoiceData.orders
+      );
+    }
+
+    // Também enviar email automático de confirmação do pedido (modo fallback)
     triggerOrderEmail(request.orderId, undefined, undefined, { silent: false, retry: true });
 
   // Automatically generate and print invoice PDF for local reference too
