@@ -770,7 +770,7 @@ export const AppyPayReferenceModal = ({
     }
   };
 
-  // Handler para enviar email usando SMTP direto
+  // Handler para enviar email usando Edge Function SMTP
   const handleSendEmail = async () => {
     if (!customerInfo.email) {
       toast.error('Email do cliente não encontrado');
@@ -780,7 +780,6 @@ export const AppyPayReferenceModal = ({
     setSendingEmail(true);
     
     try {
-      // Dados do email
       const emailData = {
         to: customerInfo.email,
         customerName: customerInfo.name || 'Cliente',
@@ -795,118 +794,24 @@ export const AppyPayReferenceModal = ({
         instructions: paymentReference.instructions.pt.steps
       };
 
-      console.log('Tentando enviar email para:', customerInfo.email);
+      console.log('Enviando email para:', customerInfo.email);
       console.log('Dados do email:', emailData);
 
-      // Tentar usar a Edge Function primeiro
-      try {
-        const { data, error } = await supabase.functions.invoke('send-smtp-email', {
-          body: emailData
-        });
+      const { data, error } = await supabase.functions.invoke('send-smtp-email', {
+        body: emailData
+      });
 
-        if (error) {
-          console.error('Erro na Edge Function:', error);
-          throw new Error(`Erro na Edge Function: ${error.message}`);
-        }
-
-        console.log('Resposta da Edge Function:', data);
-        toast.success(`Email enviado automaticamente para ${customerInfo.email}`);
-        return;
-        
-      } catch (edgeError) {
-        console.error('Edge Function falhou:', edgeError);
-        
-        // Usar serviço alternativo SMTP
-        const response = await fetch('/api/send-email', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            smtp: {
-              host: 'mail.angohost.ao',
-              port: 587,
-              secure: false,
-              auth: {
-                user: 'support@angohost.ao',
-                pass: '97z2lh;F4_k5'
-              }
-            },
-            email: {
-              from: 'support@angohost.ao',
-              to: customerInfo.email,
-              subject: 'Referência de Pagamento Multicaixa - AngoHost',
-              html: `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                  <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center;">
-                    <h1 style="margin: 0; font-size: 28px;">AngoHost</h1>
-                    <p style="margin: 10px 0 0 0; font-size: 16px;">Referência de Pagamento Multicaixa</p>
-                  </div>
-                  
-                  <div style="padding: 30px;">
-                    <p style="font-size: 18px; margin-bottom: 20px;">Olá ${emailData.customerName},</p>
-                    
-                    <p>Sua referência de pagamento foi gerada com sucesso:</p>
-                    
-                    <div style="background: #f7fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 25px; margin: 25px 0; text-align: center;">
-                      <h2 style="color: #2d3748; margin-bottom: 20px;">💳 Dados para Pagamento</h2>
-                      
-                      <div style="margin-bottom: 20px;">
-                        <div style="display: inline-block; background: white; padding: 15px; margin: 10px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                          <div style="font-size: 12px; font-weight: 600; color: #718096; margin-bottom: 5px;">ENTIDADE</div>
-                          <div style="font-size: 20px; font-weight: 600; color: #2d3748;">${emailData.entity}</div>
-                        </div>
-                        
-                        <div style="display: inline-block; background: white; padding: 15px; margin: 10px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                          <div style="font-size: 12px; font-weight: 600; color: #718096; margin-bottom: 5px;">REFERÊNCIA</div>
-                          <div style="font-size: 20px; font-weight: 600; color: #2d3748;">${emailData.reference}</div>
-                        </div>
-                      </div>
-                      
-                      <div style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; padding: 20px; border-radius: 12px; margin: 20px 0;">
-                        <div style="font-size: 14px; margin-bottom: 5px;">VALOR A PAGAR</div>
-                        <div style="font-size: 28px; font-weight: 700;">${emailData.amount}</div>
-                      </div>
-                      
-                      <p><strong>Descrição:</strong> ${emailData.description}</p>
-                      <p><strong>Válido até:</strong> ${emailData.validityDate}</p>
-                    </div>
-                    
-                    <div style="background: #f0fff4; border: 1px solid #9ae6b4; border-radius: 8px; padding: 20px; margin: 20px 0;">
-                      <h3 style="color: #22543d; margin-bottom: 15px;">📋 Como Pagar</h3>
-                      ${emailData.instructions.map((step, index) => `
-                        <div style="margin-bottom: 10px; padding: 10px; background: white; border-radius: 6px; border-left: 4px solid #48bb78;">
-                          <strong>${index + 1}.</strong> ${step}
-                        </div>
-                      `).join('')}
-                    </div>
-                    
-                    <p>Após o pagamento, você receberá a confirmação e a fatura final.</p>
-                  </div>
-                  
-                  <div style="background: #2d3748; color: #e2e8f0; padding: 25px; text-align: center;">
-                    <div style="font-weight: 600; margin-bottom: 5px;">ANGOHOST - PRESTAÇÃO DE SERVIÇOS, LDA</div>
-                    <div style="font-size: 14px;">
-                      Email: support@angohost.ao | Telefone: +244 226 430 401<br>
-                      Cacuaco Sequele - Angola | NIF: 5000088927
-                    </div>
-                  </div>
-                </div>
-              `
-            }
-          })
-        });
-
-        if (response.ok) {
-          toast.success(`Email enviado automaticamente para ${customerInfo.email}`);
-        } else {
-          throw new Error('Serviço de email indisponível');
-        }
+      if (error) {
+        console.error('Erro na Edge Function:', error);
+        throw new Error(`Falha no envio: ${error.message}`);
       }
+
+      console.log('Resposta da Edge Function:', data);
+      toast.success(`✅ Email enviado automaticamente para ${customerInfo.email}`);
       
     } catch (error) {
       console.error('Erro completo ao enviar email:', error);
-      toast.error(`Erro ao enviar email automaticamente: ${error.message || 'Serviço temporariamente indisponível'}`);
+      toast.error(`❌ Erro ao enviar email: ${error.message || 'Serviço temporariamente indisponível'}`);
     } finally {
       setSendingEmail(false);
     }
