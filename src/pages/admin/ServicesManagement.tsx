@@ -12,7 +12,7 @@ import { AlertTriangle, RefreshCw, CheckCircle2, XCircle, Trash2, Edit } from "l
 import { toast } from "sonner";
 import { getServices, updateServiceStatus, deleteService } from "@/services/serviceManagementService";
 import { getAllOrders } from "@/services/orders";
-import ServiceDetailsDialog from "@/components/admin/ServiceDetailsDialog";
+import { ServiceDetailsDialog } from "@/components/admin/ServiceDetailsDialog";
 import { formatDate } from "@/components/admin/order-details/OrderDetailsUtils";
 import { ServiceStatus } from "@/types/service";
 import { useAdminAuth } from "@/hooks/use-admin-auth";

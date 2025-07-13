@@ -52,26 +52,8 @@ export const createInvoice = async (invoiceData: Record<string, any>) => {
       return { success: false, error: "No data returned after invoice creation" };
     }
     
-    // Auto-generate PDF after invoice creation
-    try {
-      const { generateInvoicePdf } = await import('@/utils/invoice/invoicePdfGenerator');
-      const pdfUrl = await generateInvoicePdf(data[0].id, data[0].invoice_number);
-      
-      // Update the invoice with the PDF URL
-      const { error: updateError } = await supabase
-        .from('invoices')
-        .update({ pdf_url: pdfUrl })
-        .eq('id', data[0].id);
-        
-      if (updateError) {
-        console.warn('Error updating invoice with PDF URL:', updateError);
-      } else {
-        data[0].pdf_url = pdfUrl;
-      }
-    } catch (pdfError) {
-      console.error('Error auto-generating PDF:', pdfError);
-      // Continue without PDF
-    }
+    // PDF generation removed - using print reference system
+    console.log('Invoice created successfully, PDF generation disabled');
     
     return { success: true, invoice: data[0] };
   } catch (err) {

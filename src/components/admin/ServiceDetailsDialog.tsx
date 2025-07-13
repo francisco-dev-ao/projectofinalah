@@ -16,9 +16,14 @@ import { toast } from 'sonner';
 
 interface ServiceDetailsDialogProps {
   service: any;
+  open?: boolean;
+  onClose?: () => void;
+  onStatusUpdate?: (itemId: string, newStatus: any) => Promise<void>;
+  onDelete?: (itemId: string) => Promise<void>;
+  onServicesChange?: () => Promise<void>;
 }
 
-export function ServiceDetailsDialog({ service }: ServiceDetailsDialogProps) {
+export function ServiceDetailsDialog({ service, open, onClose }: ServiceDetailsDialogProps) {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const handlePrintService = async () => {
@@ -88,13 +93,15 @@ export function ServiceDetailsDialog({ service }: ServiceDetailsDialogProps) {
   };
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="ghost" size="sm">
-          <Eye className="h-4 w-4 mr-2" />
-          Ver Detalhes
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onClose}>
+      {!open && (
+        <DialogTrigger asChild>
+          <Button variant="ghost" size="sm">
+            <Eye className="h-4 w-4 mr-2" />
+            Ver Detalhes
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Detalhes do Serviço</DialogTitle>
