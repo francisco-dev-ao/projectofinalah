@@ -34,6 +34,7 @@ const OrderFailed = lazy(() => import('@/pages/OrderFailed'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 const OrderDetails = lazy(() => import('@/pages/OrderDetails'));
 const SharedInvoiceView = lazy(() => import('@/pages/SharedInvoiceView'));
+const ResetPasswordPage = lazy(() => import('@/pages/ResetPasswordPage'));
 
 export const publicRoutes = (
   <>
@@ -53,5 +54,6 @@ export const publicRoutes = (
     <Route path="/order/:id" element={lazyLoad(OrderDetails)} />
     <Route path="/subscription/:planType/:planId" element={lazyLoad(SubscriptionPage)} />
     <Route path="/invoices/shared/:token" element={lazyLoad(SharedInvoiceView)} />
+    <Route path="/reset-password" element={lazyLoad(ResetPasswordPage)} />
   </>
 );

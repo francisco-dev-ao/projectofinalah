@@ -400,6 +400,188 @@ Equipa AngoHost
   }
 
   /**
+   * Envia email de boas-vindas para novos usuários
+   */
+  static async sendWelcomeEmail(
+    customerEmail: string,
+    customerName: string
+  ): Promise<{ success: boolean; message?: string; error?: string }> {
+    const html = `
+      <!DOCTYPE html>
+      <html lang="pt">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Bem-vindo à AngoHost</title>
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+          <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4;">
+              <tr>
+                  <td align="center" style="padding: 20px 0;">
+                      <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; max-width: 600px; width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                          <!-- Header -->
+                          <tr>
+                              <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center;">
+                                  <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: 700; letter-spacing: -0.5px;">
+                                      🎉 Bem-vindo à AngoHost!
+                                  </h1>
+                                  <p style="margin: 15px 0 0 0; color: #e8e8e8; font-size: 16px; line-height: 1.5;">
+                                      Sua jornada digital começa aqui
+                                  </p>
+                              </td>
+                          </tr>
+                          
+                          <!-- Content -->
+                          <tr>
+                              <td style="padding: 40px 30px;">
+                                  <p style="margin: 0 0 25px 0; color: #333333; font-size: 18px; line-height: 1.6;">
+                                      Olá <strong>${customerName}</strong>! 👋
+                                  </p>
+                                  
+                                  <p style="margin: 0 0 30px 0; color: #555555; font-size: 16px; line-height: 1.7;">
+                                      É com grande satisfação que damos as boas-vindas à <strong>AngoHost</strong>! 
+                                      Sua conta foi criada com sucesso e você agora faz parte da nossa comunidade de clientes.
+                                  </p>
+                                  
+                                  <!-- Features Section -->
+                                  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background: linear-gradient(135deg, #f8f9fc 0%, #e8eaf6 100%); border-radius: 12px; margin: 30px 0; padding: 25px;">
+                                      <tr>
+                                          <td>
+                                              <h3 style="margin: 0 0 20px 0; color: #333333; font-size: 20px; font-weight: 600; text-align: center;">
+                                                  O que você pode fazer agora:
+                                              </h3>
+                                              
+                                              <div style="margin: 20px 0;">
+                                                  <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                                                      <span style="display: inline-block; width: 30px; height: 30px; background-color: #667eea; color: white; border-radius: 50%; text-align: center; line-height: 30px; margin-right: 15px; font-weight: bold;">🌐</span>
+                                                      <span style="color: #555555; font-size: 15px;">Registrar e gerir domínios .ao e internacionais</span>
+                                                  </div>
+                                                  <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                                                      <span style="display: inline-block; width: 30px; height: 30px; background-color: #667eea; color: white; border-radius: 50%; text-align: center; line-height: 30px; margin-right: 15px; font-weight: bold;">🚀</span>
+                                                      <span style="color: #555555; font-size: 15px;">Contratar planos de hospedagem profissional</span>
+                                                  </div>
+                                                  <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                                                      <span style="display: inline-block; width: 30px; height: 30px; background-color: #667eea; color: white; border-radius: 50%; text-align: center; line-height: 30px; margin-right: 15px; font-weight: bold;">📧</span>
+                                                      <span style="color: #555555; font-size: 15px;">Configurar contas de email profissionais</span>
+                                                  </div>
+                                                  <div style="display: flex; align-items: center;">
+                                                      <span style="display: inline-block; width: 30px; height: 30px; background-color: #667eea; color: white; border-radius: 50%; text-align: center; line-height: 30px; margin-right: 15px; font-weight: bold;">💼</span>
+                                                      <span style="color: #555555; font-size: 15px;">Acessar suporte técnico especializado</span>
+                                                  </div>
+                                              </div>
+                                          </td>
+                                      </tr>
+                                  </table>
+                                  
+                                  <!-- Next Steps -->
+                                  <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; border-radius: 8px; padding: 20px; margin: 30px 0;">
+                                      <h4 style="margin: 0 0 15px 0; color: #856404; font-size: 18px; font-weight: 600;">
+                                          📝 Próximos Passos:
+                                      </h4>
+                                      <ol style="margin: 0; padding-left: 20px; color: #856404; font-size: 15px; line-height: 1.8;">
+                                          <li>Confirme seu email clicando no link de verificação que enviamos</li>
+                                          <li>Complete seu perfil na área do cliente</li>
+                                          <li>Explore nossos serviços e faça seu primeiro pedido</li>
+                                          <li>Entre em contacto conosco se precisar de ajuda</li>
+                                      </ol>
+                                  </div>
+                                  
+                                  <!-- Support Section -->
+                                  <div style="background-color: #d1ecf1; border-radius: 8px; padding: 20px; margin: 30px 0; text-align: center;">
+                                      <h4 style="margin: 0 0 15px 0; color: #0c5460; font-size: 18px; font-weight: 600;">
+                                          🤝 Precisa de Ajuda?
+                                      </h4>
+                                      <p style="margin: 0 0 15px 0; color: #0c5460; font-size: 15px; line-height: 1.6;">
+                                          Nossa equipe está pronta para ajudá-lo. Entre em contacto através dos canais abaixo:
+                                      </p>
+                                      <div style="color: #0c5460; font-size: 14px;">
+                                          📧 <strong>Email:</strong> support@angohost.ao<br>
+                                          📞 <strong>Telefone:</strong> +244 999 999 999<br>
+                                          💬 <strong>Chat Online:</strong> Disponível no site
+                                      </div>
+                                  </div>
+                                  
+                                  <p style="margin: 30px 0 20px 0; color: #555555; font-size: 16px; line-height: 1.7;">
+                                      Obrigado por escolher a AngoHost como seu parceiro tecnológico. 
+                                      Estamos ansiosos para ajudá-lo a alcançar seus objetivos digitais!
+                                  </p>
+                                  
+                                  <p style="margin: 20px 0 0 0; color: #333333; font-size: 16px; line-height: 1.6;">
+                                      Atenciosamente,<br>
+                                      <strong>Equipa AngoHost</strong><br>
+                                      <em>Seu parceiro digital em Angola</em>
+                                  </p>
+                              </td>
+                          </tr>
+                          
+                          <!-- Footer -->
+                          <tr>
+                              <td style="background-color: #f8f9fc; padding: 30px; text-align: center; border-top: 1px solid #e5e5e5;">
+                                  <p style="margin: 0 0 10px 0; color: #666666; font-size: 14px; font-weight: 600;">
+                                      AngoHost - Soluções Digitais para Angola
+                                  </p>
+                                  <p style="margin: 0 0 15px 0; color: #888888; font-size: 13px;">
+                                      Hospedagem • Domínios • Email • Suporte Técnico
+                                  </p>
+                                  <div style="margin: 15px 0;">
+                                      <a href="#" style="color: #667eea; text-decoration: none; margin: 0 10px; font-size: 12px;">Site</a>
+                                      <a href="#" style="color: #667eea; text-decoration: none; margin: 0 10px; font-size: 12px;">Suporte</a>
+                                      <a href="#" style="color: #667eea; text-decoration: none; margin: 0 10px; font-size: 12px;">Contacto</a>
+                                  </div>
+                                  <p style="margin: 15px 0 0 0; color: #aaaaaa; font-size: 12px;">
+                                      © ${new Date().getFullYear()} AngoHost - Todos os direitos reservados
+                                  </p>
+                              </td>
+                          </tr>
+                      </table>
+                  </td>
+              </tr>
+          </table>
+      </body>
+      </html>
+    `;
+
+    const textContent = `
+Olá ${customerName}!
+
+Bem-vindo à AngoHost! 🎉
+
+É com grande satisfação que damos as boas-vindas! Sua conta foi criada com sucesso e você agora faz parte da nossa comunidade.
+
+O QUE VOCÊ PODE FAZER AGORA:
+🌐 Registrar e gerir domínios .ao e internacionais
+🚀 Contratar planos de hospedagem profissional  
+📧 Configurar contas de email profissionais
+💼 Acessar suporte técnico especializado
+
+PRÓXIMOS PASSOS:
+1. Confirme seu email clicando no link de verificação
+2. Complete seu perfil na área do cliente
+3. Explore nossos serviços e faça seu primeiro pedido
+4. Entre em contacto conosco se precisar de ajuda
+
+PRECISA DE AJUDA?
+📧 Email: support@angohost.ao
+📞 Telefone: +244 999 999 999
+💬 Chat Online: Disponível no site
+
+Obrigado por escolher a AngoHost como seu parceiro tecnológico!
+
+Atenciosamente,
+Equipa AngoHost
+Seu parceiro digital em Angola
+    `;
+
+    return this.sendEmail({
+      from: 'noreply@angohost.ao',
+      to: customerEmail,
+      subject: `🎉 Bem-vindo à AngoHost, ${customerName}! Sua conta foi criada`,
+      html,
+      text: textContent
+    });
+  }
+
+  /**
    * Envia email de confirmação de pedido
    */
   static async sendOrderConfirmationEmail(

@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -10,15 +10,40 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { LogIn, UserPlus } from "lucide-react";
+import ForgotPasswordForm from "@/components/auth/ForgotPasswordForm";
 
 const AuthPage = () => {
   const [open, setOpen] = useState(true);
+  const [mode, setMode] = useState<'default' | 'recuperar'>('default');
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const modeParam = searchParams.get('modo');
+    if (modeParam === 'recuperar') {
+      setMode('recuperar');
+    }
+  }, [searchParams]);
 
   const closeDialog = () => {
     setOpen(false);
     navigate('/');
   };
+
+  const handleBackToDefault = () => {
+    setMode('default');
+    navigate('/auth');
+  };
+
+  if (mode === 'recuperar') {
+    return (
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <ForgotPasswordForm onBackToLogin={handleBackToDefault} />
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

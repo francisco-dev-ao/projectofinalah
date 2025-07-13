@@ -137,6 +137,27 @@ export const useAuthState = () => {
         return { error };
       } else {
         console.log('useAuthState: SignUp bem-sucedido!');
+        
+        // Enviar email de boas-vindas automaticamente
+        try {
+          console.log('Enviando email de boas-vindas para:', email);
+          const { EmailService } = await import('@/services/emailService');
+          
+          const welcomeEmailResult = await EmailService.sendWelcomeEmail(
+            email,
+            name || 'Cliente'
+          );
+          
+          if (welcomeEmailResult.success) {
+            console.log('Email de boas-vindas enviado com sucesso');
+          } else {
+            console.error('Erro ao enviar email de boas-vindas:', welcomeEmailResult.error);
+          }
+        } catch (emailError) {
+          console.error('Erro crítico ao enviar email de boas-vindas:', emailError);
+          // Não falha o registro se o email falhar
+        }
+        
         toast.success('Conta criada! Verifique seu email para confirmar.');
         return { error: null };
       }
