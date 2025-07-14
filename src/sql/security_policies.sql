@@ -17,11 +17,7 @@ CREATE POLICY "Users cannot directly modify wallets"
 CREATE POLICY "Admins can manage all wallets"
   ON user_wallets FOR ALL
   USING (
-    EXISTS (
-      SELECT 1 FROM profiles 
-      WHERE id = auth.uid() 
-      AND role = 'admin'
-    )
+    auth.jwt() ->> 'user_metadata' ->> 'role' = 'admin'
   );
 
 -- Wallet Transactions Security
@@ -38,11 +34,7 @@ CREATE POLICY "Only system can create transactions"
 CREATE POLICY "Admins can view all transactions"
   ON wallet_transactions FOR SELECT
   USING (
-    EXISTS (
-      SELECT 1 FROM profiles 
-      WHERE id = auth.uid() 
-      AND role = 'admin'
-    )
+    auth.jwt() ->> 'user_metadata' ->> 'role' = 'admin'
   );
 
 -- Invoices Security
@@ -54,21 +46,13 @@ CREATE POLICY "Users can view own invoices"
       WHERE o.id = order_id AND o.user_id = auth.uid()
     )
     OR 
-    EXISTS (
-      SELECT 1 FROM profiles 
-      WHERE id = auth.uid() 
-      AND role IN ('admin', 'suporte')
-    )
+    auth.jwt() ->> 'user_metadata' ->> 'role' IN ('admin', 'suporte')
   );
 
 CREATE POLICY "Only system can create invoices"
   ON invoices FOR INSERT
   WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM profiles 
-      WHERE id = auth.uid() 
-      AND role = 'admin'
-    )
+    auth.jwt() ->> 'user_metadata' ->> 'role' = 'admin'
   );
 
 -- Orders Security
@@ -77,11 +61,7 @@ CREATE POLICY "Users can view own orders"
   USING (
     user_id = auth.uid()
     OR 
-    EXISTS (
-      SELECT 1 FROM profiles 
-      WHERE id = auth.uid() 
-      AND role IN ('admin', 'suporte')
-    )
+    auth.jwt() ->> 'user_metadata' ->> 'role' IN ('admin', 'suporte')
   );
 
 CREATE POLICY "Users can create own orders"
@@ -91,30 +71,19 @@ CREATE POLICY "Users can create own orders"
 -- Profiles Security
 CREATE POLICY "Users can view own profile"
   ON profiles FOR SELECT
+  USING (id = auth.uid());
+
+CREATE POLICY "Admins can view all profiles"
+  ON profiles FOR SELECT
   USING (
-    id = auth.uid()
-    OR 
-    EXISTS (
-      SELECT 1 FROM profiles p
-      WHERE p.id = auth.uid() 
-      AND p.role IN ('admin', 'suporte')
-    )
+    auth.jwt() ->> 'user_metadata' ->> 'role' = 'admin'
+    OR auth.jwt() ->> 'user_metadata' ->> 'role' = 'suporte'
   );
 
 CREATE POLICY "Users can update own profile"
   ON profiles FOR UPDATE
   USING (id = auth.uid())
-  WITH CHECK (
-    id = auth.uid() 
-    AND (
-      role = OLD.role -- Cannot change own role
-      OR EXISTS (
-        SELECT 1 FROM profiles p
-        WHERE p.id = auth.uid() 
-        AND p.role = 'admin'
-      )
-    )
-  );
+  WITH CHECK (id = auth.uid());
 
 -- Payment References Security
 CREATE POLICY "Users can view own payment references"
@@ -131,9 +100,5 @@ CREATE POLICY "Users can view own payment references"
       WHERE i.id = invoice_id AND o.user_id = auth.uid()
     )
     OR 
-    EXISTS (
-      SELECT 1 FROM profiles 
-      WHERE id = auth.uid() 
-      AND role = 'admin'
-    )
+    auth.jwt() ->> 'user_metadata' ->> 'role' = 'admin'
   );
