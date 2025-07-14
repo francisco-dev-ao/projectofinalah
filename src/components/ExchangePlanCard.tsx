@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Check, ArrowRight } from "lucide-react";
-import { useCart } from "@/contexts/cart/useCart";
+import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
 import { formatPrice } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
