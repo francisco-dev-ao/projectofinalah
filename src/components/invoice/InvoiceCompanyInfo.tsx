@@ -38,18 +38,16 @@ const InvoiceCompanyInfo: React.FC<InvoiceCompanyInfoProps> = ({ companyInfo, or
           </div>
           
           {/* Client Information */}
-          <div className="space-y-4">
-            <div>
-              <h3 className="font-bold text-sm uppercase text-gray-500 mb-3">Para</h3>
-              <div className="space-y-2">
-                <p className="font-bold text-lg">{order?.profiles?.name || 'Cliente'}</p>
-                {order?.profiles?.company_name && (
-                  <p className="text-sm text-gray-600">{order.profiles.company_name}</p>
-                )}
-                <p className="text-sm text-gray-600">
-                  {order?.profiles?.address || 'Endereço não especificado'}
-                </p>
-              </div>
+          <div>
+            <h3 className="font-bold text-sm uppercase text-gray-500 mb-3">Para</h3>
+            <div className="space-y-2">
+              <p className="font-bold text-lg">{order?.profiles?.name || order?.profiles?.company_name || 'Cliente'}</p>
+              {order?.profiles?.company_name && (
+                <p className="text-sm text-gray-600">{order.profiles.company_name}</p>
+              )}
+              <p className="text-sm text-gray-600">
+                {order?.profiles?.address || 'Endereço não especificado'}
+              </p>
             </div>
             <div className="space-y-1 pt-2 border-t border-gray-100">
               <p className="text-sm"><span className="font-medium">Email:</span> {order?.profiles?.email || 'N/A'}</p>

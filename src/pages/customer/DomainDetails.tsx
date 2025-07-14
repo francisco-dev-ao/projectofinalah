@@ -65,45 +65,43 @@ const DomainDetails = () => {
       // First try to get from domains table
       let { data: domainData, error: domainError } = await supabase
         .from('domains')
-        .select(`
-          *,
-          orders:order_id (
-            user_id,
-            total_amount,
-            status
-          )
-        `)
+        .select('*') // Remova o select com relação!
         .eq('id', domainId)
-        .single();
+        .maybeSingle();
       
       console.log('Domains table query result:', { domainData, domainError });
       
       // If not found in domains table, try domain_orders table
       if (domainError || !domainData) {
         console.log('Domain not found in domains table, trying domain_orders...');
-        
+
+        // Consulta simples em domain_orders
         const { data: orderData, error: orderError } = await supabase
           .from('domain_orders')
-          .select(`
-            *,
-            orders:order_id (
-              user_id,
-              total_amount,
-              status
-            )
-          `)
+          .select('*')
           .eq('id', domainId)
-          .single();
-        
+          .maybeSingle();
+
         console.log('Domain orders query result:', { orderData, orderError });
-        
+
         if (orderError || !orderData) {
           console.error("Domain not found in either table:", { domainError, orderError });
-          setError("Domínio não encontrado");
+          setError(`Domínio não encontrado: ${orderError?.message || domainError?.message || 'desconhecido'}`);
           toast.error("Domínio não encontrado");
           return;
         }
-        
+
+        // Buscar dados do pedido relacionado, se existir
+        let orderDetails = null;
+        if (orderData.order_id) {
+          const { data: orderDetailsData } = await supabase
+            .from('orders')
+            .select('user_id, total_amount, status')
+            .eq('id', orderData.order_id)
+            .maybeSingle();
+          orderDetails = orderDetailsData;
+        }
+
         // Convert domain_orders format to domains format
         domainData = {
           id: orderData.id,
@@ -120,7 +118,8 @@ const DomainDetails = () => {
           expiration_date: new Date(new Date(orderData.created_at).getTime() + 365 * 24 * 60 * 60 * 1000).toISOString(),
           nameservers: ['ns1.angohost.co.ao', 'ns2.angohost.co.ao'],
           created_at: orderData.created_at,
-          updated_at: orderData.updated_at
+          updated_at: orderData.updated_at,
+          order_details: orderDetails // Adiciona detalhes do pedido, se houver
         };
       }
       

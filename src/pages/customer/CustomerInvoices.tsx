@@ -276,22 +276,6 @@ export default function CustomerInvoices() {
             <p className="text-gray-600 mt-1">Gerencie e visualize suas faturas</p>
           </div>
           {/* Botões para administradores */}
-          <div className="flex gap-2">
-            <button
-              onClick={checkOrphanedInvoices}
-              className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors text-sm"
-              title="Verificar faturas órfãs (apenas para administradores)"
-            >
-              Verificar Faturas Órfãs
-            </button>
-            <button
-              onClick={clearDemoData}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
-              title="Limpar dados de exemplo (apenas para administradores)"
-            >
-              Limpar Dados de Exemplo
-            </button>
-          </div>
         </div>
       </div>
       

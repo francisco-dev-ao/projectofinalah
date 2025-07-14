@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Loader2, ArrowLeft, Globe, Calendar, RefreshCw } from 'lucide-react';
 import { formatPrice, formatDate } from '@/lib/utils';
-import { useCart } from '@/contexts/CartContext';
+import { useCart } from '@/contexts/cart/useCart';
 import { v4 as uuidv4 } from 'uuid';
 import CustomerLayout from '@/components/customer/CustomerLayout';
 import { useAuth } from '@/contexts/AuthContext';

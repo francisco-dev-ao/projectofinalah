@@ -7,7 +7,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { useNavigate } from "react-router-dom";
 import { formatPrice } from "@/lib/utils";
 import { toast } from "sonner";
-import { useCart } from "@/contexts/CartContext";
+import { useCart } from "@/contexts/cart/useCart";
 
 export interface HostingPlan {
   id: string;

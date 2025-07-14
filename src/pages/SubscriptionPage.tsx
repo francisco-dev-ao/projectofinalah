@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { HostingPlan } from "../components/HostingPlansSection";
-import { useCart } from "@/contexts/CartContext";
+import { useCart } from "@/contexts/cart/useCart";
 
 interface SubscriptionOption {
   id: string;

@@ -22,9 +22,10 @@ const CartItemsList = () => {
 
   // Group items by type for display
   const domainItems = cartItems.filter(item => item.type === 'domain');
+  const domainRenewalItems = cartItems.filter(item => item.type === 'domain_renewal');
   const hostingItems = cartItems.filter(item => item.type === 'hosting');
   const emailItems = cartItems.filter(item => item.type === 'email');
-  const otherItems = cartItems.filter(item => !item.type || (item.type !== 'domain' && item.type !== 'hosting' && item.type !== 'email'));
+  const otherItems = cartItems.filter(item => !item.type || (item.type !== 'domain' && item.type !== 'domain_renewal' && item.type !== 'hosting' && item.type !== 'email'));
   
   // Check if there's only domain in cart
   const hasDomainOnly = cartItems.length === 1 && cartItems[0].type === 'domain';
@@ -44,6 +45,20 @@ const CartItemsList = () => {
                   item={item} 
                   updateDomainPeriod={updateDomainPeriod}
                   handleRemoveItem={handleRemoveItem}
+                />
+              ))}
+            </CartCategorySection>
+          )}
+
+          {/* Display domain renewal items */}
+          {domainRenewalItems.length > 0 && (
+            <CartCategorySection title="Renovação de Domínios">
+              {domainRenewalItems.map((item) => (
+                <CartItemCard 
+                  key={item.id} 
+                  item={item} 
+                  updateQuantity={updateItemQuantity} 
+                  removeItem={removeItem}
                 />
               ))}
             </CartCategorySection>

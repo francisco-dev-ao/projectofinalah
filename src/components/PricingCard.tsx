@@ -3,7 +3,7 @@ import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { formatPrice } from "@/lib/utils";
-import { useCart } from "@/contexts/CartContext";
+import { useCart } from "@/contexts/cart/useCart";
 import { toast } from "sonner";
 
 export interface PricingPlan {

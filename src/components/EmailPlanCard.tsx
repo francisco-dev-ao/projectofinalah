@@ -6,7 +6,7 @@ import { Check, Plus, Minus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { formatPrice } from "@/lib/utils";
 import { toast } from "sonner";
-import { useCart } from "@/contexts/CartContext";
+import { useCart } from "@/contexts/cart/useCart";
 import '@/hostinger-hover.css';
 
 export interface EmailPlan {

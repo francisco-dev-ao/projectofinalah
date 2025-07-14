@@ -5,10 +5,11 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { SafeCartProvider } from "@/contexts/SafeCartProvider";
+import { CartProvider } from "@/contexts/cart/CartProvider";
 import { queryClient } from "@/utils/queryClient";
 import { Toaster as HotToast } from 'react-hot-toast';
 import { useSessionTimeout } from "@/hooks/useSessionTimeout";
+import { SafeCartProvider } from "@/contexts/SafeCartProvider";
 
 interface AppProvidersProps {
   children: React.ReactNode;

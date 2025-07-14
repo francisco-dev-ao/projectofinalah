@@ -19,7 +19,7 @@ interface AddFundsDialogProps {
 const AddFundsDialog = ({ open, onClose, onDeposit }: AddFundsDialogProps) => {
   const { user } = useAuth();
   const [amount, setAmount] = useState<number>(0);
-  const [paymentMethod, setPaymentMethod] = useState<string>("online_payment");
+  const [paymentMethod, setPaymentMethod] = useState<string>("appypay");
   const [isLoading, setIsLoading] = useState(false);
   const [amountError, setAmountError] = useState<string | null>(null);
   const [currentInvoiceId, setCurrentInvoiceId] = useState<string | null>(null);
@@ -144,14 +144,17 @@ const AddFundsDialog = ({ open, onClose, onDeposit }: AddFundsDialogProps) => {
             </div>
             <div className="grid gap-2">
               <Label htmlFor="payment-method">Método de Pagamento</Label>
-              <div className="p-3 border rounded-md bg-gray-50">
-                <p className="font-medium text-gray-900">Pagamento Online</p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Você será redirecionado para o sistema de pagamento após confirmar.
-                </p>
-              </div>
-              {/* Campo Select foi removido, pois só existe um método de pagamento */}
-              <input type="hidden" name="payment-method" value="online_payment" />
+              <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+                <SelectTrigger id="payment-method">
+                  <SelectValue placeholder="Pagamento por Referência Multicaixa" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="appypay">Pagamento por Referência Multicaixa</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-500 mt-1">
+                Você receberá uma referência Multicaixa para efetuar o pagamento e o saldo será adicionado após a confirmação.
+              </p>
             </div>
           </div>
           <DialogFooter>

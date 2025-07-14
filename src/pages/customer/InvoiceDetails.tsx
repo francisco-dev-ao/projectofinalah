@@ -77,6 +77,7 @@ const InvoiceDetails = () => {
           *,
           orders:order_id (
             *,
+            profiles:user_id (*),
             order_items(*)
           )
         `)
@@ -172,32 +173,13 @@ const InvoiceDetails = () => {
 
   const handlePrintInvoice = async () => {
     if (!invoice) return;
-    
     try {
       setIsPrinting(true);
       console.log('InvoiceDetails: Printing invoice:', invoice.id);
       const { downloadHelpers } = await import("@/utils/downloadHelpers");
-      
-      // Buscar dados completos da fatura com referências de pagamento
-      const { data: invoiceData, error } = await supabase
-        .from('invoices')
-        .select(`
-          *,
-          orders (
-            *,
-            payment_references (*),
-            order_items (*)
-          )
-        `)
-        .eq('id', invoice.id)
-        .single();
-        
-      if (error) throw new Error(`Erro ao carregar fatura: ${error.message}`);
-      
-      // Usar a função de impressão direta
-      await downloadHelpers.printInvoiceDirectly(invoiceData);
+      // Passar a referência de pagamento real (com expires_at) para a impressão
+      await downloadHelpers.printInvoiceDirectly(invoice, true);
       toast.success('Abrindo janela de impressão...');
-      
     } catch (error: any) {
       console.error('InvoiceDetails: Error printing invoice:', error);
       toast.error(error.message || 'Erro ao imprimir fatura. Por favor, tente novamente.');
@@ -299,11 +281,30 @@ const InvoiceDetails = () => {
         onPrint={handlePrintInvoice}
       />
 
+      {/* Removido bloco duplicado de informações do cliente, pois InvoiceCompanyInfo já exibe esses dados */}
+
+      {/* Exibir referência de pagamento original, se existir */}
+      {invoice?.orders?.payment_references && invoice.orders.payment_references.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Referência de Pagamento</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-1 text-sm">
+              <div><span className="font-medium">Entidade:</span> {invoice.orders.payment_references[0].entity}</div>
+              <div><span className="font-medium">Referência:</span> {invoice.orders.payment_references[0].reference}</div>
+              <div><span className="font-medium">Valor:</span> KZ {(invoice.amount || 0).toLocaleString('pt-PT', { minimumFractionDigits: 2 })}</div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <InvoiceCompanyInfo companyInfo={companyInfo} order={order} />
 
       <InvoiceItemsTable order={order} />
 
-      <InvoicePaymentInfo invoice={invoice} companyInfo={companyInfo} />
+      {/* Remover exibição de informações bancárias e instruções de pagamento */}
+      {/* <InvoicePaymentInfo invoice={invoice} companyInfo={companyInfo} /> */}
 
       {invoice?.payment_instructions && (
         <Card>
