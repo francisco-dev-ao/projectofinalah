@@ -34,7 +34,7 @@ const DomainProtectionOption = () => {
         
         const protectionService = {
           id: `domain-protection-${domain.id}-${Date.now()}-${index}`,
-          name: `Proteção Total do Domínio (${domain.name})`,
+          name: `Proteção do Domínio (${domain.name})`,
           type: 'domain_protection' as const,
           description: `Proteja ${domain.name} contra roubo por ${years} ano${years > 1 ? 's' : ''}`,
           price: protectionPrice,
@@ -68,7 +68,7 @@ const DomainProtectionOption = () => {
           
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
-              <h3 className="font-semibold text-lg">Proteção Total do Domínio</h3>
+              <h3 className="font-semibold text-lg">Proteção do Domínio</h3>
               <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
                 Recomendado
               </span>

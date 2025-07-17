@@ -6,6 +6,7 @@ import CartItemsList from "@/components/cart/CartItemsList";
 import DomainSelector from "@/components/cart/DomainSelector";
 import CartAuthOptions from "@/components/cart/CartAuthOptions";
 import OrderSummary from "@/components/cart/OrderSummary";
+import CartSummarySection from "@/components/cart/CartSummarySection";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -111,8 +112,8 @@ const CartContent: React.FC<CartContentProps> = ({
       
       {/* Right column: Order summary */}
       <div>
-        <OrderSummary 
-          onProceedToCheckout={handleProceedToCheckout} 
+        <CartSummarySection 
+          handleProceedToCheckout={handleProceedToCheckout} 
           isProcessing={isProcessing || isPending}
         />
       </div>

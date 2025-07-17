@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect } from 'react';
 import { CartContextType, CartItem, DomainCheckResult } from './types';
 import { 
@@ -30,37 +29,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [discount, setDiscount] = useState(0);
   const [couponCode, setCouponCode] = useState('');
   const [hasDomainInCart, setHasDomainInCart] = useState(false);
-  const [loading, setLoading] = useState(false);  // Clean up localStorage if needed on component mount
-  useEffect(() => {
-    try {
-      // Limpeza forçada (remover se necessário após resolver o problema)
-      console.log("Verificando e potencialmente limpando o carrinho armazenado");
-      
-      const savedCart = localStorage.getItem('cart');
-      if (savedCart) {
-        try {
-          const parsedCart = JSON.parse(savedCart);
-          if (!Array.isArray(parsedCart)) {
-            console.error('Cart in localStorage is not an array, clearing it:', parsedCart);
-            localStorage.removeItem('cart');
-            setCartItems([]);
-          } else {
-            console.log("Cart validation passed:", parsedCart.length, "items in cart");
-          }
-        } catch (parseError) {
-          console.error('Failed to parse cart from localStorage, clearing it:', parseError);
-          localStorage.removeItem('cart');
-          setCartItems([]);
-        }
-      } else {
-        console.log("No cart found in localStorage");
-      }
-    } catch (e) {
-      console.error('Error checking cart in localStorage, clearing it:', e);
-      localStorage.removeItem('cart');
-      setCartItems([]);
-    }
-  }, []);
+  const [loading, setLoading] = useState(false);
 
   // Update hasDomainInCart and save cart to localStorage whenever cartItems changes
   useEffect(() => {

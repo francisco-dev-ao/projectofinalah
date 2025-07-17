@@ -41,7 +41,6 @@ const CartSummarySection: React.FC<CartSummarySectionProps> = ({
         isProcessing={isProcessing}
       />
       
-      <SatisfactionGuarantee />
     </div>
   );
 };

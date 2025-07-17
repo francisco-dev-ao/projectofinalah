@@ -10,6 +10,7 @@ import CartSummarySection from "@/components/cart/CartSummarySection";
 import { Loader2 } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { toast } from "sonner";
+import { buscarDominio } from '@/utils/domainSearch';
 
 // Define the checkout steps
 const checkoutSteps = [
@@ -158,6 +159,8 @@ const CartPage = () => {
           </Suspense>
         </div>
       </div>
+      {/* Removido o card de Resumo do Pedido em HTML puro conforme solicitado */}
+      {/* O script de atualização automática deve ser colocado em um arquivo .js separado ou dentro de um useEffect, se for React. */}
     </CartPageLayout>
   );
 };

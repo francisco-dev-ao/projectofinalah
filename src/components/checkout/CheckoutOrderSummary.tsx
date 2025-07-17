@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/contexts/CartContext";
 import { formatPrice } from "@/lib/utils";
+import SatisfactionGuarantee from "@/components/cart/SatisfactionGuarantee";
 
 const CheckoutOrderSummary = () => {
   const { cartItems, total } = useCart();
@@ -17,6 +18,9 @@ const CheckoutOrderSummary = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        <div className="mb-2">
+          <SatisfactionGuarantee highlight />
+        </div>
         {/* Items do carrinho */}
         <div className="space-y-3">
           {cartItems.map((item, index) => (

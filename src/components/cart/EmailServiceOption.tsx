@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -92,6 +92,25 @@ const EmailServiceOption = () => {
       setSelectedUsers(existingEmailItem.quantity || existingEmailItem.metadata?.users || 1);
     }
   }, [hasEmailInCart, existingEmailItem]);
+
+  // Atualizar o carrinho automaticamente ao alterar a quantidade
+  useEffect(() => {
+    if (hasEmailInCart && existingEmailItem) {
+      const updatedEmailService = {
+        ...existingEmailItem,
+        name: `${selectedPlan.name} (${selectedUsers} usuário${selectedUsers > 1 ? 's' : ''})`,
+        quantity: selectedUsers,
+        price: selectedPlan.annualPrice, // Price per user
+        unitPrice: selectedPlan.annualPrice, // Price per user
+        metadata: {
+          users: selectedUsers,
+          originalPrice: selectedPlan.annualPrice
+        }
+      };
+      removeItem(existingEmailItem.id);
+      addItem(updatedEmailService, selectedUsers);
+    }
+  }, [selectedUsers, selectedPlan, hasEmailInCart, existingEmailItem, addItem, removeItem]);
 
   const calculatePrice = () => {
     return selectedPlan.annualPrice * selectedUsers;
@@ -262,7 +281,7 @@ const EmailServiceOption = () => {
                     
                     <div className="flex justify-between items-center mt-3">
                       <p className="text-sm text-gray-500">
-                        {selectedUsers} usuário{selectedUsers > 1 ? 's' : ''} • Máximo: 500
+                        Mínimo: 1 • Máximo: 500
                       </p>
                       <div className="text-right">
                         <p className="text-sm text-gray-600">Preço anual:</p>
@@ -344,14 +363,6 @@ const EmailServiceOption = () => {
                         disabled={selectedUsers >= 500}
                       >
                         <Plus className="h-4 w-4" />
-                      </Button>
-
-                      {/* Update button */}
-                      <Button 
-                        onClick={updateEmailQuantity}
-                        className="ml-4 bg-blue-600 hover:bg-blue-700 text-white"
-                      >
-                        Atualizar
                       </Button>
 
                       {/* Remove button */}
