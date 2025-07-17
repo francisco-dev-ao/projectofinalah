@@ -161,9 +161,13 @@ const CartItemsSection: React.FC<CartItemsSectionProps> = ({
         </div>
       )}
       
-      {/* Authentication options for non-logged in users */}
-      {!isAuthenticated && showAuthSection && (
-        <div id="step-auth">
+      {/* Authentication options for non-logged in users - Show automatically when there are items */}
+      {!isAuthenticated && cartItems.length > 0 && (
+        <div id="step-auth" className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-sm p-6 border-l-4 border-blue-500">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+            <h2 className="text-xl font-semibold text-blue-900">Etapa Necessária</h2>
+          </div>
           <CartAuthOptions onAuthSuccess={() => {}} />
         </div>
       )}

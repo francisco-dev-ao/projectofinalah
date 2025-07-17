@@ -18,12 +18,20 @@ const CartAuthOptions = ({ onAuthSuccess }: CartAuthOptionsProps) => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-      <h2 className="text-xl font-semibold mb-4">Identifique-se</h2>
+    <div className="bg-white rounded-lg border border-blue-200 p-6">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+          <span className="text-blue-600 font-bold text-lg">🔑</span>
+        </div>
+        <div>
+          <h2 className="text-xl font-semibold text-blue-900">Identifique-se</h2>
+          <p className="text-blue-700 text-sm">Acesso necessário para continuar</p>
+        </div>
+      </div>
       
-      <div className="mb-4">
-        <p className="text-gray-600 mb-2">
-          Para continuar com sua compra, faça login na sua conta ou crie uma nova.
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <p className="text-blue-800 text-sm font-medium">
+          ✨ Para continuar com sua compra e garantir a segurança da transação, faça login na sua conta ou crie uma nova.
         </p>
       </div>
       

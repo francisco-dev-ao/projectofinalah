@@ -163,25 +163,25 @@ const StepNavigator: React.FC<StepNavigatorProps> = ({ onStepClick, currentStep 
       </div>
       
       {(needsAuth || needsContactProfile) && (
-        <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
           <div className="flex items-center gap-2 mb-2">
-            <Circle className="h-4 w-4 text-yellow-600" />
-            <span className="font-medium text-yellow-900">
-              {needsAuth ? 'Login Necessário' : 'Perfil de Contacto Necessário'}
+            <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
+            <span className="font-medium text-amber-900">
+              {needsAuth ? '🔐 Autenticação Necessária' : '📋 Perfil de Contacto Necessário'}
             </span>
           </div>
-          <p className="text-sm text-yellow-700 mb-3">
+          <p className="text-sm text-amber-700 mb-3">
             {needsAuth 
-              ? 'Para finalizar sua compra, você precisa fazer login ou criar uma conta.'
-              : 'Para registrar domínios, você precisa selecionar um perfil de contacto.'
+              ? 'Para finalizar sua compra e garantir a segurança, você precisa fazer login ou criar uma conta.'
+              : 'Para registrar domínios com segurança, você precisa selecionar um perfil de contacto válido.'
             }
           </p>
           <Button 
             onClick={() => onStepClick(needsAuth ? 'auth' : 'contact')}
             size="sm"
-            className="bg-yellow-600 hover:bg-yellow-700 text-white"
+            className="bg-amber-600 hover:bg-amber-700 text-white w-full"
           >
-            {needsAuth ? 'Fazer Login' : 'Selecionar Perfil'}
+            {needsAuth ? '🚀 Fazer Login Agora' : '✅ Selecionar Perfil'}
           </Button>
         </div>
       )}
