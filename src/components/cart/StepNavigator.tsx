@@ -27,27 +27,7 @@ const StepNavigator: React.FC<StepNavigatorProps> = ({ onStepClick, currentStep 
   useEffect(() => {
     if (!hasItems) return;
     
-    // Auto-suggest domain protection after adding domains
-    if (hasDomains && !hasProtection) {
-      setTimeout(() => {
-        toast.success("💎 Proteja seu investimento! Adicione Proteção Total do Domínio para garantir segurança máxima.", {
-          duration: 6000,
-          action: {
-            label: "Ver Proteção",
-            onClick: () => {
-              const element = document.getElementById('domain-protection');
-              if (element) {
-                element.scrollIntoView({ behavior: 'smooth' });
-                element.classList.add('animate-pulse');
-                setTimeout(() => element.classList.remove('animate-pulse'), 2000);
-              }
-            }
-          }
-        });
-      }, 2000);
-    }
-    
-    // Auto-suggest email service for professional presence
+    // Auto-suggest email service first for professional presence
     if (hasItems && !hasEmail) {
       setTimeout(() => {
         toast.success("📧 Complete sua presença profissional! Adicione Email Profissional para comunicação empresarial.", {
@@ -64,20 +44,31 @@ const StepNavigator: React.FC<StepNavigatorProps> = ({ onStepClick, currentStep 
             }
           }
         });
+      }, 2000);
+    }
+    
+    // Auto-suggest domain protection after adding domains  
+    if (hasDomains && !hasProtection && hasEmail) {
+      setTimeout(() => {
+        toast.success("💎 Proteja seu investimento! Adicione Proteção Total do Domínio para garantir segurança máxima.", {
+          duration: 6000,
+          action: {
+            label: "Ver Proteção",
+            onClick: () => {
+              const element = document.getElementById('domain-protection');
+              if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+                element.classList.add('animate-pulse');
+                setTimeout(() => element.classList.remove('animate-pulse'), 2000);
+              }
+            }
+          }
+        });
       }, 4000);
     }
   }, [hasItems, hasDomains, hasProtection, hasEmail]);
   
   const recommendations = [
-    {
-      id: 'protection',
-      title: 'Proteção Total do Domínio',
-      description: 'Garanta a segurança do seu investimento digital',
-      icon: Shield,
-      active: hasDomains && !hasProtection,
-      completed: hasProtection,
-      value: '🛡️ Essencial para negócios'
-    },
     {
       id: 'email',
       title: 'Email Profissional',
@@ -86,6 +77,15 @@ const StepNavigator: React.FC<StepNavigatorProps> = ({ onStepClick, currentStep 
       active: hasItems && !hasEmail,
       completed: hasEmail,
       value: '💼 Imagem profissional'
+    },
+    {
+      id: 'protection',
+      title: 'Proteção Total do Domínio',
+      description: 'Garanta a segurança do seu investimento digital',
+      icon: Shield,
+      active: hasDomains && !hasProtection,
+      completed: hasProtection,
+      value: '🛡️ Essencial para negócios'
     }
   ];
   
