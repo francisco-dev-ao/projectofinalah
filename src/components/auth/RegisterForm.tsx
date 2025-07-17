@@ -18,6 +18,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Loader2, Info } from "lucide-react";
 import { validateNIF } from "@/services/nifService";
 import { useNavigate, useLocation } from "react-router-dom";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 // Form schema with validation
 const formSchema = z.object({
@@ -42,6 +43,7 @@ const formSchema = z.object({
   }),
   name: z.string().optional(),
   address: z.string().optional(),
+  concordaTermos: z.literal(true, { errorMap: () => ({ message: "Você deve concordar com os Termos de Uso e Política de Privacidade." }) }),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -58,6 +60,7 @@ const RegisterForm = ({ onAuthSuccess }: RegisterFormProps) => {
   const location = useLocation();
   const [redirectPath, setRedirectPath] = useState<string | null>(null);
   const [isCompanyNameLocked, setIsCompanyNameLocked] = useState(true); // Sempre ineditável
+  const [openTermos, setOpenTermos] = useState(false);
 
   // Processar parâmetros da URL para preencher campos automaticamente
   useEffect(() => {
@@ -149,6 +152,7 @@ const RegisterForm = ({ onAuthSuccess }: RegisterFormProps) => {
       phone: "",
       name: "",
       address: "",
+      concordaTermos: undefined,
     },
     shouldUnregister: false,
     shouldFocusError: false,
@@ -476,6 +480,45 @@ const RegisterForm = ({ onAuthSuccess }: RegisterFormProps) => {
             </FormItem>
           )}
         />
+
+        <FormField
+          control={form.control}
+          name="concordaTermos"
+          render={({ field }) => (
+            <FormItem className="flex items-center space-x-2">
+              <FormControl>
+                <input
+                  type="checkbox"
+                  id="concordaTermos"
+                  checked={field.value}
+                  onChange={field.onChange}
+                  className="accent-blue-700 w-5 h-5 rounded border-gray-300 focus:ring-2 focus:ring-blue-500"
+                />
+              </FormControl>
+              <FormLabel htmlFor="concordaTermos" className="text-sm text-gray-700 select-none">
+                Eu li e concordo com
+                <button type="button" className="text-blue-700 underline ml-1" onClick={() => setOpenTermos(true)}>
+                  os Termos de Uso e Política de Privacidade
+                </button>
+              </FormLabel>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Dialog open={openTermos} onOpenChange={setOpenTermos}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Termos de Uso e Política de Privacidade</DialogTitle>
+            </DialogHeader>
+            <DialogDescription className="text-sm text-gray-700 max-h-96 overflow-y-auto">
+              <p><b>Termos de Uso:</b> Ao criar uma conta, você concorda em utilizar a plataforma de acordo com as leis vigentes e respeitar as regras estabelecidas pela AngoHost. O uso indevido pode resultar em suspensão ou exclusão da conta.</p>
+              <br />
+              <p><b>Política de Privacidade:</b> Seus dados serão tratados com confidencialidade e utilizados apenas para fins de cadastro, comunicação e prestação dos serviços contratados. Não compartilhamos suas informações com terceiros sem consentimento, exceto quando exigido por lei.</p>
+              <br />
+              <p>Para mais detalhes, consulte nossa página oficial de <a href="/termos" className="text-blue-700 underline" target="_blank" rel="noopener noreferrer">Termos de Uso</a> e <a href="/privacidade" className="text-blue-700 underline" target="_blank" rel="noopener noreferrer">Política de Privacidade</a>.</p>
+            </DialogDescription>
+          </DialogContent>
+        </Dialog>
 
         <Button 
           type="submit" 
