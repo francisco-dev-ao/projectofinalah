@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Mail, Check, Users } from "lucide-react";
+import { Mail, Check, Users, Plus, Minus } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { formatPrice } from "@/lib/utils";
 
@@ -160,22 +160,39 @@ const EmailServiceOption = () => {
                 {/* Users Selection */}
                 <div>
                   <label className="block text-sm font-medium mb-2">Número de usuários:</label>
-                  <Select value={selectedUsers.toString()} onValueChange={(value) => setSelectedUsers(parseInt(value))}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white z-50">
-                      {Array.from({ length: Math.min(selectedPlan.maxUsers, 10) }, (_, i) => i + 1).map((num) => (
-                        <SelectItem key={num} value={num.toString()}>
-                          <div className="flex items-center gap-2">
-                            <Users className="h-4 w-4" />
-                            <span>{num} usuário{num > 1 ? 's' : ''}</span>
-                            <span className="text-gray-500">- {formatPrice(selectedPlan.annualPrice * num)}/{selectedPlan.period}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setSelectedUsers(Math.max(1, selectedUsers - 1))}
+                      disabled={selectedUsers <= 1}
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                    <input
+                      type="number"
+                      min="1"
+                      max={selectedPlan.maxUsers}
+                      value={selectedUsers}
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value) || 1;
+                        const clampedValue = Math.min(Math.max(1, value), selectedPlan.maxUsers);
+                        setSelectedUsers(clampedValue);
+                      }}
+                      className="w-16 px-2 py-1 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    />
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setSelectedUsers(Math.min(selectedPlan.maxUsers, selectedUsers + 1))}
+                      disabled={selectedUsers >= selectedPlan.maxUsers}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Máximo: {selectedPlan.maxUsers} usuários
+                  </p>
                 </div>
 
                 {/* Selected Plan Features */}
