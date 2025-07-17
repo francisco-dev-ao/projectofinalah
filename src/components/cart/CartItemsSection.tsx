@@ -8,6 +8,8 @@ import DomainProtectionOption from "@/components/cart/DomainProtectionOption";
 import EmailServiceOption from "@/components/cart/EmailServiceOption";
 import CartAuthOptions from "@/components/cart/CartAuthOptions";
 import ContactProfileSelection from "@/components/checkout/ContactProfileSelection";
+import DiscountInfo from "@/components/cart/DiscountInfo";
+import StepNavigator from "@/components/cart/StepNavigator";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCheckoutContactProfile } from "@/hooks/useCheckoutContactProfile";
@@ -57,9 +59,21 @@ const CartItemsSection: React.FC<CartItemsSectionProps> = ({
     }
   };
 
+  const handleStepNavigation = (step: string) => {
+    // Here you would implement navigation logic
+    // For now, just scroll to the relevant section
+    const element = document.getElementById(`step-${step}`);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      {/* Step Navigator */}
+      <StepNavigator onStepClick={handleStepNavigation} currentStep="cart" />
+      
+      <div id="step-cart" className="bg-white rounded-lg shadow-sm p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
           <h1 className="text-2xl font-semibold">Seu Carrinho</h1>
           <Link 
@@ -72,38 +86,35 @@ const CartItemsSection: React.FC<CartItemsSectionProps> = ({
         </div>
         
         <CartItemsList />
+        
+        {/* Discount Info */}
+        <DiscountInfo />
       </div>
       
-      {/* Additional Services Section */}
-      {cartItems.length > 0 && (
-        <div className="space-y-4">
-          <Separator />
-          <h2 className="text-xl font-semibold">Serviços Adicionais</h2>
-          
-          {/* Domain Protection Option */}
-          <DomainProtectionOption />
-          
-          {/* Email Service Option */}
-          <EmailServiceOption />
-        </div>
-      )}
+      {/* Domain Protection Option - Only shown if there are domains */}
+      <DomainProtectionOption />
+      
+      {/* Email Service Option - Only shown if there are services that need email */}
+      <EmailServiceOption />
       
       {/* Domain selection section - show only when needed */}
       {(needsDomain && !hasDomainInCart) && (
-        <DomainSelector 
-          existingDomain={existingDomain}
-          setExistingDomain={setExistingDomain}
-          domainOption={domainOption}
-          setDomainOption={setDomainOption}
-          domainError={domainError}
-          setDomainError={setDomainError}
-          onValidate={onValidateDomain}
-        />
+        <div id="step-domain">
+          <DomainSelector 
+            existingDomain={existingDomain}
+            setExistingDomain={setExistingDomain}
+            domainOption={domainOption}
+            setDomainOption={setDomainOption}
+            domainError={domainError}
+            setDomainError={setDomainError}
+            onValidate={onValidateDomain}
+          />
+        </div>
       )}
 
       {/* Contact Profile selection for NEW domains only - OPCIONAL para domínios existentes */}
       {isAuthenticated && isContactProfileRequired && (
-        <div className="bg-white rounded-lg shadow-sm p-6 border-l-4 border-blue-500">
+        <div id="step-contact" className="bg-white rounded-lg shadow-sm p-6 border-l-4 border-blue-500">
           <div className="flex items-start gap-3 mb-4">
             <AlertTriangle className="h-5 w-5 text-blue-500 mt-0.5" />
             <div>
@@ -133,7 +144,9 @@ const CartItemsSection: React.FC<CartItemsSectionProps> = ({
       
       {/* Authentication options for non-logged in users */}
       {!isAuthenticated && showAuthSection && (
-        <CartAuthOptions onAuthSuccess={() => {}} />
+        <div id="step-auth">
+          <CartAuthOptions onAuthSuccess={() => {}} />
+        </div>
       )}
     </div>
   );

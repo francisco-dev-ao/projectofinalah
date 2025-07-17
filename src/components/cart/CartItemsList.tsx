@@ -108,10 +108,6 @@ const CartItemsList = () => {
         </div>
       </div>
       
-      {/* Show additional services prompt only when there's just a domain in the cart */}
-      {hasDomainOnly && (
-        <AdditionalServicesPrompt onlyDomainInCart={hasDomainOnly} />
-      )}
     </>
   );
 };

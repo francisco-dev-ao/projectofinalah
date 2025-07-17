@@ -93,7 +93,7 @@ const CartItemCard: React.FC<CartItemCardProps> = ({ item, updateQuantity, remov
             <Button 
               variant="ghost" 
               size="sm" 
-              className="text-gray-500 hover:text-red-500 hover:bg-red-50 mt-2 p-0 transition-all duration-200 hover:scale-110 group"
+              className="text-red-500 hover:text-red-700 hover:bg-red-50 mt-2 p-0 transition-all duration-200 hover:scale-110 group border border-red-200 hover:border-red-300"
               onClick={handleRemoveItem}
             >
               <Trash2 size={16} className="mr-1 group-hover:animate-pulse" />

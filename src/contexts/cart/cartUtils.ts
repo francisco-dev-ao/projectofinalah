@@ -24,6 +24,31 @@ export const calculateSubtotal = (cartItems: CartItem[]): number => {
 };
 
 /**
+ * Calculate automatic discount for bulk users
+ */
+export const calculateBulkDiscount = (cartItems: CartItem[]): number => {
+  if (!Array.isArray(cartItems)) {
+    return 0;
+  }
+  
+  // Calculate total users in email services
+  const totalUsers = cartItems.reduce((count, item) => {
+    if (item.type === 'email' && item.metadata?.users) {
+      return count + (item.metadata.users * item.quantity);
+    }
+    return count;
+  }, 0);
+  
+  // Apply 2% discount for purchases above 10 users
+  if (totalUsers > 10) {
+    const subtotal = calculateSubtotal(cartItems);
+    return subtotal * 0.02; // 2% discount
+  }
+  
+  return 0;
+};
+
+/**
  * Calculate final total - sem RF
  */
 export const calculateTotal = (subtotal: number, discount: number): number => {

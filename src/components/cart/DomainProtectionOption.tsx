@@ -8,39 +8,51 @@ import { formatPrice } from "@/lib/utils";
 const DomainProtectionOption = () => {
   const { cartItems, addItem, removeItem } = useCart();
   
-  // Check if domain protection is already in cart
-  const hasDomainProtection = cartItems.some(item => item.type === 'domain_protection');
+  // Get all domains in cart
+  const domainItems = cartItems.filter(item => item.type === 'domain');
+  const protectionItems = cartItems.filter(item => item.type === 'domain_protection');
   
-  // Check if there's at least one domain in cart
-  const hasDomainInCart = cartItems.some(item => item.type === 'domain');
+  if (domainItems.length === 0) return null;
   
-  if (!hasDomainInCart) return null;
-
-  const protectionService = {
-    id: 'domain-protection',
-    name: 'Proteção Total do Domínio',
-    type: 'domain_protection' as const,
-    description: 'Proteja seu domínio contra roubo, transferências não autorizadas e mantenha seus dados privados.',
-    price: 4800, // KZ 4.800,00
-    period: 'ano',
-    features: [
-      'Proteção contra roubo de domínio',
-      'Autenticação de dois fatores (2FA)',
-      'Anonimato do proprietário no WHOIS',
-      'Bloqueio de transferência automático',
-      'Monitoramento 24/7',
-      'Alertas de segurança em tempo real'
-    ]
-  };
+  // Calculate total protection needed
+  const totalProtectionNeeded = domainItems.reduce((total, domain) => {
+    const duration = domain.duration || 12;
+    const years = Math.ceil(duration / 12);
+    return total + (4800 * years); // Base price per year
+  }, 0);
 
   const handleToggleProtection = () => {
-    if (hasDomainProtection) {
-      const protectionItem = cartItems.find(item => item.type === 'domain_protection');
-      if (protectionItem) {
-        removeItem(protectionItem.id);
-      }
+    if (protectionItems.length > 0) {
+      // Remove all protection items
+      protectionItems.forEach(item => removeItem(item.id));
     } else {
-      addItem(protectionService, 1);
+      // Add protection for each domain with matching period
+      domainItems.forEach((domain, index) => {
+        const duration = domain.duration || 12;
+        const years = Math.ceil(duration / 12);
+        const protectionPrice = 4800 * years;
+        
+        const protectionService = {
+          id: `domain-protection-${domain.id}-${Date.now()}-${index}`,
+          name: `Proteção Total do Domínio (${domain.name})`,
+          type: 'domain_protection' as const,
+          description: `Proteja ${domain.name} contra roubo por ${years} ano${years > 1 ? 's' : ''}`,
+          price: protectionPrice,
+          period: `${years} ano${years > 1 ? 's' : ''}`,
+          domainId: domain.id,
+          domainName: domain.name,
+          features: [
+            'Proteção contra roubo de domínio',
+            'Autenticação de dois fatores (2FA)',
+            'Anonimato do proprietário no WHOIS',
+            'Bloqueio de transferência automático',
+            'Monitoramento 24/7',
+            'Alertas de segurança em tempo real'
+          ]
+        };
+        
+        addItem(protectionService, 1);
+      });
     }
   };
 
@@ -56,16 +68,25 @@ const DomainProtectionOption = () => {
           
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
-              <h3 className="font-semibold text-lg">{protectionService.name}</h3>
+              <h3 className="font-semibold text-lg">Proteção Total do Domínio</h3>
               <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
                 Recomendado
               </span>
             </div>
             
-            <p className="text-gray-600 mb-4">{protectionService.description}</p>
+            <p className="text-gray-600 mb-4">
+              Proteja {domainItems.length > 1 ? 'seus domínios' : 'seu domínio'} contra roubo, transferências não autorizadas e mantenha seus dados privados.
+            </p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
-              {protectionService.features.map((feature, index) => (
+              {[
+                'Proteção contra roubo de domínio',
+                'Autenticação de dois fatores (2FA)',
+                'Anonimato do proprietário no WHOIS',
+                'Bloqueio de transferência automático',
+                'Monitoramento 24/7',
+                'Alertas de segurança em tempo real'
+              ].map((feature, index) => (
                 <div key={index} className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
                   <span className="text-sm">{feature}</span>
@@ -73,20 +94,41 @@ const DomainProtectionOption = () => {
               ))}
             </div>
             
+            <div className="mb-4">
+              <h4 className="font-medium mb-2">Domínios no carrinho:</h4>
+              <div className="space-y-2">
+                {domainItems.map((domain) => {
+                  const duration = domain.duration || 12;
+                  const years = Math.ceil(duration / 12);
+                  const protectionPrice = 4800 * years;
+                  
+                  return (
+                    <div key={domain.id} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                      <div>
+                        <span className="font-medium">{domain.name}</span>
+                        <span className="text-sm text-gray-500 ml-2">({years} ano{years > 1 ? 's' : ''})</span>
+                      </div>
+                      <span className="text-sm font-medium">{formatPrice(protectionPrice)}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="text-2xl font-bold text-blue-600">
-                  {formatPrice(protectionService.price)}
+                  {formatPrice(totalProtectionNeeded)}
                 </span>
-                <span className="text-gray-500">/{protectionService.period}</span>
+                <span className="text-gray-500">total</span>
               </div>
               
               <Button 
                 onClick={handleToggleProtection}
-                variant={hasDomainProtection ? "outline" : "default"}
-                className={hasDomainProtection ? "border-blue-600 text-blue-600" : "bg-blue-600 hover:bg-blue-700"}
+                variant={protectionItems.length > 0 ? "outline" : "default"}
+                className={protectionItems.length > 0 ? "border-blue-600 text-blue-600" : "bg-blue-600 hover:bg-blue-700"}
               >
-                {hasDomainProtection ? (
+                {protectionItems.length > 0 ? (
                   <>
                     <Check className="mr-2 h-4 w-4" />
                     Adicionado

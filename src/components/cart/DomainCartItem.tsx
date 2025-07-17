@@ -47,7 +47,7 @@ const DomainCartItem: React.FC<DomainCartItemProps> = ({
         <Button 
           variant="ghost" 
           size="sm" 
-          className="text-gray-500 hover:text-red-500 mt-2"
+          className="text-red-500 hover:text-red-700 hover:bg-red-50 mt-2 border border-red-200 hover:border-red-300"
           onClick={() => handleRemoveItem(item.id)}
         >
           <Trash2 size={16} className="mr-1" />

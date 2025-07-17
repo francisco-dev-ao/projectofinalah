@@ -2,6 +2,7 @@
 // Adaptador para o SafeCartProvider
 import { useSimpleCart } from './SafeCartProvider';
 import { CartItem, DomainCheckResult, CartContextType } from './cart/types';
+import { calculateBulkDiscount } from './cart/cartUtils';
 import React from 'react';
 
 // Hook adaptador que fornece a mesma interface do antigo useCart
@@ -26,7 +27,7 @@ export const useCart = (): CartContextType => {
     isInCart: (id: string) => simpleCart.cartItems.some(item => item.id === id),
     
     // Estados adicionais com valores padrão
-    discount: 0,
+    discount: calculateBulkDiscount(simpleCart.cartItems),
     setDiscount: () => {}, // Função vazia para compatibilidade
     couponCode: '',
     setCouponCode: () => {}, // Função vazia para compatibilidade
