@@ -199,10 +199,6 @@ const HostingPlansSection = () => {
             <HostingPlanCard key={index} plan={plan} />
           ))}
         </div>
-        <p className="text-center text-sm text-gray-500 mt-8 max-w-2xl mx-auto">
-          * Domínio grátis disponível com pagamento anual antecipado. Todos os preços estão em Kwanzas (AOA) e incluem IVA.
-          Consulte os termos e condições para mais detalhes.
-        </p>
       </div>
     </section>
   );
