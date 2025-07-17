@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 interface CompanyInfo {
   name?: string;
   address?: string;
+  phone?: string;
 }
 
 interface NIFValidationResult {
@@ -15,7 +16,7 @@ interface NIFValidationResult {
 }
 
 // The base URL for the Angola tax authority API
-const API_BASE_URL = "https://consulta.edgarsingui.ao/public/consultar-por-nif";
+const API_BASE_URL = "https://api-nif.angohost.ao/consultar";
 
 /**
  * Validates a NIF (Angola Tax ID Number) using the official API
@@ -28,8 +29,8 @@ export const validateNIF = async (nif: string): Promise<NIFValidationResult> => 
   
   console.log('nifService: Validando NIF:', nif, 'Limpo:', cleanNIF);
   
-  // Basic validation check before sending to API
-  if (cleanNIF.length < 5) {
+  // Validação mais rigorosa: NIFs devem ter pelo menos 9 caracteres
+  if (cleanNIF.length < 9) {
     console.log('nifService: NIF muito curto:', cleanNIF.length);
     return { isValid: false, companyInfo: null };
   }
@@ -37,8 +38,8 @@ export const validateNIF = async (nif: string): Promise<NIFValidationResult> => 
   // Verificar se é um NIF pessoal (formato como 005732018NE040)
   const isPersonalNIF = /^\d{9}[A-Z]{2}\d{3}$/.test(cleanNIF);
   
-  // Verificar se é um NIF empresarial (9 ou 10 dígitos)
-  const isBusinessNIF = /^\d{9,10}$/.test(cleanNIF);
+  // Verificar se é um NIF empresarial (10 dígitos)
+  const isBusinessNIF = /^\d{10}$/.test(cleanNIF);
   
   // Verificar se é um NIF válido (pessoal ou empresarial)
   if (!isPersonalNIF && !isBusinessNIF) {
@@ -46,6 +47,12 @@ export const validateNIF = async (nif: string): Promise<NIFValidationResult> => 
     return { isValid: false, companyInfo: null };
   }
   
+  // Validação adicional: NIFs devem começar com números
+  if (!/^\d/.test(cleanNIF)) {
+    console.log('nifService: NIF não começa com número:', cleanNIF);
+    return { isValid: false, companyInfo: null };
+  }
+
   try {
     console.log('nifService: Consultando API para NIF:', cleanNIF, 'Tipo:', isPersonalNIF ? 'Pessoal' : 'Empresarial');
     // Make actual API call to the official NIF validation service
@@ -68,7 +75,8 @@ export const validateNIF = async (nif: string): Promise<NIFValidationResult> => 
         isValid: true,
         companyInfo: {
           name: responseData.nome || responseData.name || "",
-          address: responseData.endereco || responseData.address || ""
+          address: responseData.endereco || responseData.address || "",
+          phone: responseData.numero_contacto || responseData.phone || responseData.telefone || ""
         }
       };
     } else {

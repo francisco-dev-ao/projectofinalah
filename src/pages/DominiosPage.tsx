@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
+import { formatPrice } from '@/lib/utils';
+import { domainExtensions } from '@/data/domainPricing';
 
 const DominiosPage = () => {
   const navigate = useNavigate();
@@ -143,7 +145,7 @@ const DominiosPage = () => {
                     Estabeleça sua presença online com um domínio único e exclusivo.
                   </p>
                   <div className="mb-3 text-[16px] text-[#495057]">
-                    Por apenas <span className="font-bold text-[18px] text-[#1f1f1f]">KZ 5.000,00</span> <span className="font-normal">/ano</span>
+                    Por apenas <span className="font-bold text-[18px] text-[#1f1f1f]">{formatPrice(domainExtensions.find(ext => ext.name === '.it.ao')?.price || 5000)}</span> <span className="font-normal">/ano</span>
                   </div>
                   <Button 
                     className="bg-[#0D1F63] hover:bg-[#13297a] transition text-white px-5 py-2 rounded-[4px] min-w-[100px] font-semibold shadow text-[15px]"

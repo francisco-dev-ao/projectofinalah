@@ -60,17 +60,17 @@ const Navbar = () => {
           <Link
             to="/hospedagem"
             className={cn(
-              "px-3 py-2 rounded-md text-sm font-medium transition-colors",
-              isActive('/hospedagem') ? "bg-white shadow text-primary" : "text-muted-foreground hover:bg-muted"
+              "px-3 py-2 rounded-md text-sm font-medium transition-colors border-b-2",
+              isActive('/hospedagem') ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-primary"
             )}
           >
-            Alojamento web
+            Hospedagem
           </Link>
           <Link
             to="/dominios"
             className={cn(
-              "px-3 py-2 rounded-md text-sm font-medium transition-colors",
-              isActive('/dominios') ? "bg-white shadow text-primary" : "text-muted-foreground hover:bg-muted"
+              "px-3 py-2 rounded-md text-sm font-medium transition-colors border-b-2",
+              isActive('/dominios') ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-primary"
             )}
           >
             Registrar Domínios
@@ -78,8 +78,8 @@ const Navbar = () => {
           <Link
             to="/email"
             className={cn(
-              "px-3 py-2 rounded-md text-sm font-medium transition-colors",
-              isActive('/email') ? "bg-white shadow text-primary" : "text-muted-foreground hover:bg-muted"
+              "px-3 py-2 rounded-md text-sm font-medium transition-colors border-b-2",
+              isActive('/email') ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-primary"
             )}
           >
             Email Corporativo
@@ -87,8 +87,8 @@ const Navbar = () => {
           <Link
             to="/contacto"
             className={cn(
-              "px-3 py-2 rounded-md text-sm font-medium transition-colors",
-              isActive('/contacto') ? "bg-white shadow text-primary" : "text-muted-foreground hover:bg-muted"
+              "px-3 py-2 rounded-md text-sm font-medium transition-colors border-b-2",
+              isActive('/contacto') ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-primary"
             )}
           >
             Contacto
@@ -176,7 +176,7 @@ const Navbar = () => {
             className="block py-2 text-sm font-medium hover:text-primary"
             onClick={toggleMenu}
           >
-            Alojamento web
+            Hospedagem
           </Link>
           <Link
             to="/email"

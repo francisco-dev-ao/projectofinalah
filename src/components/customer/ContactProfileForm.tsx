@@ -89,10 +89,20 @@ const ContactProfileForm = ({ onSubmit, onCancel, initialData, isEdit = false }:
   const handleNIFBlurEvent = async (e: React.FocusEvent<HTMLInputElement>) => {
     const nif = e.target.value.trim();
     if (nif) {
-      const companyName = await handleNIFBlur(nif);
-      if (companyName) {
-        form.setValue('name', companyName);
-        form.setValue('domainOwnerName', companyName);
+      const companyInfo = await handleNIFBlur(nif);
+      if (companyInfo) {
+        if (companyInfo.name) {
+          form.setValue('name', companyInfo.name);
+          form.setValue('domainOwnerName', companyInfo.name);
+        }
+        if (companyInfo.address) {
+          form.setValue('address', companyInfo.address);
+        }
+        if (companyInfo.phone) {
+          // Limpar o telefone para manter apenas números
+          const cleanPhone = companyInfo.phone.replace(/\D/g, '');
+          form.setValue('phone', cleanPhone);
+        }
       }
     }
   };
@@ -177,11 +187,52 @@ const ContactProfileForm = ({ onSubmit, onCancel, initialData, isEdit = false }:
                       <Input 
                         placeholder="NIF empresarial (9-10 dígitos) ou pessoal (ex: 005732018NE040)" 
                         {...field} 
+                        onChange={(e) => {
+                          // Validação mais rigorosa: NIFs devem sempre começar com números
+                          let value = e.target.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+                          
+                          // Se começar com letra, não permitir
+                          if (value.length > 0 && !/^\d/.test(value)) {
+                            value = value.replace(/^[A-Z]+/, '');
+                          }
+                          
+                          // Para NIFs pessoais, permitir letras apenas após 9 dígitos
+                          if (value.length > 9) {
+                            // Extrair os primeiros 9 caracteres (devem ser números)
+                            const firstNine = value.substring(0, 9);
+                            const rest = value.substring(9);
+                            
+                            // Se os primeiros 9 não são todos números, corrigir
+                            if (!/^\d{9}$/.test(firstNine)) {
+                              value = firstNine.replace(/[^0-9]/g, '') + rest;
+                            }
+                            
+                            // Depois dos primeiros 9 dígitos, permitir até 2 letras seguidas de números
+                            if (rest.length > 0) {
+                              // Permitir no máximo 2 letras após os 9 dígitos
+                              const letters = rest.match(/^[A-Z]{0,2}/);
+                              const afterLetters = rest.substring(letters ? letters[0].length : 0);
+                              const numbers = afterLetters.replace(/[^0-9]/g, '');
+                              
+                              value = firstNine + (letters ? letters[0] : '') + numbers;
+                            }
+                          } else {
+                            // Para os primeiros 9 caracteres, apenas números
+                            value = value.replace(/[^0-9]/g, '');
+                          }
+                          
+                          // Limitar o tamanho total
+                          if (value.length > 14) {
+                            value = value.substring(0, 14);
+                          }
+                          
+                          field.onChange(value);
+                        }}
                         onBlur={handleNIFBlurEvent}
                       />
                     </FormControl>
                     <FormDescription>
-                      Para NIFs empresariais use 9-10 dígitos. Para NIFs pessoais use o formato completo (ex: 005732018NE040)
+                      NIFs devem começar com números. Empresarial: apenas números. Pessoal: 9 números + 2 letras + 3 números (ex: 006887386BE049)
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -243,8 +294,17 @@ const ContactProfileForm = ({ onSubmit, onCancel, initialData, isEdit = false }:
                 <FormItem>
                   <FormLabel>Nome do titular do domínio</FormLabel>
                   <FormControl>
-                    <Input placeholder="Nome completo do titular" {...field} />
+                    <Input 
+                      placeholder="Nome será preenchido automaticamente após validação do NIF" 
+                      {...field} 
+                      disabled={true} // Sempre ineditável
+                      readOnly={true} // Garantir que é apenas leitura
+                      className="bg-gray-50"
+                    />
                   </FormControl>
+                  <FormDescription>
+                    Este campo é preenchido automaticamente após a validação do NIF.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -273,6 +333,7 @@ const ContactProfileForm = ({ onSubmit, onCancel, initialData, isEdit = false }:
                   <FormControl>
                     <Input placeholder="+244 XXX XXX XXX" {...field} />
                   </FormControl>
+                  <p className="text-xs text-muted-foreground">Pode ser preenchido automaticamente pela validação do NIF.</p>
                   <FormMessage />
                 </FormItem>
               )}

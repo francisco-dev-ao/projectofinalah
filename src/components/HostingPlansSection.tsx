@@ -1,6 +1,6 @@
 
 import { useState, useTransition } from "react";
-import { Check } from "lucide-react";
+import { Check, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
@@ -104,10 +104,10 @@ const HostingPlanCard = ({ plan }: { plan: HostingPlan }) => {
 
   // Define color styles based on plan color
   const cardStyles = {
-    "blue": "border-blue-500 hover:border-blue-600",
-    "yellow": "border-accent hover:border-accent/80",
-    "purple": "border-purple-500 hover:border-purple-400",
-    "default": "border-gray-200 hover:border-gray-300"
+    blue: "border-[#27374] hover:border-[#1b2951]",
+    yellow: "border-[#27374] hover:border-[#1951]",
+    purple: "border-[#27374] hover:border-[#1b2951]",
+    default: "border-[#27374] hover:border-[#1b2951]"
   };
 
   const buttonStyles = {
@@ -128,7 +128,7 @@ const HostingPlanCard = ({ plan }: { plan: HostingPlan }) => {
     : buttonStyles.default;
 
   return (
-    <Card className={`flex flex-col h-full ${colorStyle} ${plan.recommended ? 'border-2 shadow-lg' : 'border'} ${cardHoverStyle} relative`}>
+    <Card className={`flex flex-col h-full border border-[#273d74] ${plan.recommended ? 'border-2 shadow-lg' : ''} ${cardHoverStyle} relative`}>
       {plan.recommended && (
         <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-accent text-black px-4 py-1 rounded-full text-sm font-medium">
           Recomendado
@@ -162,7 +162,7 @@ const HostingPlanCard = ({ plan }: { plan: HostingPlan }) => {
         <div className="border-t border-b py-4 space-y-2">
           {plan.features.map((feature, index) => (
             <div key={index} className="flex items-start gap-2">
-              <Check className="text-green-500 mt-0.5 shrink-0" size={18} />
+              <CheckCircle className="text-green-500 mt-0.5 shrink-0" size={18} />
               <span className="text-sm">{feature}</span>
             </div>
           ))}

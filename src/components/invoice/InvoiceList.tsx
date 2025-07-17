@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { formatDateTime } from "@/lib/utils";
+import { formatDateTime, formatPrice } from "@/lib/utils";
 import { toast } from "sonner";
 import { Eye, Download } from "lucide-react";
 
@@ -143,11 +143,7 @@ const InvoiceList: React.FC = () => {
                     <td className="py-3">{formatDateTime(invoice.created_at)}</td>
                     <td className="py-3">{formatDateTime(invoice.due_date)}</td>
                     <td className="py-3">
-                      KZ {new Intl.NumberFormat('pt-PT', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                        useGrouping: true
-                      }).format(invoice.total_amount || 0)}
+                      {formatPrice(invoice.total_amount || 0)}
                     </td>
                     <td className="py-3">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusClassName(invoice.status)}`}>

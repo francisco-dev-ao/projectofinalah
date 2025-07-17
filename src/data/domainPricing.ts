@@ -1,12 +1,17 @@
-
-export interface DomainExtension {
+// Interface original
+export interface DomainExtension { 
   name: string;
   price: number;
   renewalPrice: number;
   description: string;
 }
 
-// Updated domain pricing data with registration and renewal prices
+// Função de formatação (35.000)
+export function formatKz(value: number): string {
+  return value.toLocaleString('pt-PT'); // ex: 35000 → "35.000"
+}
+
+// Dados dos domínios com preços numéricos
 export const domainExtensions: DomainExtension[] = [
   {
     name: ".ao",
@@ -40,11 +45,19 @@ export const domainExtensions: DomainExtension[] = [
   }
 ];
 
-// Map for quick lookups by extension name
-export const domainPriceMap: Record<string, {price: number, renewalPrice: number}> = domainExtensions.reduce((acc, domain) => {
-  acc[domain.name] = {
-    price: domain.price,
-    renewalPrice: domain.renewalPrice
-  };
-  return acc;
-}, {} as Record<string, {price: number, renewalPrice: number}>);
+// Versão formatada para exibição (preço como string formatada)
+export const formattedDomainExtensions = domainExtensions.map(domain => ({
+  ...domain,
+  priceFormatted: formatKz(domain.price),
+  renewalPriceFormatted: formatKz(domain.renewalPrice)
+}));
+
+// Map para consulta rápida com valores numéricos
+export const domainPriceMap: Record<string, { price: number; renewalPrice: number }> =
+  domainExtensions.reduce((acc, domain) => {
+    acc[domain.name] = {
+      price: domain.price,
+      renewalPrice: domain.renewalPrice
+    };
+    return acc;
+  }, {} as Record<string, { price: number; renewalPrice: number }>);

@@ -8,6 +8,7 @@ import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Loader2, ChevronLeft } from 'lucide-react';
 import { PrintReferenceButton } from '@/components/invoice/PrintReferenceButton';
+import { formatPrice } from '@/lib/utils';
 
 export default function InvoiceDetails() {
   const { id } = useParams();
@@ -139,8 +140,8 @@ export default function InvoiceDetails() {
                   <td className="px-6 py-4">{item.name}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{item.description || '-'}</td>
                   <td className="px-6 py-4">{item.quantity}</td>
-                  <td className="px-6 py-4 text-right">KZ {new Intl.NumberFormat('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: true }).format(item.unit_price)}</td>
-                  <td className="px-6 py-4 text-right">KZ {new Intl.NumberFormat('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: true }).format(item.unit_price * item.quantity)}</td>
+                  <td className="px-6 py-4 text-right">{formatPrice(item.unit_price)}</td>
+                  <td className="px-6 py-4 text-right">{formatPrice(item.unit_price * item.quantity)}</td>
                 </tr>
               ))}
             </tbody>
@@ -148,7 +149,7 @@ export default function InvoiceDetails() {
               <tr>
                 <td colSpan={4} className="px-6 py-3 text-right font-semibold">Total</td>
                 <td className="px-6 py-3 text-right font-semibold">
-                  KZ {new Intl.NumberFormat('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: true }).format(invoice.amount || 0)}
+                  {formatPrice(invoice.amount || 0)}
                 </td>
               </tr>
             </tfoot>

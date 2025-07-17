@@ -11,6 +11,7 @@ import { PrintReferenceButton } from './PrintReferenceButton';
 import { toast } from 'sonner';
 import { getInvoiceItems } from '@/utils/invoice/getInvoiceItems';
 import axios from 'axios';
+import { formatPrice } from '@/lib/utils';
 
 // Define interface for invoice items that matches the component needs
 interface InvoiceItemLocal {
@@ -226,8 +227,8 @@ export default function InvoiceView({ invoiceId }: InvoiceViewProps) {
                     </div>
                   </td>
                   <td className="px-4 py-3 text-center">{item.quantity}</td>
-                  <td className="px-4 py-3 text-right">KZ {item.unit_price.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}</td>
-                  <td className="px-4 py-3 text-right font-medium">KZ {item.total_price.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}</td>
+                  <td className="px-4 py-3 text-right">{formatPrice(item.unit_price)}</td>
+                  <td className="px-4 py-3 text-right font-medium">{formatPrice(item.total_price)}</td>
                 </tr>
               ))}
             </tbody>
@@ -239,12 +240,12 @@ export default function InvoiceView({ invoiceId }: InvoiceViewProps) {
           <div className="w-64">
             <div className="flex justify-between py-2">
               <span>Subtotal:</span>
-              <span>KZ {(invoice.amount || 0).toLocaleString('pt-PT', { minimumFractionDigits: 2 })}</span>
+              <span>{formatPrice(invoice.amount || 0)}</span>
             </div>
             <Separator />
             <div className="flex justify-between py-2 font-bold text-lg">
               <span>Total:</span>
-              <span>KZ {(invoice.amount || 0).toLocaleString('pt-PT', { minimumFractionDigits: 2 })}</span>
+              <span>{formatPrice(invoice.amount || 0)}</span>
             </div>
           </div>
         </div>
@@ -256,7 +257,7 @@ export default function InvoiceView({ invoiceId }: InvoiceViewProps) {
             <div className="text-sm text-gray-600">
               <p><strong>Entidade:</strong> {invoice.orders.payment_references[0].entity}</p>
               <p><strong>Referência:</strong> {invoice.orders.payment_references[0].reference}</p>
-              <p><strong>Valor:</strong> KZ {(invoice.amount || 0).toLocaleString('pt-PT', { minimumFractionDigits: 2 })}</p>
+              <p><strong>Valor:</strong> {formatPrice(invoice.amount || 0)}</p>
               <p className="mt-2 text-xs">Pagamento via ATM, Internet Banking ou Multicaixa Express</p>
             </div>
           </div>

@@ -61,10 +61,12 @@ const HeroSection = () => {
       {/* Carrossel de fundo */}
       <div
         className="absolute inset-0 w-full h-full bg-cover transition-all duration-1000"
-        style={{ backgroundImage: `url(${slide.imagem})`, backgroundPosition: 'center 20%' }}
+        style={{ backgroundImage: `url(${slide.imagem})`, backgroundPosition: 'center 26%', transform: 'scaleX(-1)' }}
       >
         {/* Gradiente preto no lado esquerdo para legibilidade do texto */}
         <div className="absolute inset-0 pointer-events-none" style={{background: 'linear-gradient(90deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 25%)'}}></div>
+        {/* Gradiente preto no lado direito para legibilidade do texto */}
+        <div className="absolute inset-0 pointer-events-none" style={{background: 'linear-gradient(270deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 60%)'}}></div>
       </div>
       {/* Conteúdo do Hero */}
       <div className="relative z-10 w-full max-w-5xl pl-8 md:pl-16 lg:pl-24 flex flex-col items-start justify-center min-h-[600px]">
@@ -75,7 +77,7 @@ const HeroSection = () => {
           {slide.descricao}
         </p>
         <button
-          className="bg-blue-400 hover:bg-blue-500 text-black font-semibold px-8 py-3 rounded-lg shadow transition-all duration-150 mb-8 focus:outline-none focus:ring-2 focus:ring-[#fabb05]/40 focus:ring-offset-2 active:scale-95"
+          className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-8 py-3 rounded-lg shadow transition-all duration-150 mb-8 focus:outline-none focus:ring-2 focus:ring-[#fabb05]/40 focus:ring-offset-2 active:scale-95"
           onClick={() => slide.botao.onClick(navigate)}
           style={{fontFamily: 'Montserrat, sans-serif'}}
         >

@@ -11,6 +11,7 @@ import { checkPendingInvoices } from "@/services/wallet/paymentWebhookHandler";
 import { toast } from "sonner";
 import { useAuth } from '@/contexts/AuthContext';
 import { RpcReturnTypes } from "@/types/supabase";
+import { formatPrice } from '@/lib/utils';
 
 interface WalletBalanceProps {
   wallet: Wallet | null;
@@ -115,7 +116,7 @@ const WalletBalance = ({ wallet, isLoading, onDeposit }: WalletBalanceProps) => 
                   <Skeleton className="h-8 w-36" />
                 ) : (
                   <p className="text-3xl font-bold">
-                    KZ {new Intl.NumberFormat('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: true }).format(wallet?.balance || 0)}
+                    {formatPrice(wallet?.balance || 0)}
                   </p>
                 )}
               </div>
@@ -127,7 +128,7 @@ const WalletBalance = ({ wallet, isLoading, onDeposit }: WalletBalanceProps) => 
                   {pendingDeposits.count} {pendingDeposits.count === 1 ? 'depósito' : 'depósitos'} pendente
                 </p>
                 <p className="text-xs text-yellow-700">
-                  Total: KZ {new Intl.NumberFormat('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: true }).format(pendingDeposits.amount)}
+                  Total: {formatPrice(pendingDeposits.amount)}
                 </p>
                 <Button 
                   variant="outline" 

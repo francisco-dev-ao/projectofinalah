@@ -64,7 +64,21 @@ const CustomerFiscalData = () => {
 
   // NIF validation handler
   const handleNIFValidation = async (nif: string) => {
-    if (nif.length < 5) return;
+    // Só validar se o NIF tiver tamanho mínimo para ser válido
+    if (!nif || nif.length < 9) {
+      console.log('CustomerFiscalData: NIF muito curto para validação:', nif.length);
+      return;
+    }
+    
+    // Verificar formato válido antes de chamar API
+    const isPersonalNIF = /^\d{9}[A-Z]{2}\d{3}$/.test(nif);
+    const isBusinessNIF = /^\d{10}$/.test(nif); // Empresas devem ter 10 dígitos
+    
+    if (!isPersonalNIF && !isBusinessNIF) {
+      console.log('CustomerFiscalData: Formato de NIF inválido, não fazendo chamada AJAX:', nif);
+      toast.error("Formato de NIF inválido. Empresa: 10 dígitos. Pessoa: 9 números + 2 letras + 3 números.");
+      return;
+    }
     
     setIsNifValidating(true);
     
@@ -78,10 +92,33 @@ const CustomerFiscalData = () => {
           fiscalForm.setValue('companyAddress', result.companyInfo.address);
         }
         
-        toast.success("NIF válido");
+        // Preencher telefone de faturação se disponível na API, mas permitir edição
+        if (result.companyInfo.phone) {
+          console.log('CustomerFiscalData: Preenchendo telefone da API:', result.companyInfo.phone);
+          // Limpar o telefone para manter apenas números
+          const cleanPhone = result.companyInfo.phone.replace(/\D/g, '');
+          fiscalForm.setValue('phoneInvoice', cleanPhone);
+        }
+        
+        // Mensagem de sucesso específica baseada nos dados preenchidos
+        const filledFields = [];
+        if (result.companyInfo.name) filledFields.push("nome");
+        if (result.companyInfo.address) filledFields.push("endereço");
+        if (result.companyInfo.phone) filledFields.push("telefone");
+        
+        if (filledFields.length > 0) {
+          toast.success(`Dados preenchidos automaticamente: ${filledFields.join(", ")}. O telefone pode ser editado se necessário.`);
+        } else {
+          toast.success("NIF válido");
+        }
+      } else {
+        // Disparar erro em tempo real quando NIF não encontrar informações na API
+        toast.error("NIF não encontrado na base de dados da API. Verifique se o número está correto.");
       }
     } catch (error) {
       console.error('Error validating NIF:', error);
+      // Disparar erro em tempo real para problemas de API
+      toast.error("Erro ao consultar NIF na API. Tente novamente em alguns instantes.");
     } finally {
       setIsNifValidating(false);
     }
@@ -90,7 +127,21 @@ const CustomerFiscalData = () => {
   // Validação automática do NIF quando o usuário terminar de digitar
   const handleNIFBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
     const nif = e.target.value.trim();
-    if (nif && nif.length >= 5) {
+    
+    // Se o campo não está vazio mas tem menos de 9 caracteres, mostrar erro
+    if (nif && nif.length > 0 && nif.length < 9) {
+      toast.error(`NIF incompleto. Por favor, complete os dígitos (mínimo 9 caracteres). Atual: ${nif.length} dígitos.`);
+      return;
+    }
+    
+    // Se parece ser NIF empresarial (só números) mas não tem 10 dígitos, mostrar erro específico
+    if (nif && /^\d+$/.test(nif) && nif.length > 0 && nif.length < 10) {
+      toast.error(`NIF empresarial incompleto. Empresas devem ter 10 dígitos. Atual: ${nif.length} dígitos.`);
+      return;
+    }
+    
+    // Só validar se o NIF tiver tamanho mínimo para ser válido
+    if (nif && nif.length >= 9) {
       await handleNIFValidation(nif);
     }
   };
@@ -146,14 +197,52 @@ const CustomerFiscalData = () => {
                           placeholder="NIF empresarial (9-10 dígitos) ou pessoal (ex: 005732018NE040)"
                           {...field} 
                           onChange={(e) => {
-                            field.onChange(e);
-                            handleNIFValidation(e.target.value);
+                            // Validação mais rigorosa: NIFs devem sempre começar com números
+                            let value = e.target.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+                            
+                            // Se começar com letra, não permitir
+                            if (value.length > 0 && !/^\d/.test(value)) {
+                              value = value.replace(/^[A-Z]+/, '');
+                            }
+                            
+                            // Para NIFs pessoais, permitir letras apenas após 9 dígitos
+                            if (value.length > 9) {
+                              // Extrair os primeiros 9 caracteres (devem ser números)
+                              const firstNine = value.substring(0, 9);
+                              const rest = value.substring(9);
+                              
+                              // Se os primeiros 9 não são todos números, corrigir
+                              if (!/^\d{9}$/.test(firstNine)) {
+                                value = firstNine.replace(/[^0-9]/g, '') + rest;
+                              }
+                              
+                              // Depois dos primeiros 9 dígitos, permitir até 2 letras seguidas de números
+                              if (rest.length > 0) {
+                                // Permitir no máximo 2 letras após os 9 dígitos
+                                const letters = rest.match(/^[A-Z]{0,2}/);
+                                const afterLetters = rest.substring(letters ? letters[0].length : 0);
+                                const numbers = afterLetters.replace(/[^0-9]/g, '');
+                                
+                                value = firstNine + (letters ? letters[0] : '') + numbers;
+                              }
+                            } else {
+                              // Para os primeiros 9 caracteres, apenas números
+                              value = value.replace(/[^0-9]/g, '');
+                            }
+                            
+                            // Limitar o tamanho total
+                            if (value.length > 14) {
+                              value = value.substring(0, 14);
+                            }
+                            
+                            field.onChange(value);
+                            handleNIFValidation(value);
                           }} 
                           onBlur={handleNIFBlur}
                         />
                       </FormControl>
                       <FormDescription>
-                        Para NIFs empresariais use 9-10 dígitos. Para NIFs pessoais use o formato completo.
+                        NIFs devem começar com números. Empresarial: apenas números. Pessoal: 9 números + 2 letras + 3 números.
                         {isNifValidating && " Validando NIF..."}
                       </FormDescription>
                       <FormMessage />
@@ -167,8 +256,17 @@ const CustomerFiscalData = () => {
                     <FormItem>
                       <FormLabel>Nome da Empresa</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input 
+                          {...field} 
+                          disabled={true} // Sempre ineditável
+                          readOnly={true} // Garantir que é apenas leitura
+                          placeholder="Nome será preenchido automaticamente após validação do NIF"
+                          className="bg-gray-50"
+                        />
                       </FormControl>
+                      <FormDescription>
+                        Este campo é preenchido automaticamente após a validação do NIF.
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -223,6 +321,7 @@ const CustomerFiscalData = () => {
                       <FormControl>
                         <Input {...field} placeholder="Telefone para contato de faturação" />
                       </FormControl>
+                      <p className="text-xs text-muted-foreground">Pode ser preenchido automaticamente pela validação do NIF.</p>
                       <FormMessage />
                     </FormItem>
                   )}

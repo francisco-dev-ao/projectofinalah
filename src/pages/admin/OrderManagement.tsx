@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from "@/components/ui/table";
-import { AlertTriangle, RefreshCw } from "lucide-react";
+import { AlertTriangle, RefreshCw, Trash2, CheckCircle, XCircle, Mail } from "lucide-react";
 import OrderDetailsDialog from "@/components/admin/OrderDetailsDialog";
 import PaymentDialog from "@/components/admin/PaymentDialog";
 import InvoiceDialog from "@/components/admin/InvoiceDialog";
@@ -17,6 +17,7 @@ import { formatPrice } from "@/lib/utils";
 import { getAllOrders, formatOrderStatus, getOrder, updateOrderStatus } from "@/services/orderService";
 import { OrderStatus } from "@/types/order";
 import { formatDate } from "@/components/admin/order-details/OrderDetailsUtils";
+import { supabase } from "@/integrations/supabase/client";
 
 const OrderManagement = () => {
   const [orders, setOrders] = useState<any[]>([]);
@@ -158,6 +159,36 @@ const OrderManagement = () => {
     loadOrders(); // Refresh orders to reflect new invoice
   };
 
+  const handleApproveOrder = async (orderId: string) => {
+    await handleStatusUpdate(orderId, "approved");
+    // Aqui pode-se disparar notificação por e-mail se desejado
+  };
+
+  const handleRejectOrder = async (orderId: string) => {
+    await handleStatusUpdate(orderId, "rejected");
+    // Aqui pode-se disparar notificação por e-mail se desejado
+  };
+
+  const handleDeleteOrder = async (orderId: string) => {
+    try {
+      setLoading(true);
+      const { error } = await supabase
+        .from("orders")
+        .delete()
+        .eq("id", orderId);
+      if (error) {
+        toast.error("Erro ao eliminar pedido");
+      } else {
+        toast.success("Pedido eliminado com sucesso");
+        loadOrders();
+      }
+    } catch (error) {
+      toast.error("Erro ao eliminar pedido");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Get badge variant based on status
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -253,6 +284,7 @@ const OrderManagement = () => {
                 <TableRow>
                   <TableHead>Número do Pedido</TableHead>
                   <TableHead>Cliente</TableHead>
+                  <TableHead>Tipo de Serviço</TableHead>
                   <TableHead>Data do Pedido</TableHead>
                   <TableHead>Total</TableHead>
                   <TableHead>Status</TableHead>
@@ -260,32 +292,55 @@ const OrderManagement = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredOrders.map((order) => (
-                  <TableRow key={order.id}>
-                    <TableCell>{order.id.substring(0, 8)}</TableCell>
-                    <TableCell>{order.profiles?.name || "N/A"}</TableCell>
-                    <TableCell>{formatDate(order.created_at)}</TableCell>
-                    <TableCell>{formatPrice(order.total_amount)}</TableCell>
-                    <TableCell>
-                      <Badge variant={getStatusBadge(order.status)} className="px-3 py-1 text-sm">
-                        {formatOrderStatus(order.status)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button variant="secondary" size="sm" onClick={() => handleOpenOrderDetails(order.id)}>
-                          Ver Detalhes
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleOpenPaymentDialog(order.id)}>
-                          Pagamento
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleOpenInvoiceDialog(order.id)}>
-                          Fatura
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {filteredOrders.map((order) => {
+                  const tipoServico = order.order_items && order.order_items.length > 0
+                    ? order.order_items.map((item: any) => item.name).join(", ")
+                    : "-";
+                  return (
+                    <TableRow key={order.id}>
+                      <TableCell>{order.id.substring(0, 8)}</TableCell>
+                      <TableCell>{order.profiles?.name || "N/A"}</TableCell>
+                      <TableCell>{tipoServico}</TableCell>
+                      <TableCell>{formatDate(order.created_at)}</TableCell>
+                      <TableCell>{formatPrice(order.total_amount)}</TableCell>
+                      <TableCell>
+                        <Badge variant={getStatusBadge(order.status)} className="px-3 py-1 text-sm">
+                          {formatOrderStatus(order.status)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button variant="secondary" size="sm" onClick={() => handleOpenOrderDetails(order.id)}>
+                            Ver Detalhes
+                          </Button>
+                          <Button variant="outline" size="sm" onClick={() => handleOpenPaymentDialog(order.id)}>
+                            Pagamento
+                          </Button>
+                          <Button variant="outline" size="sm" onClick={() => handleOpenInvoiceDialog(order.id)}>
+                            Fatura
+                          </Button>
+                          {order.status === "pending" && (
+                            <>
+                              <Button variant="default" size="sm" onClick={() => handleApproveOrder(order.id)} title="Aprovar">
+                                <CheckCircle className="h-4 w-4" />
+                              </Button>
+                              <Button variant="destructive" size="sm" onClick={() => handleRejectOrder(order.id)} title="Rejeitar">
+                                <XCircle className="h-4 w-4" />
+                              </Button>
+                            </>
+                          )}
+                          <Button variant="outline" size="sm" onClick={() => handleDeleteOrder(order.id)} title="Eliminar">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                          {/* Opcional: botão para enviar notificação por e-mail */}
+                          {/* <Button variant="outline" size="sm" onClick={() => handleSendEmail(order.id)} title="Notificar por e-mail">
+                            <Mail className="h-4 w-4" />
+                          </Button> */}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </div>

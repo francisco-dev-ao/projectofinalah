@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { sendPaymentReferenceEmail } from '@/services/paymentReferencePdfService';
+import { formatPrice } from '@/lib/utils';
 // Print reference system removed
 
 interface PaymentReference {
@@ -667,7 +668,7 @@ export const AppyPayReferenceModal = ({
                   </div>
                   <div class="reference-item amount-highlight">
                     <div class="item-label" style="color: rgba(255,255,255,0.9); margin-bottom: 5px;">Valor a Pagar</div>
-                     <div class="item-value">KZ ${paymentReference.amount.toLocaleString('pt-AO').replace(/,/g, '.')}</div>
+                     <div class="item-value">{formatPrice(paymentReference.amount)}</div>
                   </div>
                   <div class="reference-item">
                     <div class="item-label">Descrição</div>
@@ -731,7 +732,7 @@ export const AppyPayReferenceModal = ({
                     </li>
                     <li class="instruction-item">
                       <div class="step-number">5</div>
-                      <div>Confirme o valor: <strong>KZ ${paymentReference.amount.toLocaleString('pt-AO').replace(/,/g, '.')}</strong></div>
+                      <div>Confirme o valor: <strong>${formatPrice(paymentReference.amount)}</strong></div>
                     </li>
                     <li class="instruction-item">
                       <div class="step-number">6</div>
@@ -1030,7 +1031,7 @@ export const AppyPayReferenceModal = ({
                   <div className="flex-1">
                     <p className="text-sm font-medium text-green-600 mb-1">Valor</p>
                      <p className="text-2xl font-bold text-green-800">
-                       KZ {paymentReference.amount.toLocaleString('pt-AO').replace(/,/g, '.')}
+                       {formatPrice(paymentReference.amount)}
                      </p>
                   </div>
                   <Button

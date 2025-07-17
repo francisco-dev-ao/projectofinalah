@@ -1,6 +1,7 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import HostingPlansSection from "../components/HostingPlansSection";
+import { CheckCircle } from "lucide-react";
 
 const HospedagemPage = () => {
   return (
@@ -39,7 +40,7 @@ const HospedagemPage = () => {
               </p>
               <ul className="space-y-3 mb-4">
                 <li className="flex items-start gap-2">
-                  <span className="text-green-600 mt-1">✓</span>
+                  <CheckCircle className="text-green-600 mt-1 shrink-0" size={18} />
                   <span>
                     Uptime garantido de 99.9% para o seu site nunca sair do ar
                   </span>
@@ -50,7 +51,7 @@ const HospedagemPage = () => {
             </div>
             {/* Espaço para imagem à direita */}
             <div className="flex-1 flex justify-center">
-              <div className="w-full max-w-md aspect-video bg-[#eaf0fa] rounded-xl flex items-center justify-center shadow-inner border border-[#dbeafe]">
+              <div className="w-full max-w-md aspect-video bg-[#eaf0fa] rounded-xl flex items-start justify-center shadow-inner border border-[#dbeafe]">
                 <img
                   src="/equipe.png"
                   alt="Equipe AngoHost"

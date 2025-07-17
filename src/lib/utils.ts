@@ -7,15 +7,15 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
- * Padroniza valores monetários como "KZ 35.000,00"
+ * Padroniza valores monetários como "25.000 Kz"
  */
 export function formatCurrency(
   value: number | string | null | undefined,
-  currency = "KZ"
+  currency = "Kz"
 ): string {
   // Handle null, undefined ou string vazia
   if (value === null || value === undefined || value === "") {
-    return `${currency} 0,00`;
+    return `0 Kz`;
   }
 
   let numValue =
@@ -27,14 +27,14 @@ export function formatCurrency(
     numValue = 0;
   }
 
-  // Formatação pt-PT: ponto para milhar, vírgula para decimal, sempre duas casas
+  // Formatação: ponto para milhar, sem casas decimais
   const formatted = new Intl.NumberFormat("pt-PT", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
     useGrouping: true,
   }).format(numValue);
 
-  return `${currency} ${formatted}`;
+  return `${formatted} Kz`;
 }
 
 /**

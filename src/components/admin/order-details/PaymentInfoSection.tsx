@@ -58,10 +58,6 @@ const PaymentInfoSection = ({
                 <span className="font-medium">Método:</span>
                 <span>
                   {payment.method === "multicaixa" && "Multicaixa Express"}
-                  {payment.method === "bank_transfer" && "Transferência Bancária"}
-                  {payment.method === "credit_card" && "Cartão de Crédito"}
-                  {payment.method === "transfer" && "Transferência Bancária"}
-                  {payment.method === "cash" && "Dinheiro"}
                 </span>
               </div>
               <div className="flex justify-between">

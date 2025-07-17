@@ -18,12 +18,6 @@ const PAYMENT_METHODS = [
     name: "Multicaixa Express",
     status: "active",
     description: "Pagamento instantâneo via Multicaixa Express",
-  },
-  {
-    id: "bank_transfer",
-    name: "Transferência Bancária",
-    status: "active",
-    description: "Transferência para conta bancária da empresa",
   }
 ];
 
@@ -47,15 +41,6 @@ const PaymentsPage = () => {
             status: "completed",
             customer: "Cliente Exemplo",
             reference: "MCX123456789"
-          },
-          {
-            id: "pay_2", 
-            method: "bank_transfer",
-            amount: 45000,
-            created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-            status: "completed",
-            customer: "Empresa ABC",
-            reference: "TRF987654321"
           }
         ]);
         setLoadingPayments(false);
@@ -167,9 +152,7 @@ const PaymentsPage = () => {
                         <TableCell className="font-medium">{payment.id}</TableCell>
                         <TableCell>{payment.customer}</TableCell>
                         <TableCell>
-                          {payment.method === "multicaixa" 
-                            ? "Multicaixa Express" 
-                            : "Transferência Bancária"}
+                          Multicaixa Express
                         </TableCell>
                         <TableCell>{payment.reference}</TableCell>
                         <TableCell>

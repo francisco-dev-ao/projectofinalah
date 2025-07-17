@@ -23,12 +23,13 @@ import { useNavigate, useLocation } from "react-router-dom";
 const formSchema = z.object({
   nif: z.string()
     .min(1, { message: "NIF é obrigatório" })
+    .min(9, { message: "NIF deve ter pelo menos 9 dígitos" })
     .regex(/^[a-zA-Z0-9]+$/, { message: "NIF deve conter apenas letras e números" })
     .refine((value) => {
       const cleanNIF = value.replace(/[^a-zA-Z0-9]/g, '');
-      // Aceitar NIFs empresariais (9-10 dígitos) ou pessoais (formato 005732018NE040)
-      return /^\d{9,10}$/.test(cleanNIF) || /^\d{9}[A-Z]{2}\d{3}$/.test(cleanNIF);
-    }, { message: "Formato inválido. Empresa: 9-10 dígitos (ex: 5000088927). Pessoa: 9 díg + 2 letras + 3 díg (ex: 005732018NE040)" }),
+      // Aceitar NIFs empresariais (10 dígitos) ou pessoais (formato 005732018NE040)
+      return /^\d{10}$/.test(cleanNIF) || /^\d{9}[A-Z]{2}\d{3}$/.test(cleanNIF);
+    }, { message: "Formato inválido. Empresa: 10 dígitos (ex: 5000088927). Pessoa: 9 díg + 2 letras + 3 díg (ex: 005732018NE040)" }),
   company_name: z.string().optional(),
   email: z.string().email({
     message: "Por favor insira um email válido.",
@@ -56,7 +57,7 @@ const RegisterForm = ({ onAuthSuccess }: RegisterFormProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [redirectPath, setRedirectPath] = useState<string | null>(null);
-  const [isCompanyNameLocked, setIsCompanyNameLocked] = useState(false);
+  const [isCompanyNameLocked, setIsCompanyNameLocked] = useState(true); // Sempre ineditável
 
   // Processar parâmetros da URL para preencher campos automaticamente
   useEffect(() => {
@@ -156,7 +157,21 @@ const RegisterForm = ({ onAuthSuccess }: RegisterFormProps) => {
   // Handle NIF validation and autofill
   const handleNIFBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
     const nif = e.target.value.trim();
-    if (nif) {
+    
+    // Se o campo não está vazio mas tem menos de 9 caracteres, mostrar erro
+    if (nif && nif.length > 0 && nif.length < 9) {
+      toast.error(`NIF incompleto. Por favor, complete os dígitos (mínimo 9 caracteres). Atual: ${nif.length} dígitos.`);
+      return;
+    }
+    
+    // Se parece ser NIF empresarial (só números) mas não tem 10 dígitos, mostrar erro específico
+    if (nif && /^\d+$/.test(nif) && nif.length > 0 && nif.length < 10) {
+      toast.error(`NIF empresarial incompleto. Empresas devem ter 10 dígitos. Atual: ${nif.length} dígitos.`);
+      return;
+    }
+    
+    // Só validar se o NIF tiver tamanho mínimo para ser válido
+    if (nif && nif.length >= 9) {
       await handleNIFValidation(nif);
     }
   };
@@ -164,32 +179,75 @@ const RegisterForm = ({ onAuthSuccess }: RegisterFormProps) => {
   // Handle NIF validation and autofill
   const handleNIFValidation = async (nif: string) => {
     console.log('RegisterForm: handleNIFValidation chamado com NIF:', nif);
-    if (nif) {
-      setNifChecking(true);
-      try {
-        console.log('RegisterForm: Chamando validateNIF...');
-        const result = await validateNIF(nif);
-        console.log('RegisterForm: Resultado da validação:', result);
+    
+    // Verificar se o NIF tem tamanho adequado antes de fazer chamada AJAX
+    if (!nif || nif.length < 9) {
+      console.log('RegisterForm: NIF muito curto para validação:', nif.length);
+      return;
+    }
+    
+    // Verificar formato válido antes de chamar API
+    const isPersonalNIF = /^\d{9}[A-Z]{2}\d{3}$/.test(nif);
+    const isBusinessNIF = /^\d{10}$/.test(nif); // Empresas devem ter 10 dígitos
+    
+    if (!isPersonalNIF && !isBusinessNIF) {
+      console.log('RegisterForm: Formato de NIF inválido, não fazendo chamada AJAX:', nif);
+      form.setValue("company_name", "");
+      toast.error("Formato de NIF inválido. Empresa: 10 dígitos. Pessoa: 9 números + 2 letras + 3 números.");
+      return;
+    }
+    
+    setNifChecking(true);
+    try {
+      console.log('RegisterForm: Chamando validateNIF...');
+      const result = await validateNIF(nif);
+      console.log('RegisterForm: Resultado da validação:', result);
+      
+      if (result.isValid && result.companyInfo) {
+        console.log('RegisterForm: NIF válido, preenchendo dados da empresa:', result.companyInfo);
+        form.setValue("name", result.companyInfo.name || "");
+        form.setValue("company_name", result.companyInfo.name || "");
+        form.setValue("address", result.companyInfo.address || "");
         
-        if (result.isValid && result.companyInfo) {
-          console.log('RegisterForm: NIF válido, preenchendo dados da empresa:', result.companyInfo);
-          form.setValue("name", result.companyInfo.name || "");
-          form.setValue("company_name", result.companyInfo.name || "");
-          form.setValue("address", result.companyInfo.address || "");
-          setIsCompanyNameLocked(!!result.companyInfo.name);
-          toast.success("Os dados da empresa foram preenchidos automaticamente.");
-        } else {
-          console.log('RegisterForm: NIF inválido ou sem dados da empresa');
-          setIsCompanyNameLocked(false);
+        // Preencher telefone se disponível na API, mas permitir edição
+        if (result.companyInfo.phone) {
+          console.log('RegisterForm: Preenchendo telefone da API:', result.companyInfo.phone);
+          // Limpar o telefone para manter apenas números
+          const cleanPhone = result.companyInfo.phone.replace(/\D/g, '');
+          form.setValue("phone", cleanPhone);
         }
-      } catch (error) {
-        console.error("RegisterForm: Erro ao validar NIF:", error);
-        setIsCompanyNameLocked(false);
-      } finally {
-        setNifChecking(false);
+        
+        // Campo sempre ineditável, só é preenchido via API
+        setIsCompanyNameLocked(true);
+        
+        // Mensagem de sucesso específica baseada nos dados preenchidos
+        const filledFields = [];
+        if (result.companyInfo.name) filledFields.push("nome");
+        if (result.companyInfo.address) filledFields.push("endereço");
+        if (result.companyInfo.phone) filledFields.push("telefone");
+        
+        if (filledFields.length > 0) {
+          toast.success(`Dados preenchidos automaticamente: ${filledFields.join(", ")}. O telefone pode ser editado se necessário.`);
+        } else {
+          toast.success("NIF válido.");
+        }
+      } else {
+        console.log('RegisterForm: NIF inválido ou sem dados da empresa');
+        // Limpar o campo se NIF for inválido, mas manter ineditável
+        form.setValue("company_name", "");
+        setIsCompanyNameLocked(true);
+        // Disparar erro em tempo real quando NIF não encontrar informações na API
+        toast.error("NIF não encontrado na base de dados da API. Verifique se o número está correto.");
       }
-    } else {
-      setIsCompanyNameLocked(false);
+    } catch (error) {
+      console.error("RegisterForm: Erro ao validar NIF:", error);
+      // Limpar o campo em caso de erro, mas manter ineditável
+      form.setValue("company_name", "");
+      setIsCompanyNameLocked(true);
+      // Disparar erro em tempo real para problemas de API
+      toast.error("Erro ao consultar NIF na API. Tente novamente em alguns instantes.");
+    } finally {
+      setNifChecking(false);
     }
   };
 
@@ -258,14 +316,54 @@ const RegisterForm = ({ onAuthSuccess }: RegisterFormProps) => {
               <FormControl>
                 <div className="relative group">
                   <Input
-                    placeholder="NIF empresarial (9-10 dígitos) ou pessoal (ex: 005732018NE040)"
+                    placeholder="NIF empresarial (10 dígitos) ou pessoal (ex: 005732018NE040)"
                     {...field}
                     onBlur={handleNIFBlur}
                     onChange={e => {
-                      field.onChange(e);
-                      if (!e.target.value) {
-                        setIsCompanyNameLocked(false);
+                      // Validação mais rigorosa: NIFs devem sempre começar com números
+                      let value = e.target.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+                      
+                      // Se começar com letra, não permitir
+                      if (value.length > 0 && !/^\d/.test(value)) {
+                        value = value.replace(/^[A-Z]+/, '');
+                      }
+                      
+                      // Para NIFs pessoais, permitir letras apenas após 9 dígitos
+                      if (value.length > 9) {
+                        // Extrair os primeiros 9 caracteres (devem ser números)
+                        const firstNine = value.substring(0, 9);
+                        const rest = value.substring(9);
+                        
+                        // Se os primeiros 9 não são todos números, corrigir
+                        if (!/^\d{9}$/.test(firstNine)) {
+                          value = firstNine.replace(/[^0-9]/g, '') + rest;
+                        }
+                        
+                        // Depois dos primeiros 9 dígitos, permitir até 2 letras seguidas de números
+                        if (rest.length > 0) {
+                          // Permitir no máximo 2 letras após os 9 dígitos
+                          const letters = rest.match(/^[A-Z]{0,2}/);
+                          const afterLetters = rest.substring(letters ? letters[0].length : 0);
+                          const numbers = afterLetters.replace(/[^0-9]/g, '');
+                          
+                          value = firstNine + (letters ? letters[0] : '') + numbers;
+                        }
+                      } else {
+                        // Para os primeiros 9 caracteres, apenas números
+                        value = value.replace(/[^0-9]/g, '');
+                      }
+                      
+                      // Limitar o tamanho total
+                      if (value.length > 14) {
+                        value = value.substring(0, 14);
+                      }
+                      
+                      field.onChange(value);
+                      
+                      if (!value) {
+                        // Se NIF for removido, limpar o Nome Fiscal mas manter ineditável
                         form.setValue('company_name', '');
+                        setIsCompanyNameLocked(true);
                       }
                     }}
                     disabled={nifChecking || isSubmitting}
@@ -278,7 +376,7 @@ const RegisterForm = ({ onAuthSuccess }: RegisterFormProps) => {
                   )}
                 </div>
               </FormControl>
-              <p className="text-xs text-muted-foreground">Para NIFs empresariais use 9-10 dígitos. Para NIFs pessoais use o formato completo. Ao informar o NIF, preencheremos alguns campos automaticamente.</p>
+              <p className="text-xs text-muted-foreground">NIFs devem começar com números. Empresarial: 10 dígitos (ex: 5000088927). Pessoal: 9 números + 2 letras + 3 números (ex: 006887386BE049).</p>
               <FormMessage />
             </FormItem>
           )}
@@ -294,13 +392,14 @@ const RegisterForm = ({ onAuthSuccess }: RegisterFormProps) => {
                 <Input
                   placeholder="Nome da empresa ou pessoa física"
                   {...field}
-                  disabled={isCompanyNameLocked}
-                  className="transition-all duration-200 border-gray-300 hover:border-primary focus:border-primary hover:shadow-lg focus:shadow-primary/20 hover:ring-2 hover:ring-primary/30 focus:ring-2 focus:ring-primary/40"
+                  disabled={true} // Sempre ineditável
+                  readOnly={true} // Garantir que é apenas leitura
+                  className="transition-all duration-200 border-gray-300 hover:border-primary focus:border-primary hover:shadow-lg focus:shadow-primary/20 hover:ring-2 hover:ring-primary/30 focus:ring-2 focus:ring-primary/40 bg-gray-50"
                 />
               </FormControl>
-              {isCompanyNameLocked && (
-                <p className="text-xs text-muted-foreground">Preenchido automaticamente pela API. Edite o NIF para alterar.</p>
-              )}
+              <p className="text-xs text-muted-foreground">
+                Este campo é preenchido automaticamente após a validação do NIF.
+              </p>
               <FormMessage />
             </FormItem>
           )}
@@ -325,7 +424,7 @@ const RegisterForm = ({ onAuthSuccess }: RegisterFormProps) => {
                   className="transition-all duration-200 border-gray-300 hover:border-primary focus:border-primary hover:shadow-lg focus:shadow-primary/20 hover:ring-2 hover:ring-primary/30 focus:ring-2 focus:ring-primary/40"
                 />
               </FormControl>
-              <p className="text-xs text-muted-foreground">Deve ter 9 dígitos e começar com 9.</p>
+              <p className="text-xs text-muted-foreground">Deve ter 9 dígitos e começar com 9. Pode ser preenchido automaticamente pela validação do NIF.</p>
               <FormMessage />
             </FormItem>
           )}

@@ -113,7 +113,6 @@ const PaymentDialog = ({ open, onClose, order, onOrdersChange }: PaymentDialogPr
                 <SelectValue placeholder="Selecione o método" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={PaymentMethod.BANK_TRANSFER}>Transferência Bancária</SelectItem>
                 <SelectItem value={PaymentMethod.MULTICAIXA}>Multicaixa Express</SelectItem>
               </SelectContent>
             </Select>

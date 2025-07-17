@@ -103,11 +103,7 @@ const DirectPaymentDialog = ({ open, onClose, order, onOrdersChange }: DirectPay
                   <SelectValue placeholder="Selecione um método" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="bank_transfer">Transferência Bancária</SelectItem>
                   <SelectItem value="multicaixa">Multicaixa Express</SelectItem>
-                  <SelectItem value="emiscart">EMIS Cart</SelectItem>
-                  <SelectItem value="credit_card">Cartão de Crédito</SelectItem>
-                  <SelectItem value="cash">Dinheiro</SelectItem>
                 </SelectContent>
               </Select>
             </div>
