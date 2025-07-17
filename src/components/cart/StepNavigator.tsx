@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
-import { CheckCircle, Circle, ArrowRight, Shield, Mail, ShoppingCart } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { CheckCircle, Circle, ArrowRight, Shield, Mail, ShoppingCart, Sparkles, Trophy, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCheckoutContactProfile } from "@/hooks/useCheckoutContactProfile";
@@ -17,6 +18,9 @@ const StepNavigator: React.FC<StepNavigatorProps> = ({ onStepClick, currentStep 
   const { isAuthenticated } = useAuth();
   const { isContactProfileRequired, isContactProfileValid } = useCheckoutContactProfile();
   const navigate = useNavigate();
+  
+  // Estado para controlar o popup da mágica
+  const [showMagicPopup, setShowMagicPopup] = useState(false);
   
   const hasItems = cartItems.length > 0;
   const hasDomains = cartItems.some(item => item.type === 'domain');
@@ -77,23 +81,18 @@ const StepNavigator: React.FC<StepNavigatorProps> = ({ onStepClick, currentStep 
   useEffect(() => {
     if (isReadyForCheckout) {
       setTimeout(() => {
-        toast.success("🎉 TUDO PRONTO! Perfil confirmado com sucesso! Agora você pode finalizar sua compra.", {
+        setShowMagicPopup(true);
+        toast.success("🎉 MÁGICA ACONTECEU! Todas as etapas concluídas com sucesso!", {
           duration: 8000,
-          action: {
-            label: "🚀 Finalizar Agora",
-            onClick: () => {
-              const element = document.getElementById('finalizar-compra-section');
-              if (element) {
-                element.scrollIntoView({ behavior: 'smooth' });
-                element.classList.add('animate-bounce');
-                setTimeout(() => element.classList.remove('animate-bounce'), 3000);
-              }
-            }
-          }
         });
       }, 1000);
     }
   }, [isReadyForCheckout]);
+
+  const handleFinalizarCompra = () => {
+    setShowMagicPopup(false);
+    navigate('/checkout');
+  };
   
   const recommendations = [
     {
@@ -213,54 +212,95 @@ const StepNavigator: React.FC<StepNavigatorProps> = ({ onStepClick, currentStep 
         </div>
       )}
       
-      {/* Finalizar Compra - Appears when everything is ready */}
-      {isReadyForCheckout && (
-        <div 
-          id="finalizar-compra-section"
-          className="mt-6 p-6 bg-gradient-to-r from-green-50 via-emerald-50 to-teal-50 border-4 border-green-300 rounded-lg shadow-2xl"
-          style={{
-            animation: 'pulse 2s infinite, glow 3s infinite alternate'
-          }}
-        >
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="w-4 h-4 bg-green-500 rounded-full animate-ping"></div>
-              <div className="w-3 h-3 bg-emerald-500 rounded-full animate-ping animation-delay-200"></div>
-              <h3 className="text-2xl font-bold text-green-900 animate-bounce">
-                🎉 MÁGICA ACONTECEU! ✨
-              </h3>
-              <div className="w-3 h-3 bg-emerald-500 rounded-full animate-ping animation-delay-200"></div>
-              <div className="w-4 h-4 bg-green-500 rounded-full animate-ping"></div>
+      {/* Magic Popup - Modal que abre quando tudo está pronto */}
+      <Dialog open={showMagicPopup} onOpenChange={setShowMagicPopup}>
+        <DialogContent className="max-w-2xl p-0 overflow-hidden border-4 border-green-400 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
+          <div className="relative">
+            {/* Decorative background elements */}
+            <div className="absolute inset-0 bg-gradient-to-r from-green-100/50 to-emerald-100/50 animate-pulse"></div>
+            <div className="absolute top-4 left-4 w-8 h-8 bg-yellow-400 rounded-full animate-ping opacity-75"></div>
+            <div className="absolute top-8 right-8 w-6 h-6 bg-green-400 rounded-full animate-bounce opacity-75"></div>
+            <div className="absolute bottom-6 left-8 w-4 h-4 bg-blue-400 rounded-full animate-pulse opacity-75"></div>
+            
+            <div className="relative z-10 p-8 text-center">
+              <DialogHeader className="mb-6">
+                <div className="flex items-center justify-center gap-3 mb-4">
+                  <Star className="w-8 h-8 text-yellow-500 animate-spin" />
+                  <Trophy className="w-10 h-10 text-yellow-600 animate-bounce" />
+                  <Sparkles className="w-8 h-8 text-yellow-500 animate-ping" />
+                </div>
+                
+                <DialogTitle className="text-4xl font-bold text-green-900 mb-2 animate-bounce">
+                  🎉 MÁGICA ACONTECEU! ✨
+                </DialogTitle>
+                
+                <div className="text-2xl font-bold text-emerald-800 animate-pulse">
+                  🏆 PARABÉNS! TUDO PRONTO! 🏆
+                </div>
+              </DialogHeader>
+              
+              <div className="space-y-6">
+                <div className="bg-white/80 rounded-xl p-6 border-2 border-green-300 shadow-lg">
+                  <h3 className="text-xl font-bold text-green-900 mb-4">
+                    🎯 Todas as etapas foram concluídas com sucesso!
+                  </h3>
+                  
+                  <div className="grid grid-cols-3 gap-4 text-sm">
+                    <div className="flex flex-col items-center p-3 bg-green-100 rounded-lg">
+                      <CheckCircle className="w-6 h-6 text-green-600 mb-2" />
+                      <span className="font-medium text-green-800">Produtos<br/>Adicionados</span>
+                    </div>
+                    <div className="flex flex-col items-center p-3 bg-blue-100 rounded-lg">
+                      <CheckCircle className="w-6 h-6 text-blue-600 mb-2" />
+                      <span className="font-medium text-blue-800">Login<br/>Realizado</span>
+                    </div>
+                    <div className="flex flex-col items-center p-3 bg-purple-100 rounded-lg">
+                      <CheckCircle className="w-6 h-6 text-purple-600 mb-2" />
+                      <span className="font-medium text-purple-800">Perfil<br/>Confirmado</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <Button 
+                    onClick={handleFinalizarCompra}
+                    size="lg"
+                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold px-8 py-6 text-xl shadow-2xl transform hover:scale-105 transition-all duration-300"
+                  >
+                    <ShoppingCart className="mr-4 h-8 w-8 animate-pulse" />
+                    🚀 FINALIZAR COMPRA AGORA! 💫
+                    <ArrowRight className="ml-4 h-8 w-8 animate-pulse" />
+                  </Button>
+                  
+                  <div className="flex items-center justify-center gap-4 text-green-700 text-sm font-medium">
+                    <div className="flex items-center gap-1">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
+                      <span>Processo seguro</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
+                      <span>Pagamento protegido</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
+                      <span>Entrega rápida</span>
+                    </div>
+                  </div>
+                  
+                  <Button 
+                    onClick={() => setShowMagicPopup(false)}
+                    variant="ghost"
+                    size="sm"
+                    className="text-gray-600 hover:text-gray-800"
+                  >
+                    Continuar navegando
+                  </Button>
+                </div>
+              </div>
             </div>
-            
-            <div className="bg-white/80 rounded-lg p-4 mb-4 border-2 border-green-200">
-              <p className="text-green-800 mb-2 font-bold text-lg">
-                🎯 Todas as etapas foram concluídas com sucesso!
-              </p>
-              <p className="text-green-700 font-medium">
-                ✅ Produtos adicionados • ✅ Login realizado • ✅ Perfil confirmado
-              </p>
-            </div>
-            
-            <Button 
-              onClick={() => navigate('/checkout')}
-              size="lg"
-              className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold px-12 py-4 text-xl shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:scale-105"
-              style={{
-                animation: 'bounce 1s infinite, glow 2s infinite alternate'
-              }}
-            >
-              <ShoppingCart className="mr-4 h-7 w-7 animate-pulse" />
-              🚀 FINALIZAR COMPRA AGORA! 💫
-              <ArrowRight className="ml-4 h-7 w-7 animate-pulse" />
-            </Button>
-            
-            <p className="text-green-600 text-sm mt-3 font-medium animate-pulse">
-              ⚡ Processo seguro e rápido • 🔒 Pagamento protegido
-            </p>
           </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
