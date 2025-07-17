@@ -157,58 +157,83 @@ const EmailServiceOption = () => {
                   </Select>
                 </div>
 
-                {/* Users Selection - Destacado */}
-                <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
-                  <label className="block text-lg font-semibold mb-3 text-blue-800">Número de usuários:</label>
-                  <div className="flex items-center gap-3">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={() => setSelectedUsers(Math.max(1, selectedUsers - 1))}
-                      disabled={selectedUsers <= 1}
-                      className="border-blue-300 hover:border-blue-400"
-                    >
-                      <Minus className="h-4 w-4" />
-                    </Button>
-                    <input
-                      type="number"
-                      min="1"
-                      max={selectedPlan.maxUsers}
-                      value={selectedUsers}
-                      onChange={(e) => {
-                        const value = parseInt(e.target.value) || 1;
-                        const clampedValue = Math.min(Math.max(1, value), selectedPlan.maxUsers);
-                        setSelectedUsers(clampedValue);
-                      }}
-                      className="w-20 px-3 py-2 text-center text-lg font-semibold border-2 border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={() => setSelectedUsers(Math.min(selectedPlan.maxUsers, selectedUsers + 1))}
-                      disabled={selectedUsers >= selectedPlan.maxUsers}
-                      className="border-blue-300 hover:border-blue-400"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                    
-                    {/* Botão Adicionar E-mail ao lado */}
-                    <Button 
-                      onClick={handleToggleEmail}
-                      className="ml-3 bg-green-600 hover:bg-green-700 text-white"
-                    >
-                      Adicionar E-mail
-                    </Button>
+                {/* Users Selection - Interface padrão dos pacotes */}
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Plano selecionado:</label>
+                    <div className="text-lg font-semibold text-gray-800">
+                      {selectedPlan.name}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {formatPrice(selectedPlan.monthlyPrice)}/mês • {formatPrice(selectedPlan.annualPrice)}/ano por usuário
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center mt-3">
-                    <p className="text-sm text-blue-600">
-                      Máximo: {selectedPlan.maxUsers} usuários
-                    </p>
-                    <div className="text-right">
-                      <p className="text-sm text-gray-600">Total:</p>
-                      <p className="text-lg font-bold text-green-600">
-                        {formatPrice(calculatePrice())}/{selectedPlan.period}
+
+                  {/* Quantidade de usuários */}
+                  <div className="border-t border-b py-4">
+                    <label className="block text-sm font-medium mb-3">Quantidade de usuários:</label>
+                    <div className="flex items-center gap-3">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => setSelectedUsers(Math.max(1, selectedUsers - 1))}
+                        disabled={selectedUsers <= 1}
+                      >
+                        <Minus className="h-4 w-4" />
+                      </Button>
+                      
+                      <input
+                        type="number"
+                        min="1"
+                        max="500"
+                        value={selectedUsers}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value) || 1;
+                          const clampedValue = Math.min(Math.max(1, value), 500);
+                          setSelectedUsers(clampedValue);
+                        }}
+                        className="w-20 px-3 py-2 text-center font-medium border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      />
+                      
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => setSelectedUsers(Math.min(500, selectedUsers + 1))}
+                        disabled={selectedUsers >= 500}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+
+                      {/* Botão Adicionar E-mail ao lado */}
+                      <Button 
+                        onClick={handleToggleEmail}
+                        className="ml-4 bg-green-600 hover:bg-green-700 text-white"
+                        disabled={hasEmailInCart}
+                      >
+                        {hasEmailInCart ? (
+                          <>
+                            <Check className="mr-2 h-4 w-4" />
+                            Adicionado
+                          </>
+                        ) : (
+                          'Adicionar E-mail'
+                        )}
+                      </Button>
+                    </div>
+                    
+                    <div className="flex justify-between items-center mt-3">
+                      <p className="text-sm text-gray-500">
+                        {selectedUsers} usuário{selectedUsers > 1 ? 's' : ''} • Máximo: 500
                       </p>
+                      <div className="text-right">
+                        <p className="text-sm text-gray-600">Preço anual:</p>
+                        <p className="text-lg font-bold text-green-600">
+                          {formatPrice(calculatePrice())}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          (~{formatPrice(Math.round(calculatePrice() / 12))}/mês)
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -228,32 +253,32 @@ const EmailServiceOption = () => {
               </div>
             )}
             
-            {!hasEmailInCart && (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">Preço selecionado:</span>
-                <span className="text-lg font-bold text-green-600">
-                  {formatPrice(calculatePrice())}/{selectedPlan.period}
-                </span>
-              </div>
-            )}
-            
-            {hasEmailInCart && (
-              <div className="flex items-center justify-between">
+            {hasEmailInCart ? (
+              <div className="flex items-center justify-between bg-green-50 p-3 rounded-lg border border-green-200">
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl font-bold text-green-600">
-                    {formatPrice(cartItems.find(item => item.type === 'email')?.price || 0)}
-                  </span>
-                  <span className="text-gray-500">/{selectedPlan.period}</span>
+                  <Check className="h-5 w-5 text-green-600" />
+                  <div>
+                    <div className="font-medium text-green-800">E-mail adicionado ao carrinho</div>
+                    <div className="text-sm text-green-600">
+                      {formatPrice(cartItems.find(item => item.type === 'email')?.price || 0)}/ano
+                    </div>
+                  </div>
                 </div>
                 
                 <Button 
                   onClick={handleToggleEmail}
                   variant="outline"
-                  className="border-green-600 text-green-600"
+                  size="sm"
+                  className="border-red-300 text-red-600 hover:bg-red-50"
                 >
-                  <Check className="mr-2 h-4 w-4" />
-                  Adicionado
+                  Remover
                 </Button>
+              </div>
+            ) : (
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-600">
+                  Configure a quantidade de usuários e clique em "Adicionar E-mail"
+                </p>
               </div>
             )}
           </div>
