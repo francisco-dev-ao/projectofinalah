@@ -34,11 +34,11 @@ const StepNavigator: React.FC<StepNavigatorProps> = ({ onStepClick, currentStep 
   const needsAuth = !isAuthenticated && hasItems;
   const needsContactProfile = isAuthenticated && isContactProfileRequired && !isContactProfileValid();
   
-  // Verificação mais rigorosa - TODAS as condições devem ser atendidas
+  // Verificação mais rigorosa - Só está pronto quando perfil de contacto está selecionado
   const isReadyForCheckout = hasItems && 
                            isAuthenticated && 
                            (!isContactProfileRequired || isContactProfileValid()) &&
-                           cartItems.length > 0; // Garantir que realmente há itens
+                           cartItems.length > 0;
   
   console.log('🔍 Verificação do checkout:', {
     hasItems,
@@ -47,7 +47,8 @@ const StepNavigator: React.FC<StepNavigatorProps> = ({ onStepClick, currentStep 
     isContactProfileValid: isContactProfileValid(),
     needsContactProfile,
     cartItemsCount: cartItems.length,
-    isReadyForCheckout
+    isReadyForCheckout,
+    finalStep: isContactProfileRequired ? 'Aguardando seleção de perfil' : 'Não requer perfil'
   });
   
   // Auto-guidance for next steps - mostrar apenas uma vez
@@ -97,31 +98,38 @@ const StepNavigator: React.FC<StepNavigatorProps> = ({ onStepClick, currentStep 
     }
   }, [hasItems, hasDomains, hasProtection, hasEmail, emailSuggestionShown, protectionSuggestionShown]);
   
-  // Magic happens ONLY when ALL requirements are truly met
+  // Magic happens ONLY when user selects a contact profile (final step)
   useEffect(() => {
-    // Verificação extra rigorosa antes de mostrar o popup
-    const allConditionsMet = hasItems && 
-                           cartItems.length > 0 && 
-                           isAuthenticated && 
-                           (!isContactProfileRequired || (isContactProfileRequired && isContactProfileValid())) &&
-                           !magicNotificationShown;
+    // O popup só deve aparecer quando:
+    // 1. Tem itens no carrinho
+    // 2. Está autenticado  
+    // 3. Perfil de contacto é necessário E foi selecionado (isContactProfileValid)
+    // 4. Popup ainda não foi mostrado
     
-    console.log('🎉 Verificando se pode mostrar a mágica:', {
-      allConditionsMet,
+    const shouldShowMagic = hasItems && 
+                          cartItems.length > 0 && 
+                          isAuthenticated && 
+                          isContactProfileRequired && 
+                          isContactProfileValid() && 
+                          !magicNotificationShown;
+    
+    console.log('🎉 Verificando se pode mostrar a mágica após seleção de perfil:', {
+      shouldShowMagic,
       hasItems,
       cartItemsLength: cartItems.length,
       isAuthenticated,
       isContactProfileRequired,
       isContactProfileValidResult: isContactProfileValid(),
-      magicNotificationShown
+      magicNotificationShown,
+      message: shouldShowMagic ? '✨ TODAS AS CONDIÇÕES ATENDIDAS - MOSTRANDO MÁGICA!' : '❌ Condições não atendidas ainda'
     });
     
-    if (allConditionsMet) {
+    if (shouldShowMagic) {
       setTimeout(() => {
         setShowMagicPopup(true);
         setMagicNotificationShown(true);
-        console.log('✨ MÁGICA ATIVADA! Popup sendo exibido.');
-      }, 1000);
+        console.log('✨ MÁGICA ATIVADA APÓS SELEÇÃO DE PERFIL! Popup sendo exibido.');
+      }, 500); // Delay menor já que é a ação final
     }
   }, [hasItems, cartItems.length, isAuthenticated, isContactProfileRequired, isContactProfileValid, magicNotificationShown]);
 
