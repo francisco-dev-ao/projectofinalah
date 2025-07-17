@@ -68,21 +68,53 @@ const emailPlans = [
 ];
 
 const EmailServiceOption = () => {
-  const { cartItems, addItem, removeItem } = useCart();
+  const { cartItems, addItem, removeItem, updateItemQuantity } = useCart();
   const [selectedPlan, setSelectedPlan] = useState(emailPlans[1]); // Default to recommended plan
   const [selectedUsers, setSelectedUsers] = useState(1);
   
   // Check if email service is already in cart
   const hasEmailInCart = cartItems.some(item => item.type === 'email');
+  const existingEmailItem = cartItems.find(item => item.type === 'email');
   
   // Check if there's at least one domain in cart
   const hasDomainInCart = cartItems.some(item => item.type === 'domain');
   
-  // Don't show if no domain in cart OR if email is already in cart
-  if (!hasDomainInCart || hasEmailInCart) return null;
+  // Don't show if no domain in cart
+  if (!hasDomainInCart) return null;
+  
+  // Set initial values based on existing email in cart
+  React.useEffect(() => {
+    if (hasEmailInCart && existingEmailItem) {
+      const existingPlan = emailPlans.find(plan => plan.id === existingEmailItem.id);
+      if (existingPlan) {
+        setSelectedPlan(existingPlan);
+      }
+      setSelectedUsers(existingEmailItem.quantity || existingEmailItem.metadata?.users || 1);
+    }
+  }, [hasEmailInCart, existingEmailItem]);
 
   const calculatePrice = () => {
     return selectedPlan.annualPrice * selectedUsers;
+  };
+
+  const updateEmailQuantity = () => {
+    if (hasEmailInCart && existingEmailItem) {
+      const updatedEmailService = {
+        ...existingEmailItem,
+        name: `${selectedPlan.name} (${selectedUsers} usuário${selectedUsers > 1 ? 's' : ''})`,
+        quantity: selectedUsers,
+        price: selectedPlan.annualPrice, // Price per user
+        unitPrice: selectedPlan.annualPrice, // Price per user
+        metadata: {
+          users: selectedUsers,
+          originalPrice: selectedPlan.annualPrice
+        }
+      };
+      
+      // Remove the old item and add the updated one
+      removeItem(existingEmailItem.id);
+      addItem(updatedEmailService, selectedUsers);
+    }
   };
 
   const handleToggleEmail = () => {
@@ -261,25 +293,94 @@ const EmailServiceOption = () => {
             )}
             
             {hasEmailInCart ? (
-              <div className="flex items-center justify-between bg-green-50 p-3 rounded-lg border border-green-200">
-                <div className="flex items-center gap-2">
-                  <Check className="h-5 w-5 text-green-600" />
-                  <div>
+              <div className="space-y-4">
+                {/* Email already in cart - show modification interface */}
+                <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Check className="h-5 w-5 text-green-600" />
                     <div className="font-medium text-green-800">E-mail adicionado ao carrinho</div>
-                    <div className="text-sm text-green-600">
-                      {formatPrice(cartItems.find(item => item.type === 'email')?.price || 0)}/ano
+                  </div>
+  
+                  {/* Current plan info */}
+                  <div className="mb-4">
+                    <div className="text-lg font-semibold text-gray-800">
+                      {selectedPlan.name}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {formatPrice(selectedPlan.monthlyPrice)}/mês • {formatPrice(selectedPlan.annualPrice)}/ano por usuário
+                    </div>
+                  </div>
+
+                  {/* Quantity controls for existing email */}
+                  <div className="border-t border-b py-4">
+                    <label className="block text-sm font-medium mb-3">Quantidade de usuários:</label>
+                    <div className="flex items-center gap-3">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => setSelectedUsers(Math.max(1, selectedUsers - 1))}
+                        disabled={selectedUsers <= 1}
+                      >
+                        <Minus className="h-4 w-4" />
+                      </Button>
+                      
+                      <input
+                        type="number"
+                        min="1"
+                        max="500"
+                        value={selectedUsers}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value) || 1;
+                          const clampedValue = Math.min(Math.max(1, value), 500);
+                          setSelectedUsers(clampedValue);
+                        }}
+                        className="w-20 px-3 py-2 text-center font-medium border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      />
+                      
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => setSelectedUsers(Math.min(500, selectedUsers + 1))}
+                        disabled={selectedUsers >= 500}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+
+                      {/* Update button */}
+                      <Button 
+                        onClick={updateEmailQuantity}
+                        className="ml-4 bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        Atualizar
+                      </Button>
+
+                      {/* Remove button */}
+                      <Button 
+                        onClick={handleToggleEmail}
+                        variant="outline"
+                        size="sm"
+                        className="border-red-300 text-red-600 hover:bg-red-50"
+                      >
+                        Remover
+                      </Button>
+                    </div>
+                    
+                    <div className="flex justify-between items-center mt-3">
+                      <p className="text-sm text-gray-500">
+                        {selectedUsers} usuário{selectedUsers > 1 ? 's' : ''} • Máximo: 500
+                      </p>
+                      <div className="text-right">
+                        <p className="text-sm text-gray-600">Preço anual:</p>
+                        <p className="text-lg font-bold text-green-600">
+                          {formatPrice(calculatePrice())}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          (~{formatPrice(Math.round(calculatePrice() / 12))}/mês)
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
-                
-                <Button 
-                  onClick={handleToggleEmail}
-                  variant="outline"
-                  size="sm"
-                  className="border-red-300 text-red-600 hover:bg-red-50"
-                >
-                  Remover
-                </Button>
               </div>
             ) : (
               <div className="text-center p-3 bg-gray-50 rounded-lg">
