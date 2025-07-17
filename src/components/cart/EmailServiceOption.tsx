@@ -95,14 +95,15 @@ const EmailServiceOption = () => {
       const emailService = {
         ...selectedPlan,
         name: `${selectedPlan.name} (${selectedUsers} usuário${selectedUsers > 1 ? 's' : ''})`,
-        price: calculatePrice(),
-        quantity: 1,
+        price: selectedPlan.annualPrice, // Price per user
+        unitPrice: selectedPlan.annualPrice, // Price per user
+        quantity: selectedUsers, // Set quantity to number of users
         metadata: {
           users: selectedUsers,
           originalPrice: selectedPlan.annualPrice
         }
       };
-      addItem(emailService, 1);
+      addItem(emailService, selectedUsers);
     }
   };
 

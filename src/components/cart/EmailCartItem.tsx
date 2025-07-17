@@ -46,7 +46,7 @@ const EmailCartItem: React.FC<EmailCartItemProps> = ({
             <Plus size={16} />
           </Button>
           <span className="text-sm text-gray-500 ml-1">
-            {formatPrice(item.unitPrice || 0)} cada
+            {formatPrice(item.unitPrice || 0)} por usuário
           </span>
         </div>
         
