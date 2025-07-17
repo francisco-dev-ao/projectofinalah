@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { ArrowLeft, AlertTriangle } from "lucide-react";
 import CartItemsList from "@/components/cart/CartItemsList";
 import DomainSelector from "@/components/cart/DomainSelector";
+import DomainProtectionOption from "@/components/cart/DomainProtectionOption";
+import EmailServiceOption from "@/components/cart/EmailServiceOption";
 import CartAuthOptions from "@/components/cart/CartAuthOptions";
 import ContactProfileSelection from "@/components/checkout/ContactProfileSelection";
 import { useCart } from "@/contexts/CartContext";
@@ -11,6 +13,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCheckoutContactProfile } from "@/hooks/useCheckoutContactProfile";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Separator } from "@/components/ui/separator";
 
 interface CartItemsSectionProps {
   domainOption: "register" | "use";
@@ -70,6 +73,20 @@ const CartItemsSection: React.FC<CartItemsSectionProps> = ({
         
         <CartItemsList />
       </div>
+      
+      {/* Additional Services Section */}
+      {cartItems.length > 0 && (
+        <div className="space-y-4">
+          <Separator />
+          <h2 className="text-xl font-semibold">Serviços Adicionais</h2>
+          
+          {/* Domain Protection Option */}
+          <DomainProtectionOption />
+          
+          {/* Email Service Option */}
+          <EmailServiceOption />
+        </div>
+      )}
       
       {/* Domain selection section - show only when needed */}
       {(needsDomain && !hasDomainInCart) && (

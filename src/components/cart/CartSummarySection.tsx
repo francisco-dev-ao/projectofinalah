@@ -1,6 +1,8 @@
 
 import React from "react";
 import OrderSummary from "@/components/cart/OrderSummary";
+import SatisfactionGuarantee from "@/components/cart/SatisfactionGuarantee";
+import TermsAndConditions from "@/components/cart/TermsAndConditions";
 import { useCheckoutContactProfile } from "@/hooks/useCheckoutContactProfile";
 import { useAuth } from "@/contexts/AuthContext";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -38,6 +40,10 @@ const CartSummarySection: React.FC<CartSummarySectionProps> = ({
         onProceedToCheckout={handleProceedToCheckout} 
         isProcessing={isProcessing}
       />
+      
+      <SatisfactionGuarantee />
+      
+      <TermsAndConditions />
     </div>
   );
 };

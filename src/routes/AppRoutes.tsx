@@ -19,6 +19,8 @@ const PageLoadingFallback = () => (
 const NotFound = lazy(() => import('@/pages/NotFound'));
 const SharedInvoiceView = lazy(() => import('@/pages/SharedInvoiceView'));
 const SubscriptionPage = lazy(() => import('@/pages/SubscriptionPage'));
+const TermsDomainAO = lazy(() => import('@/pages/TermsDomainAO'));
+const TermsOfUse = lazy(() => import('@/pages/TermsOfUse'));
 
 // Wrap lazy components with Suspense
 const lazyLoad = (Component: React.LazyExoticComponent<any>) => (
@@ -38,7 +40,12 @@ export default function AppRoutes() {
       
       {/* Subscription Page - publicly accessible */}
       <Route path="/hospedagem/assinatura/:planId" element={lazyLoad(SubscriptionPage)} />
-        {/* Customer Routes - Protected with the CustomerLayout */}
+      
+      {/* Terms and conditions pages - publicly accessible */}
+      <Route path="/termos-dominios-ao" element={lazyLoad(TermsDomainAO)} />
+      <Route path="/termos-uso" element={lazyLoad(TermsOfUse)} />
+      
+      {/* Customer Routes - Protected with the CustomerLayout */}
       <Route 
         path="/customer" 
         element={
