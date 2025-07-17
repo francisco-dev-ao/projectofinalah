@@ -23,7 +23,7 @@ const emailPlans = [
       "5GB de espaço",
       "Suporte por email"
     ],
-    maxUsers: 10
+    maxUsers: 500
   },
   {
     id: "email-business", 
@@ -44,7 +44,7 @@ const emailPlans = [
       "Infraestrutura baseada na cloud",
       "Suporte por email e chat"
     ],
-    maxUsers: 50
+    maxUsers: 500
   },
   {
     id: "email-enterprise",
@@ -63,7 +63,7 @@ const emailPlans = [
       "Classificado pelo Google",
       "Suporte prioritário 24/7"
     ],
-    maxUsers: 100
+    maxUsers: 500
   }
 ];
 
@@ -157,15 +157,16 @@ const EmailServiceOption = () => {
                   </Select>
                 </div>
 
-                {/* Users Selection */}
-                <div>
-                  <label className="block text-sm font-medium mb-2">Número de usuários:</label>
-                  <div className="flex items-center gap-2">
+                {/* Users Selection - Destacado */}
+                <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+                  <label className="block text-lg font-semibold mb-3 text-blue-800">Número de usuários:</label>
+                  <div className="flex items-center gap-3">
                     <Button 
                       variant="outline" 
                       size="sm" 
                       onClick={() => setSelectedUsers(Math.max(1, selectedUsers - 1))}
                       disabled={selectedUsers <= 1}
+                      className="border-blue-300 hover:border-blue-400"
                     >
                       <Minus className="h-4 w-4" />
                     </Button>
@@ -179,20 +180,37 @@ const EmailServiceOption = () => {
                         const clampedValue = Math.min(Math.max(1, value), selectedPlan.maxUsers);
                         setSelectedUsers(clampedValue);
                       }}
-                      className="w-16 px-2 py-1 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-20 px-3 py-2 text-center text-lg font-semibold border-2 border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                     <Button 
                       variant="outline" 
                       size="sm" 
                       onClick={() => setSelectedUsers(Math.min(selectedPlan.maxUsers, selectedUsers + 1))}
                       disabled={selectedUsers >= selectedPlan.maxUsers}
+                      className="border-blue-300 hover:border-blue-400"
                     >
                       <Plus className="h-4 w-4" />
                     </Button>
+                    
+                    {/* Botão Adicionar E-mail ao lado */}
+                    <Button 
+                      onClick={handleToggleEmail}
+                      className="ml-3 bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      Adicionar E-mail
+                    </Button>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Máximo: {selectedPlan.maxUsers} usuários
-                  </p>
+                  <div className="flex justify-between items-center mt-3">
+                    <p className="text-sm text-blue-600">
+                      Máximo: {selectedPlan.maxUsers} usuários
+                    </p>
+                    <div className="text-right">
+                      <p className="text-sm text-gray-600">Total:</p>
+                      <p className="text-lg font-bold text-green-600">
+                        {formatPrice(calculatePrice())}/{selectedPlan.period}
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Selected Plan Features */}
@@ -210,32 +228,34 @@ const EmailServiceOption = () => {
               </div>
             )}
             
-            <div className="flex items-center justify-between">
+            {!hasEmailInCart && (
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold text-green-600">
-                  {hasEmailInCart ? 
-                    formatPrice(cartItems.find(item => item.type === 'email')?.price || 0) :
-                    formatPrice(calculatePrice())
-                  }
+                <span className="text-sm text-gray-600">Preço selecionado:</span>
+                <span className="text-lg font-bold text-green-600">
+                  {formatPrice(calculatePrice())}/{selectedPlan.period}
                 </span>
-                <span className="text-gray-500">/{selectedPlan.period}</span>
               </div>
-              
-              <Button 
-                onClick={handleToggleEmail}
-                variant={hasEmailInCart ? "outline" : "default"}
-                className={hasEmailInCart ? "border-green-600 text-green-600" : "bg-green-600 hover:bg-green-700"}
-              >
-                {hasEmailInCart ? (
-                  <>
-                    <Check className="mr-2 h-4 w-4" />
-                    Adicionado
-                  </>
-                ) : (
-                  'Adicionar E-mail'
-                )}
-              </Button>
-            </div>
+            )}
+            
+            {hasEmailInCart && (
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl font-bold text-green-600">
+                    {formatPrice(cartItems.find(item => item.type === 'email')?.price || 0)}
+                  </span>
+                  <span className="text-gray-500">/{selectedPlan.period}</span>
+                </div>
+                
+                <Button 
+                  onClick={handleToggleEmail}
+                  variant="outline"
+                  className="border-green-600 text-green-600"
+                >
+                  <Check className="mr-2 h-4 w-4" />
+                  Adicionado
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </CardContent>
