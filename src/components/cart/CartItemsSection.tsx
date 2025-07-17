@@ -53,7 +53,20 @@ const CartItemsSection: React.FC<CartItemsSectionProps> = ({
 
   const handleProfileContinue = () => {
     if (selectedContactProfileId) {
-      toast.success("Perfil de contacto confirmado! Agora pode prosseguir para o checkout.");
+      toast.success("🎉 Perfil de contacto confirmado com sucesso! A mágica está acontecendo...", {
+        duration: 5000,
+        action: {
+          label: "Ver Resultado",
+          onClick: () => {
+            setTimeout(() => {
+              const element = document.getElementById('finalizar-compra-section');
+              if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+              }
+            }, 500);
+          }
+        }
+      });
     } else {
       toast.error("Por favor, selecione um perfil de contacto primeiro.");
     }

@@ -73,6 +73,28 @@ const StepNavigator: React.FC<StepNavigatorProps> = ({ onStepClick, currentStep 
     }
   }, [hasItems, hasDomains, hasProtection, hasEmail]);
   
+  // Magic happens when contact profile is confirmed and ready for checkout
+  useEffect(() => {
+    if (isReadyForCheckout) {
+      setTimeout(() => {
+        toast.success("🎉 TUDO PRONTO! Perfil confirmado com sucesso! Agora você pode finalizar sua compra.", {
+          duration: 8000,
+          action: {
+            label: "🚀 Finalizar Agora",
+            onClick: () => {
+              const element = document.getElementById('finalizar-compra-section');
+              if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+                element.classList.add('animate-bounce');
+                setTimeout(() => element.classList.remove('animate-bounce'), 3000);
+              }
+            }
+          }
+        });
+      }, 1000);
+    }
+  }, [isReadyForCheckout]);
+  
   const recommendations = [
     {
       id: 'email',
@@ -193,25 +215,49 @@ const StepNavigator: React.FC<StepNavigatorProps> = ({ onStepClick, currentStep 
       
       {/* Finalizar Compra - Appears when everything is ready */}
       {isReadyForCheckout && (
-        <div className="mt-6 p-6 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-lg animate-pulse">
+        <div 
+          id="finalizar-compra-section"
+          className="mt-6 p-6 bg-gradient-to-r from-green-50 via-emerald-50 to-teal-50 border-4 border-green-300 rounded-lg shadow-2xl"
+          style={{
+            animation: 'pulse 2s infinite, glow 3s infinite alternate'
+          }}
+        >
           <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-3">
-              <div className="w-3 h-3 bg-green-500 rounded-full animate-ping"></div>
-              <h3 className="text-xl font-bold text-green-900">✅ Tudo Pronto!</h3>
-              <div className="w-3 h-3 bg-green-500 rounded-full animate-ping"></div>
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div className="w-4 h-4 bg-green-500 rounded-full animate-ping"></div>
+              <div className="w-3 h-3 bg-emerald-500 rounded-full animate-ping animation-delay-200"></div>
+              <h3 className="text-2xl font-bold text-green-900 animate-bounce">
+                🎉 MÁGICA ACONTECEU! ✨
+              </h3>
+              <div className="w-3 h-3 bg-emerald-500 rounded-full animate-ping animation-delay-200"></div>
+              <div className="w-4 h-4 bg-green-500 rounded-full animate-ping"></div>
             </div>
-            <p className="text-green-800 mb-4 font-medium">
-              Todas as etapas foram concluídas. Agora você pode finalizar sua compra com segurança!
-            </p>
+            
+            <div className="bg-white/80 rounded-lg p-4 mb-4 border-2 border-green-200">
+              <p className="text-green-800 mb-2 font-bold text-lg">
+                🎯 Todas as etapas foram concluídas com sucesso!
+              </p>
+              <p className="text-green-700 font-medium">
+                ✅ Produtos adicionados • ✅ Login realizado • ✅ Perfil confirmado
+              </p>
+            </div>
+            
             <Button 
               onClick={() => navigate('/checkout')}
               size="lg"
-              className="bg-green-600 hover:bg-green-700 text-white font-bold px-8 py-3 text-lg shadow-lg hover:shadow-xl transition-all duration-300 animate-bounce"
+              className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold px-12 py-4 text-xl shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:scale-105"
+              style={{
+                animation: 'bounce 1s infinite, glow 2s infinite alternate'
+              }}
             >
-              <ShoppingCart className="mr-3 h-6 w-6" />
-              🚀 Finalizar Compra
-              <ArrowRight className="ml-3 h-6 w-6" />
+              <ShoppingCart className="mr-4 h-7 w-7 animate-pulse" />
+              🚀 FINALIZAR COMPRA AGORA! 💫
+              <ArrowRight className="ml-4 h-7 w-7 animate-pulse" />
             </Button>
+            
+            <p className="text-green-600 text-sm mt-3 font-medium animate-pulse">
+              ⚡ Processo seguro e rápido • 🔒 Pagamento protegido
+            </p>
           </div>
         </div>
       )}
