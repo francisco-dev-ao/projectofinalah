@@ -131,12 +131,17 @@ const EmailServiceOption = () => {
               <div className="space-y-4 mb-4">
                 {/* Plan Selection */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">Escolha seu plano:</label>
+                  <label className="block text-sm font-medium mb-2 animate-pulse bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    ✨ Escolha seu plano:
+                    <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full animate-bounce">
+                      Clique aqui
+                    </span>
+                  </label>
                   <Select value={selectedPlan.id} onValueChange={(value) => {
                     const plan = emailPlans.find(p => p.id === value);
                     if (plan) setSelectedPlan(plan);
                   }}>
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className="w-full border-2 border-blue-300 hover:border-blue-500 transition-all duration-300 animate-pulse hover:animate-none bg-gradient-to-r from-blue-50 to-purple-50">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-white z-50">
