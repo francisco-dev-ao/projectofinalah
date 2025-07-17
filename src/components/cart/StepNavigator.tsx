@@ -22,6 +22,11 @@ const StepNavigator: React.FC<StepNavigatorProps> = ({ onStepClick, currentStep 
   // Estado para controlar o popup da mágica
   const [showMagicPopup, setShowMagicPopup] = useState(false);
   
+  // Estados para controlar se as notificações já foram mostradas
+  const [emailSuggestionShown, setEmailSuggestionShown] = useState(false);
+  const [protectionSuggestionShown, setProtectionSuggestionShown] = useState(false);
+  const [magicNotificationShown, setMagicNotificationShown] = useState(false);
+  
   const hasItems = cartItems.length > 0;
   const hasDomains = cartItems.some(item => item.type === 'domain');
   const hasProtection = cartItems.some(item => item.type === 'domain_protection');
@@ -32,12 +37,12 @@ const StepNavigator: React.FC<StepNavigatorProps> = ({ onStepClick, currentStep 
   // Check if all steps are complete and ready for checkout
   const isReadyForCheckout = hasItems && isAuthenticated && !needsContactProfile;
   
-  // Auto-guidance for next steps
+  // Auto-guidance for next steps - mostrar apenas uma vez
   useEffect(() => {
     if (!hasItems) return;
     
-    // Auto-suggest email service first for professional presence
-    if (hasItems && !hasEmail) {
+    // Auto-suggest email service first for professional presence - apenas uma vez
+    if (hasItems && !hasEmail && !emailSuggestionShown) {
       setTimeout(() => {
         toast.success("📧 Complete sua presença profissional! Adicione Email Profissional para comunicação empresarial.", {
           duration: 6000,
@@ -53,11 +58,12 @@ const StepNavigator: React.FC<StepNavigatorProps> = ({ onStepClick, currentStep 
             }
           }
         });
+        setEmailSuggestionShown(true);
       }, 2000);
     }
     
-    // Auto-suggest domain protection after adding domains  
-    if (hasDomains && !hasProtection && hasEmail) {
+    // Auto-suggest domain protection after adding domains - apenas uma vez
+    if (hasDomains && !hasProtection && hasEmail && !protectionSuggestionShown) {
       setTimeout(() => {
         toast.success("💎 Proteja seu investimento! Adicione Proteção Total do Domínio para garantir segurança máxima.", {
           duration: 6000,
@@ -73,21 +79,30 @@ const StepNavigator: React.FC<StepNavigatorProps> = ({ onStepClick, currentStep 
             }
           }
         });
+        setProtectionSuggestionShown(true);
       }, 4000);
     }
-  }, [hasItems, hasDomains, hasProtection, hasEmail]);
+  }, [hasItems, hasDomains, hasProtection, hasEmail, emailSuggestionShown, protectionSuggestionShown]);
   
-  // Magic happens when contact profile is confirmed and ready for checkout
+  // Magic happens when contact profile is confirmed and ready for checkout - apenas uma vez
   useEffect(() => {
-    if (isReadyForCheckout) {
+    if (isReadyForCheckout && !magicNotificationShown) {
       setTimeout(() => {
         setShowMagicPopup(true);
-        toast.success("🎉 MÁGICA ACONTECEU! Todas as etapas concluídas com sucesso!", {
-          duration: 8000,
-        });
+        // Remover a notificação toast já que temos o popup
+        setMagicNotificationShown(true);
       }, 1000);
     }
-  }, [isReadyForCheckout]);
+  }, [isReadyForCheckout, magicNotificationShown]);
+
+  // Reset notification states when items are removed
+  useEffect(() => {
+    if (!hasItems) {
+      setEmailSuggestionShown(false);
+      setProtectionSuggestionShown(false);
+      setMagicNotificationShown(false);
+    }
+  }, [hasItems]);
 
   const handleFinalizarCompra = () => {
     setShowMagicPopup(false);
