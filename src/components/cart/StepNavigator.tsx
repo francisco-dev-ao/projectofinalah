@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
-import { CheckCircle, Circle, ArrowRight, Shield, Mail } from "lucide-react";
+import { CheckCircle, Circle, ArrowRight, Shield, Mail, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCheckoutContactProfile } from "@/hooks/useCheckoutContactProfile";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 interface StepNavigatorProps {
@@ -15,6 +16,7 @@ const StepNavigator: React.FC<StepNavigatorProps> = ({ onStepClick, currentStep 
   const { cartItems } = useCart();
   const { isAuthenticated } = useAuth();
   const { isContactProfileRequired, isContactProfileValid } = useCheckoutContactProfile();
+  const navigate = useNavigate();
   
   const hasItems = cartItems.length > 0;
   const hasDomains = cartItems.some(item => item.type === 'domain');
@@ -22,6 +24,9 @@ const StepNavigator: React.FC<StepNavigatorProps> = ({ onStepClick, currentStep 
   const hasEmail = cartItems.some(item => item.type === 'email');
   const needsAuth = !isAuthenticated && hasItems;
   const needsContactProfile = isAuthenticated && isContactProfileRequired && !isContactProfileValid();
+  
+  // Check if all steps are complete and ready for checkout
+  const isReadyForCheckout = hasItems && isAuthenticated && !needsContactProfile;
   
   // Auto-guidance for next steps
   useEffect(() => {
@@ -183,6 +188,31 @@ const StepNavigator: React.FC<StepNavigatorProps> = ({ onStepClick, currentStep 
           >
             {needsAuth ? '🚀 Fazer Login Agora' : '✅ Selecionar Perfil'}
           </Button>
+        </div>
+      )}
+      
+      {/* Finalizar Compra - Appears when everything is ready */}
+      {isReadyForCheckout && (
+        <div className="mt-6 p-6 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-lg animate-pulse">
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <div className="w-3 h-3 bg-green-500 rounded-full animate-ping"></div>
+              <h3 className="text-xl font-bold text-green-900">✅ Tudo Pronto!</h3>
+              <div className="w-3 h-3 bg-green-500 rounded-full animate-ping"></div>
+            </div>
+            <p className="text-green-800 mb-4 font-medium">
+              Todas as etapas foram concluídas. Agora você pode finalizar sua compra com segurança!
+            </p>
+            <Button 
+              onClick={() => navigate('/checkout')}
+              size="lg"
+              className="bg-green-600 hover:bg-green-700 text-white font-bold px-8 py-3 text-lg shadow-lg hover:shadow-xl transition-all duration-300 animate-bounce"
+            >
+              <ShoppingCart className="mr-3 h-6 w-6" />
+              🚀 Finalizar Compra
+              <ArrowRight className="ml-3 h-6 w-6" />
+            </Button>
+          </div>
         </div>
       )}
     </div>
