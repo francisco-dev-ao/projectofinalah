@@ -127,7 +127,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
             ) : (
               <>
                 <span className="group-hover:scale-110 transition-transform duration-300">💳</span>
-                <span className="ml-2">Finalizar Compra</span>
+                <span className="ml-2">Gerar Referencia de Pagamento</span>
               </>
             )}
           </Button>

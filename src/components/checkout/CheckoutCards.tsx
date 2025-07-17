@@ -141,10 +141,7 @@ const CheckoutCards = ({
               ) : (
                 <>
                   <CheckCircle2 className="h-5 w-5 mr-2 group-hover:rotate-12 group-hover:scale-110 transition-all duration-300" />
-                  Finalizar Compra
-                  <div className="ml-2 group-hover:translate-x-1 transition-transform duration-300">
-                    ✨
-                  </div>
+                  Gerar Referencia de Pagamento
                 </>
               )}
             </span>

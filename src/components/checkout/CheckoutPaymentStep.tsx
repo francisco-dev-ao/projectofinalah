@@ -175,10 +175,7 @@ const CheckoutPaymentStep = ({ onPrevStep, onOrderSuccess }: CheckoutPaymentStep
                 ) : (
                   <>
                     <CheckCircle className="mr-2 group-hover:rotate-12 group-hover:scale-110 transition-all duration-300" size={20} />
-                    Finalizar Compra
-                    <div className="ml-2 group-hover:translate-x-1 transition-transform duration-300">
-                      🚀
-                    </div>
+                    Gerar Referencia de Pagamento
                   </>
                 )}
               </span>

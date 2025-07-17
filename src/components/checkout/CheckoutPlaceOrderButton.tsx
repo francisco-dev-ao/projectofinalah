@@ -42,10 +42,7 @@ export function CheckoutPlaceOrderButton({
         ) : (
           <>
             <CheckCircle className="mr-2 group-hover:rotate-12 group-hover:scale-110 transition-all duration-300" size={20} />
-            <span className="relative z-10">Finalizar Compra</span>
-            <div className="ml-2 group-hover:translate-x-1 transition-transform duration-300">
-              💳
-            </div>
+            <span className="relative z-10">Gerar Referencia de Pagamento</span>
           </>
         )}
       </Button>
