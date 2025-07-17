@@ -28,7 +28,7 @@ const EmailPage = lazy(() => import('@/pages/EmailPage'));
 const ExchangePage = lazy(() => import('@/pages/ExchangePage'));
 const SubscriptionPage = lazy(() => import('@/pages/SubscriptionPage'));
 const CartPage = lazy(() => import('@/pages/CartPage'));
-const CheckoutPage = lazy(() => import('@/pages/CheckoutPage'));
+const CheckoutPageWrapper = lazy(() => import('@/components/CheckoutPageWrapper'));
 const OrderSuccess = lazy(() => import('@/pages/OrderSuccess'));
 const OrderFailed = lazy(() => import('@/pages/OrderFailed'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
@@ -48,7 +48,7 @@ export const publicRoutes = (
     <Route path="/email" element={lazyLoad(EmailPage)} />
     <Route path="/exchange" element={lazyLoad(ExchangePage)} />
     <Route path="/cart" element={lazyLoad(CartPage)} />
-    <Route path="/checkout" element={lazyLoad(CheckoutPage)} />
+    <Route path="/checkout" element={lazyLoad(CheckoutPageWrapper)} />
     <Route path="/order-success/:orderId" element={lazyLoad(OrderSuccess)} />
     <Route path="/order-failed" element={lazyLoad(OrderFailed)} />
     <Route path="/order/:id" element={lazyLoad(OrderDetails)} />
