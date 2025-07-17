@@ -78,7 +78,8 @@ const EmailServiceOption = () => {
   // Check if there's at least one domain in cart
   const hasDomainInCart = cartItems.some(item => item.type === 'domain');
   
-  if (!hasDomainInCart) return null;
+  // Don't show if no domain in cart OR if email is already in cart
+  if (!hasDomainInCart || hasEmailInCart) return null;
 
   const calculatePrice = () => {
     return selectedPlan.annualPrice * selectedUsers;
