@@ -60,11 +60,26 @@ const CartItemsSection: React.FC<CartItemsSectionProps> = ({
   };
 
   const handleStepNavigation = (step: string) => {
-    // Here you would implement navigation logic
-    // For now, just scroll to the relevant section
-    const element = document.getElementById(`step-${step}`);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+    if (step === 'protection') {
+      const element = document.getElementById('domain-protection');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+        element.classList.add('animate-pulse');
+        setTimeout(() => element.classList.remove('animate-pulse'), 2000);
+      }
+    } else if (step === 'email') {
+      const element = document.getElementById('email-service');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+        element.classList.add('animate-pulse');
+        setTimeout(() => element.classList.remove('animate-pulse'), 2000);
+      }
+    } else {
+      // Handle other steps
+      const element = document.getElementById(`step-${step}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   };
 
@@ -92,10 +107,14 @@ const CartItemsSection: React.FC<CartItemsSectionProps> = ({
       </div>
       
       {/* Domain Protection Option - Only shown if there are domains */}
-      <DomainProtectionOption />
+      <div id="domain-protection">
+        <DomainProtectionOption />
+      </div>
       
       {/* Email Service Option - Only shown if there are services that need email */}
-      <EmailServiceOption />
+      <div id="email-service">
+        <EmailServiceOption />
+      </div>
       
       {/* Domain selection section - show only when needed */}
       {(needsDomain && !hasDomainInCart) && (
