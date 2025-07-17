@@ -34,8 +34,21 @@ const StepNavigator: React.FC<StepNavigatorProps> = ({ onStepClick, currentStep 
   const needsAuth = !isAuthenticated && hasItems;
   const needsContactProfile = isAuthenticated && isContactProfileRequired && !isContactProfileValid();
   
-  // Check if all steps are complete and ready for checkout
-  const isReadyForCheckout = hasItems && isAuthenticated && !needsContactProfile;
+  // Verificação mais rigorosa - TODAS as condições devem ser atendidas
+  const isReadyForCheckout = hasItems && 
+                           isAuthenticated && 
+                           (!isContactProfileRequired || isContactProfileValid()) &&
+                           cartItems.length > 0; // Garantir que realmente há itens
+  
+  console.log('🔍 Verificação do checkout:', {
+    hasItems,
+    isAuthenticated,
+    isContactProfileRequired,
+    isContactProfileValid: isContactProfileValid(),
+    needsContactProfile,
+    cartItemsCount: cartItems.length,
+    isReadyForCheckout
+  });
   
   // Auto-guidance for next steps - mostrar apenas uma vez
   useEffect(() => {
@@ -84,25 +97,44 @@ const StepNavigator: React.FC<StepNavigatorProps> = ({ onStepClick, currentStep 
     }
   }, [hasItems, hasDomains, hasProtection, hasEmail, emailSuggestionShown, protectionSuggestionShown]);
   
-  // Magic happens when contact profile is confirmed and ready for checkout - apenas uma vez
+  // Magic happens ONLY when ALL requirements are truly met
   useEffect(() => {
-    if (isReadyForCheckout && !magicNotificationShown) {
+    // Verificação extra rigorosa antes de mostrar o popup
+    const allConditionsMet = hasItems && 
+                           cartItems.length > 0 && 
+                           isAuthenticated && 
+                           (!isContactProfileRequired || (isContactProfileRequired && isContactProfileValid())) &&
+                           !magicNotificationShown;
+    
+    console.log('🎉 Verificando se pode mostrar a mágica:', {
+      allConditionsMet,
+      hasItems,
+      cartItemsLength: cartItems.length,
+      isAuthenticated,
+      isContactProfileRequired,
+      isContactProfileValidResult: isContactProfileValid(),
+      magicNotificationShown
+    });
+    
+    if (allConditionsMet) {
       setTimeout(() => {
         setShowMagicPopup(true);
-        // Remover a notificação toast já que temos o popup
         setMagicNotificationShown(true);
+        console.log('✨ MÁGICA ATIVADA! Popup sendo exibido.');
       }, 1000);
     }
-  }, [isReadyForCheckout, magicNotificationShown]);
+  }, [hasItems, cartItems.length, isAuthenticated, isContactProfileRequired, isContactProfileValid, magicNotificationShown]);
 
-  // Reset notification states when items are removed
+  // Reset notification states when conditions change
   useEffect(() => {
-    if (!hasItems) {
+    if (!hasItems || !isAuthenticated) {
       setEmailSuggestionShown(false);
       setProtectionSuggestionShown(false);
       setMagicNotificationShown(false);
+      setShowMagicPopup(false); // Fechar o popup se as condições mudarem
+      console.log('🔄 Resetando estados - condições não atendidas');
     }
-  }, [hasItems]);
+  }, [hasItems, isAuthenticated]);
 
   const handleFinalizarCompra = () => {
     setShowMagicPopup(false);
