@@ -78,10 +78,10 @@ const ContactProfileForm = ({ onSubmit, onCancel, initialData, isEdit = false }:
 
   const handleValidateNIF = async () => {
     const nif = form.getValues('nif');
-    const companyName = await validateNIFField(nif);
-    if (companyName) {
-      form.setValue('name', companyName);
-      form.setValue('domainOwnerName', companyName);
+    const companyInfo = await validateNIFField(nif);
+    if (companyInfo && typeof companyInfo === 'object' && 'name' in companyInfo) {
+      form.setValue('name', companyInfo.name);
+      form.setValue('domainOwnerName', companyInfo.name);
     }
   };
 

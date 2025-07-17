@@ -33,7 +33,7 @@ const SharedInvoiceView = () => {
   }, [token, isInitialized, isInitializing]);
 
   const fetchInvoiceDetails = async () => {
-    if (!token) return;
+    if (!token || token === ':token') return;
     
     try {
       setLoading(true);
