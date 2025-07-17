@@ -12,9 +12,10 @@ const emailPlans = [
     name: "E-mail Premium",
     description: "Recursos essenciais para pequenas empresas",
     type: 'email' as const,
-    price: 1400, // KZ 1.400,00/mês  
-    period: 'mês',
-    renewalPrice: 1600,
+    monthlyPrice: 1000,
+    annualPrice: 12000,
+    period: 'ano',
+    renewalPrice: 14500,
     features: [
       "Domínio Personalizado",
       "Anti-spam e Anti-vírus", 
@@ -22,16 +23,17 @@ const emailPlans = [
       "5GB de espaço",
       "Suporte por email"
     ],
-    maxUsers: 5
+    maxUsers: 10
   },
   {
     id: "email-business", 
     name: "Avançado Pro",
     description: "Soluções completas para empresas em crescimento",
     type: 'email' as const,
-    price: 3333, // KZ 3.333,00/mês
-    period: 'mês',
-    renewalPrice: 3500,
+    monthlyPrice: 3333,
+    annualPrice: 40000,
+    period: 'ano',
+    renewalPrice: 42000,
     recommended: true,
     features: [
       "50GB por usuário",
@@ -49,9 +51,10 @@ const emailPlans = [
     name: "Business", 
     description: "Recursos avançados para grandes empresas",
     type: 'email' as const,
-    price: 2500, // KZ 2.500,00/mês
-    period: 'mês', 
-    renewalPrice: 2700,
+    monthlyPrice: 2500,
+    annualPrice: 30000,
+    period: 'ano', 
+    renewalPrice: 32000,
     features: [
       "30GB por usuário",
       "Preço por número de usuário",
@@ -78,7 +81,7 @@ const EmailServiceOption = () => {
   if (!hasDomainInCart) return null;
 
   const calculatePrice = () => {
-    return selectedPlan.price * selectedUsers;
+    return selectedPlan.annualPrice * selectedUsers;
   };
 
   const handleToggleEmail = () => {
@@ -95,7 +98,7 @@ const EmailServiceOption = () => {
         quantity: 1,
         metadata: {
           users: selectedUsers,
-          originalPrice: selectedPlan.price
+          originalPrice: selectedPlan.annualPrice
         }
       };
       addItem(emailService, 1);
@@ -146,7 +149,7 @@ const EmailServiceOption = () => {
                                 Recomendado
                               </span>
                             )}
-                            <span className="text-gray-500">- {formatPrice(plan.price)}/{plan.period}</span>
+                            <span className="text-gray-500">- {formatPrice(plan.annualPrice)}/{plan.period}</span>
                           </div>
                         </SelectItem>
                       ))}
@@ -167,7 +170,7 @@ const EmailServiceOption = () => {
                           <div className="flex items-center gap-2">
                             <Users className="h-4 w-4" />
                             <span>{num} usuário{num > 1 ? 's' : ''}</span>
-                            <span className="text-gray-500">- {formatPrice(selectedPlan.price * num)}/{selectedPlan.period}</span>
+                            <span className="text-gray-500">- {formatPrice(selectedPlan.annualPrice * num)}/{selectedPlan.period}</span>
                           </div>
                         </SelectItem>
                       ))}
